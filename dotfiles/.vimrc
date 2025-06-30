@@ -162,9 +162,9 @@ colorscheme dracula
 "autocmd FileType markdown set background=light 
 "\| colorscheme solarized
 
-" Escape insert mode by typing jj or kk quickly
-inoremap jj <Esc>
-inoremap kk <Esc>
+" Escape insert mode by typing jk or kj quickly
+inoremap jk <Esc>
+inoremap kj <Esc>
 
 " Moving through wrapped lines
 nnoremap <silent> k gk
