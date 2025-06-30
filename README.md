@@ -1,4 +1,4 @@
-# Ubuntu_setup_scripts
+# dotfiles
 These are the scripts I use to set up my Ubuntu. They install tools for Web development and ML and work with Ubuntu 18.04, 20.04 and WSL2 Ubuntu. Some portions are untested.
 These scripts are largely inspired by https://github.com/rsnk96/Ubuntu-Setup-Scripts. Some of the code is taken directly from there. 
 For a list of useful commands and tips, check out [help](Help.md)
@@ -25,9 +25,31 @@ Programming languages, useful dev tools
 OUT OF DATE
 GUI programs I use frequently use. A number of repositories are added. Installs a IDE of your choice (Sublime/Atom/VS Code).
 
-## Setting up SimpleScreenRecorder:
-* Add to startup applications:  simplescreenrecorder --start-hidden
-* Configure SSR as below
+## Guides
+### Add a quake mode shortcut to windows terminal
+Add this to your actions section of windows terminal settings json file (Ctrl+Shift+,)
+```json
+{
+    "command": 
+    {
+        "action": "globalSummon",
+        "desktop": "toCurrent",
+        "monitor": "any",
+        "toggleVisibility": true
+    },
+    "id": "User.globalSummon",
+    "keys": "win+esc"
+},
+```
+### Keep reconnecting to an ssh instance
+Use this command to auto reconnect to ssh instance whenever the connection is broken.
 
- ![Page 1 of setup](config_files/ssr_1.png?raw=true "Screenshot 1")
- ![Page 2 of setup](config_files/ssr_2.png?raw=true "Screenshot 2")
+```bash
+autossh -M 20000 SSH_CONFIG_NAME -t 'tmux has-session -t General 2>/dev/null && tmux attach -t General || tmux'
+```
+
+You can kill this automatic reconnection using:
+
+```bash
+pkill -f "autossh.*SSH_CONFIG_NAME"
+```

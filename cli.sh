@@ -11,8 +11,9 @@ trap 'cleanup ${LINENO} $?' EXIT
 # Detect if running as root
 if [ "$EUID" -eq 0 ]; then
     ROOT_MODE=true
-    HOME="/root"
-    log "INFO" "Running in root mode. Home directory set to /root"
+    read -p "Enter root home directory: [default: $HOME]" ROOT_HOME
+    HOME="${ROOT_HOME:-$HOME}"
+    log "INFO" "Running in root mode. Home directory set to $HOME"
 else
     ROOT_MODE=false
 fi
@@ -53,6 +54,24 @@ fi
 log "INFO" "Currently logged in GitHub accounts:"
 gh auth status 2>/dev/null || echo "Not logged in to any GitHub accounts"
 read -p "Would you like to login to GitHub? [y/n] " GH_LOGIN
+
+# Determine installation method preference
+if [[ $HAS_SUDO = y ]]; then
+    log "INFO" "You have sudo access. You can install certain tools from package repositories (faster) or from git (more up to date)."
+    read -p "Install tools from package repositories? [y/n] (y=packages, n=source) " INSTALL_FROM_PACKAGES
+    INSTALL_FROM_PACKAGES=${INSTALL_FROM_PACKAGES:-y}
+else
+    log "INFO" "No sudo access or running in root mode. Installing tools from source (git)."
+    INSTALL_FROM_PACKAGES="n"
+fi
+
+# Ask if zsh should be set as default shell
+read -p "Set zsh as default shell? [y/n] " SET_ZSH_DEFAULT
+SET_ZSH_DEFAULT=${SET_ZSH_DEFAULT:-n}
+
+# Ask if tmux configuration should be copied
+read -p "Copy tmux configuration? Not recommended, lot of defaults changed. [y/n] " COPY_TMUX_CONFIG
+COPY_TMUX_CONFIG=${COPY_TMUX_CONFIG:-n}
 
 show_progress "Creating local bin directory"
 mkdir -p "$HOME/.local/bin"
@@ -95,9 +114,9 @@ if [[ $HAS_SUDO = y ]]; then
     finish_progress
 
     show_progress "Setting up GitHub CLI keyring"
-    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | run_command dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
     run_command chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | run_command tee /etc/apt/sources.list.d/github-cli.list > /dev/null
     finish_progress
     run_command apt-get install gh -y
 
@@ -125,10 +144,14 @@ if [[ $REPLACE_DOTFILES = y ]]; then
     dotfiles=(
         ".aliases"
         ".env_vars"
-        ".tmux.conf"
         ".vimrc"
         ".p10k.zsh"
     )
+    
+    # Add tmux configuration only if user allows it
+    if [[ $COPY_TMUX_CONFIG = y ]]; then
+        dotfiles+=(".tmux.conf")
+    fi
 
     for dotfile in "${dotfiles[@]}"; do
         install_dotfile "./dotfiles/$dotfile" "$HOME/$dotfile" "$SOFT_LINK_DOTFILES"
@@ -159,13 +182,30 @@ if [ -x "$(command -v zsh)"  ]; then
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
         
         # Change default shell to zsh: cannot be done safely on root
-        if [ "$SHELL" != "$(which zsh)" ]; then
+        if [ "$SHELL" != "$(which zsh)" ] && [[ $SET_ZSH_DEFAULT = y ]]; then
             log "INFO" "Changing default shell to zsh"
             if [ "$ROOT_MODE" != "true" ]; then
-                sudo chsh -s "$(which zsh)" "$(whoami)"
+                run_command chsh -s "$(which zsh)" "$(whoami)"
                 log "INFO" "Shell changed to zsh. Changes will take effect after logout."
             else
-                log "WARN" "Running as root. Shell change skipped for safety."
+                log "WARN" "Adding zsh auto-start to bashrc for root users."
+                # Add zsh auto-start to bashrc for root users
+                if [ -f "$HOME/.bashrc" ]; then
+                    # Check if the configuration is already present
+                    if ! grep -q "ZSH_STARTED" "$HOME/.bashrc"; then
+                        echo "" >> "$HOME/.bashrc"
+                        echo "# Auto-start zsh for root users (safer than chsh)" >> "$HOME/.bashrc"
+                        echo 'if [ -t 1 ] && [ "$SHELL" != "$(which zsh)" ] && [ -z "$ZSH_STARTED" ]; then' >> "$HOME/.bashrc"
+                        echo '    export ZSH_STARTED=1' >> "$HOME/.bashrc"
+                        echo '    exec zsh' >> "$HOME/.bashrc"
+                        echo 'fi' >> "$HOME/.bashrc"
+                        log "INFO" "Added zsh auto-start configuration to $HOME/.bashrc"
+                    else
+                        log "INFO" "Zsh auto-start configuration already present in $HOME/.bashrc"
+                    fi
+                else
+                    log "WARN" "No .bashrc found for root user"
+                fi
             fi
         fi
 
@@ -234,7 +274,7 @@ fi
 
 # ZOXIDE: directory navigation tool - https://github.com/ajeetdsouza/zoxide
 show_progress "Installing Zoxide"
-if [[ $HAS_SUDO = y ]]; then
+if [[ $INSTALL_FROM_PACKAGES = y ]]; then
     run_command apt-get install zoxide -y
 else
     wget https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.6/zoxide_0.9.6-1_amd64.deb -O /tmp/zoxide.deb && dpkg -i /tmp/zoxide.deb
@@ -243,7 +283,7 @@ finish_progress
 
 # BAT: better cat - https://github.com/sharkdp/bat
 show_progress "Installing BAT"
-if [[ $HAS_SUDO = y ]]; then
+if [[ $INSTALL_FROM_PACKAGES = y ]]; then
     run_command apt-get install bat -y
     mkdir -p "$HOME/.local/bin"
     ln -sf /usr/bin/batcat "$HOME/.local/bin/bat"
@@ -256,7 +296,7 @@ finish_progress
 
 # FD: simple find clone - https://github.com/sharkdp/fd
 show_progress "Installing FD"
-if [[ $HAS_SUDO = y ]]; then
+if [[ $INSTALL_FROM_PACKAGES = y ]]; then
     run_command apt-get install fd-find -y
     ln -sf "$(which fdfind)" "$HOME/.local/bin/fd"
 else
@@ -268,7 +308,7 @@ finish_progress
 
 # RIPGREP: faster grep - https://github.com/BurntSushi/ripgrep
 show_progress "Installing Ripgrep"
-if [[ $HAS_SUDO = y ]]; then
+if [[ $INSTALL_FROM_PACKAGES = y ]]; then
     url=$(wget "https://api.github.com/repos/BurntSushi/ripgrep/releases/latest" -qO-| grep browser_download_url | grep "deb" | head -n 1 | cut -d \" -f 4)
     wget "$url" -qO /tmp/rg.deb
     run_command dpkg -i /tmp/rg.deb
@@ -306,7 +346,7 @@ if [[ $HAS_SUDO = y ]]; then
 fi
 
 # WSLVIEW: wsl utilities - https://github.com/wslutilities/wslu
-if is_wsl; then
+if is_wsl && [[ $HAS_SUDO = y ]]; then
     show_progress "Installing WSLU"
     run_command apt-get install wslu -y
     finish_progress

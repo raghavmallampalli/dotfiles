@@ -35,3 +35,6 @@ cmd on-cd &{{
 # Bindings
 map c $code "$f"
 map <f-2> $printf '%s\n' "$fx" | vidir -
+map R !realpath "$f"
+map <enter> $"$EDITOR" "$f"
+map x delete
