@@ -31,6 +31,7 @@ read -p "Install nvm? [y/n] " install_nvm
 read -p "Install Julia? [y/n] " install_julia
 read -p "Install R? [y/n]: " install_r
 read -p "Install GNU octave? [y/n]: " install_octave
+read -p "Install Docker? [y/n]: " install_docker
 
 # UV installation: https://docs.astral.sh/uv/getting-started/installation/#installation-methods
 if [[ $install_uv = y ]]; then
@@ -90,6 +91,35 @@ fi
 
 if [[ $install_octave = y ]]; then
     run_command apt-get install octave -y
+fi
+
+# Docker installation (only on non-WSL systems)
+if [[ $install_docker = y ]]; then
+    if is_wsl; then
+        log "WARN" "Docker Desktop installation skipped - running in WSL environment"
+    else
+        show_progress "Installing Docker Desktop"
+        
+        # Add Docker's official GPG key
+        run_command apt-get update
+        run_command apt-get install ca-certificates curl -y
+        run_command install -m 0755 -d /etc/apt/keyrings
+        run_command curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+        run_command chmod a+r /etc/apt/keyrings/docker.asc
+
+        # Add the repository to Apt sources
+        echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+          $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+          run_command tee /etc/apt/sources.list.d/docker.list > /dev/null
+        run_command apt-get update
+
+        # Download and install Docker Desktop
+        wget -O /tmp/docker-desktop-amd64.deb https://desktop.docker.com/linux/main/amd64/docker-desktop-amd64.deb
+        run_command dpkg -i /tmp/docker-desktop-amd64.deb
+        
+        finish_progress
+    fi
 fi
 
 log "INFO" "Installation complete."
