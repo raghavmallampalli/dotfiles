@@ -1,5 +1,6 @@
 # dotfiles
-These are the scripts I use to set up my Ubuntu. They install tools for Web development and ML and work with Ubuntu 18.04, 20.04 and WSL2 Ubuntu. Some portions are untested.
+These are the scripts I use to set up my Ubuntu. They install tools for Web development and ML and work with Ubuntu 18.04, 20.04, 22.04 and WSL2 Ubuntu.
+
 These scripts are largely inspired by https://github.com/rsnk96/Ubuntu-Setup-Scripts. Some of the code is taken directly from there. 
 For a list of useful commands and tips, check out [help](Help.md)
 
@@ -10,6 +11,19 @@ git clone https://github.com/raghavmallampalli/Ubuntu_setup_scripts.git
 
 ```bash
 git remote set-url origin git@github.com:raghavmallampalli/Ubuntu_setup_scripts.git
+```
+
+## Testing on a docker
+If you want to test this setup on a docker, a sample dockerfile is provided. 
+
+### Build the Docker image:
+```bash
+docker build -t dotfiles-test .
+```
+
+### Run the container:
+```bash
+docker run -it --name dotfiles-test dotfiles-test
 ```
 
 ## Scripts
