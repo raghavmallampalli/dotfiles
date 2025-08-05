@@ -4,6 +4,8 @@ These are the scripts I use to set up my Ubuntu. They install tools for Web deve
 These scripts are largely inspired by https://github.com/rsnk96/Ubuntu-Setup-Scripts. Some of the code is taken directly from there. 
 For a list of useful commands and tips, check out [help](Help.md)
 
+I like to see icons on my terminal. Make sure to install and use a NerdFont for your terminal emulator if you want the icons to show up. I use [FircaCode](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip)
+
 ## Testing on a docker
 If you want to test this setup on a docker, a sample dockerfile is provided. 
 
