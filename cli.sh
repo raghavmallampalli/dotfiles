@@ -8,12 +8,134 @@ source "$(dirname "$0")/common.sh"
 
 trap 'cleanup ${LINENO} $?' EXIT
 
+# Parse command line arguments
+HAS_SUDO=""
+REPLACE_DOTFILES=""
+SOFT_LINK_DOTFILES=""
+SET_LOCAL_TIME=""
+GH_LOGIN=""
+INSTALL_FROM_PACKAGES=""
+SET_ZSH_DEFAULT=""
+COPY_TMUX_CONFIG=""
+
+# Function to show help
+show_help() {
+    echo "Usage: $0 [OPTIONS]"
+    echo "Options:"
+    echo "  -s, --sudo-access <y/n>        Do you have sudo access?"
+    echo "  -r, --replace-dotfiles <y/n>   Replace dotfiles?"
+    echo "  -l, --soft-link <y/n>          Soft link dotfiles? (only if replacing)"
+    echo "  -t, --local-time <y/n>         Set hardware clock to local time?"
+    echo "  -g, --github-login <y/n>       Would you like to login to GitHub?"
+    echo "  -p, --package-install <y/n>    Install tools from package repositories?"
+    echo "  -z, --zsh-default <y/n>        Set zsh as default shell?"
+    echo "  -c, --tmux-config <y/n>        Copy tmux configuration?"
+    echo "  -h, --help                      Show this help message"
+    echo ""
+    echo "If any option is not provided, the script will prompt interactively."
+    exit 0
+}
+
+# Parse options
+while getopts ":-:" opt; do
+    case $opt in
+        -)
+            case "${OPTARG}" in
+                sudo-access)
+                    HAS_SUDO="${!OPTIND}"
+                    OPTIND=$((OPTIND + 1))
+                    ;;
+                replace-dotfiles)
+                    REPLACE_DOTFILES="${!OPTIND}"
+                    OPTIND=$((OPTIND + 1))
+                    ;;
+                soft-link)
+                    SOFT_LINK_DOTFILES="${!OPTIND}"
+                    OPTIND=$((OPTIND + 1))
+                    ;;
+                local-time)
+                    SET_LOCAL_TIME="${!OPTIND}"
+                    OPTIND=$((OPTIND + 1))
+                    ;;
+                github-login)
+                    GH_LOGIN="${!OPTIND}"
+                    OPTIND=$((OPTIND + 1))
+                    ;;
+                package-install)
+                    INSTALL_FROM_PACKAGES="${!OPTIND}"
+                    OPTIND=$((OPTIND + 1))
+                    ;;
+                zsh-default)
+                    SET_ZSH_DEFAULT="${!OPTIND}"
+                    OPTIND=$((OPTIND + 1))
+                    ;;
+                tmux-config)
+                    COPY_TMUX_CONFIG="${!OPTIND}"
+                    OPTIND=$((OPTIND + 1))
+                    ;;
+                help)
+                    show_help
+                    ;;
+                *)
+                    echo "Unknown option: --${OPTARG}"
+                    show_help
+                    ;;
+            esac
+            ;;
+        s)
+            HAS_SUDO="$OPTARG"
+            ;;
+        r)
+            REPLACE_DOTFILES="$OPTARG"
+            ;;
+        l)
+            SOFT_LINK_DOTFILES="$OPTARG"
+            ;;
+        t)
+            SET_LOCAL_TIME="$OPTARG"
+            ;;
+        g)
+            GH_LOGIN="$OPTARG"
+            ;;
+        p)
+            INSTALL_FROM_PACKAGES="$OPTARG"
+            ;;
+        z)
+            SET_ZSH_DEFAULT="$OPTARG"
+            ;;
+        c)
+            COPY_TMUX_CONFIG="$OPTARG"
+            ;;
+        h)
+            show_help
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG"
+            show_help
+            ;;
+    esac
+done
+
+# Check if any CLI arguments were provided
+CLI_ARGS_PROVIDED=false
+if [ $# -gt 0 ]; then
+    CLI_ARGS_PROVIDED=true
+fi
+
 # Detect if running as root
 if [ "$EUID" -eq 0 ]; then
     ROOT_MODE=true
-    read -p "Enter root home directory: [default: $HOME]" ROOT_HOME
-    HOME="${ROOT_HOME:-$HOME}"
-    log "INFO" "Running in root mode. Home directory set to $HOME"
+    # Check if any CLI arguments were provided
+    if [ "$CLI_ARGS_PROVIDED" = true ]; then
+        # Use default root directory when CLI args are detected
+        HOME="$HOME"
+        log "INFO" "Running in root mode with CLI arguments. Using default home directory: $HOME"
+    else
+        # Interactive mode - prompt for root home directory
+        read -p "Enter root home directory: [default: $HOME]" ROOT_HOME
+        HOME="${ROOT_HOME:-$HOME}"
+        log "INFO" "Running in root mode. Home directory set to $HOME"
+    fi
 else
     ROOT_MODE=false
 fi
@@ -30,13 +152,18 @@ backup_configs
 
 # Collect all user inputs at the start
 if [ "$ROOT_MODE" = false ]; then
-    read -p "Do you have sudo access? [y/n] " HAS_SUDO
+    if [ -z "$HAS_SUDO" ]; then
+        read -p "Do you have sudo access? [y/n] " HAS_SUDO
+    fi
 else
     HAS_SUDO="y"
 fi
 
-read -p "Replace dotfiles? Read script to see which files will be replaced. [y/n] " REPLACE_DOTFILES
-if [[ $REPLACE_DOTFILES = y ]]; then
+if [ -z "$REPLACE_DOTFILES" ]; then
+    read -p "Replace dotfiles? Read script to see which files will be replaced. [y/n] " REPLACE_DOTFILES
+fi
+
+if [[ $REPLACE_DOTFILES = y ]] && [ -z "$SOFT_LINK_DOTFILES" ]; then
     log "INFO" "Dotfiles can be copied if you do not intend to make further edits, or soft linked if you wish to keep them up to date."
     log "WARN" "If you soft link, moving or deleting this repo folder will break the links."
     read -p "Soft link dotfiles? [y/n] " SOFT_LINK_DOTFILES
@@ -45,7 +172,9 @@ fi
 
 # Check if we can set local time (not WSL)
 if ! is_wsl; then
-    read -p "Set hardware clock to local time? [y/n] " SET_LOCAL_TIME
+    if [ -z "$SET_LOCAL_TIME" ]; then
+        read -p "Set hardware clock to local time? [y/n] " SET_LOCAL_TIME
+    fi
 else
     SET_LOCAL_TIME="n"
 fi
@@ -53,25 +182,33 @@ fi
 # This will work even if gh is not installed, will just print the not logged in message
 log "INFO" "Currently logged in GitHub accounts:"
 gh auth status 2>/dev/null || echo "Not logged in to any GitHub accounts"
-read -p "Would you like to login to GitHub? [y/n] " GH_LOGIN
+if [ -z "$GH_LOGIN" ]; then
+    read -p "Would you like to login to GitHub? [y/n] " GH_LOGIN
+fi
 
 # Determine installation method preference
 if [[ $HAS_SUDO = y ]]; then
-    log "INFO" "You have sudo access. You can install certain tools from package repositories (faster) or from git (more up to date)."
-    read -p "Install tools from package repositories? [y/n] (y=packages, n=source) " INSTALL_FROM_PACKAGES
-    INSTALL_FROM_PACKAGES=${INSTALL_FROM_PACKAGES:-y}
+    if [ -z "$INSTALL_FROM_PACKAGES" ]; then
+        log "INFO" "You have sudo access. You can install certain tools from package repositories (faster) or from git (more up to date)."
+        read -p "Install tools from package repositories? [y/n] (y=packages, n=source) " INSTALL_FROM_PACKAGES
+        INSTALL_FROM_PACKAGES=${INSTALL_FROM_PACKAGES:-y}
+    fi
 else
     log "INFO" "No sudo access or running in root mode. Installing tools from source (git)."
     INSTALL_FROM_PACKAGES="n"
 fi
 
 # Ask if zsh should be set as default shell
-read -p "Set zsh as default shell? [y/n] " SET_ZSH_DEFAULT
-SET_ZSH_DEFAULT=${SET_ZSH_DEFAULT:-n}
+if [ -z "$SET_ZSH_DEFAULT" ]; then
+    read -p "Set zsh as default shell? [y/n] " SET_ZSH_DEFAULT
+    SET_ZSH_DEFAULT=${SET_ZSH_DEFAULT:-n}
+fi
 
 # Ask if tmux configuration should be copied
-read -p "Copy tmux configuration? Not recommended, lot of defaults changed. [y/n] " COPY_TMUX_CONFIG
-COPY_TMUX_CONFIG=${COPY_TMUX_CONFIG:-n}
+if [ -z "$COPY_TMUX_CONFIG" ]; then
+    read -p "Copy tmux configuration? Not recommended, lot of defaults changed. [y/n] " COPY_TMUX_CONFIG
+    COPY_TMUX_CONFIG=${COPY_TMUX_CONFIG:-n}
+fi
 
 show_progress "Creating local bin directory"
 mkdir -p "$HOME/.local/bin"
