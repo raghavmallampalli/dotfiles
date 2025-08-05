@@ -258,9 +258,8 @@ if [[ $HAS_SUDO = y ]]; then
     run_command apt-get install gh -y
 
     show_progress "Installing development tools"
-    run_command apt-get update -y
     run_command apt-get install build-essential g++ cmake cmake-curses-gui pkg-config checkinstall automake -y
-    run_command apt-get install xclip jq -y
+    run_command apt-get install xclip jq autossh -y
     run_command apt-get install htop nvtop -y
     run_command apt-get install fonts-powerline aria2 -y
     run_command apt-get install moreutils -y
