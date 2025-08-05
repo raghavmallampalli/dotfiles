@@ -1,4 +1,4 @@
-Ubuntu_setup_scripts.code-workspace
 *.swp
 .history/
 config_files/zshrc.local
+*.log
