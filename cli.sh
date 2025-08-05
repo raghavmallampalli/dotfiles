@@ -345,7 +345,6 @@ if [ -x "$(command -v zsh)"  ]; then
             fi
         fi
 
-        echo "source \$HOME/.zshrc.common" | cat - "$HOME/.zshrc" > temp && mv temp "$HOME/.zshrc"
         log "INFO" "Installed Oh-My-Zsh."
 
         show_progress "Installing ZSH plugins"
