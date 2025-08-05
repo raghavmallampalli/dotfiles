@@ -402,7 +402,7 @@ if ! command -v fzf >/dev/null 2>&1; then
         execute git clone --quiet --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
     fi
     # Install with all features and do not update shell configs
-    execute "$HOME/.fzf/install" --all --no-update-rc
+    execute "$HOME/.fzf/install" --all
     # Download git integration script
     wget https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh -qO "$HOME/.fzf-git.sh"
     finish_progress
