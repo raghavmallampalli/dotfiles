@@ -4,15 +4,6 @@ These are the scripts I use to set up my Ubuntu. They install tools for Web deve
 These scripts are largely inspired by https://github.com/rsnk96/Ubuntu-Setup-Scripts. Some of the code is taken directly from there. 
 For a list of useful commands and tips, check out [help](Help.md)
 
-You can clone this repo using HTTPS, and afterward run a modification of this command to switch the remote to ssh authentication
-```bash
-git clone https://github.com/raghavmallampalli/Ubuntu_setup_scripts.git
-```
-
-```bash
-git remote set-url origin git@github.com:raghavmallampalli/Ubuntu_setup_scripts.git
-```
-
 ## Testing on a docker
 If you want to test this setup on a docker, a sample dockerfile is provided. 
 
@@ -30,10 +21,10 @@ docker run -it --name dotfiles-test dotfiles-test
 ### cli
 Basic setup of Ubuntu. It installs some essential packages and their dependencies. It also installs some useful command line utilites.
 
-IMPORTANT: Bash shell is replaced by a zsh+Oh-My-Zsh configuration.
+> IMPORTANT: `bash` shell is replaced by a `zsh+Oh-My-Zsh` configuration.
 
 ### dev
-Programming languages, useful dev tools
+Programming languages, virtual environments, useful dev tools
 
 ### gui
 OUT OF DATE
@@ -66,4 +57,10 @@ You can kill this automatic reconnection using:
 
 ```bash
 pkill -f "autossh.*SSH_CONFIG_NAME"
+```
+
+### Switching the remote to SSH authentication
+
+```bash
+git remote set-url origin git@github.com:raghavmallampalli/dotfiles.git
 ```
