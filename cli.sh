@@ -387,7 +387,6 @@ if [[ $HAS_SUDO = y ]]; then
         mkdir -p "$HOME/.tmux/plugins"
         git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
     fi
-    log "INFO" "Press Ctrl+A I (capital I) on first run of tmux to install plugins."
     finish_progress
 fi
 
@@ -494,3 +493,7 @@ if ! is_wsl; then
 fi
 
 log "INFO" "Installation completed. Restart and install other scripts."
+
+if [[ $COPY_TMUX_CONFIG = y ]]; then
+    log "WARN" "Press Ctrl+A I (capital I) on first run of tmux to install plugins."
+fi
