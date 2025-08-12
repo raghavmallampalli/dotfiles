@@ -18,8 +18,8 @@ CODEC="264"
 # **General Use / Sharing**          | 24 - 28         | 26 - 30       | Recommended for everyday use, such as sharing videos with friends or uploading to social media. The default CRF of 28 falls within this range and provides a good compromise between quality and file size for most situations. |
 # **Low Quality / High Compression** | 28 - 32         | 30 - 34       | Use this range when file size is the primary concern and some loss of quality is acceptable. This is suitable for situations where bandwidth or storage is very limited.                                                    |
 # A change of ±6 roughly doubles/halves the bitrate.
-# 28 in 264 is about same quality as 22 in 265
-CRF_VALUE=28
+# 23 in 264 is about same quality as 28 in 265
+CRF_VALUE=23
 
 
 # Preset affects encoding speed vs. compression efficiency.
