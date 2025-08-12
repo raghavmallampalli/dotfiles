@@ -70,12 +70,6 @@ if [ "$CODEC" != "264" ] && [ "$CODEC" != "265" ]; then
     exit 1
 fi
 
-# Set appropriate default CRF based on codec if user didn't specify
-if [ "$CODEC" = "265" ] && [ "$CRF_VALUE" = "28" ]; then
-    CRF_VALUE=22
-    echo "Note: Using CRF 22 for H.265 (equivalent quality to CRF 28 in H.264)"
-fi
-
 # Check if there are any MP4 files in the specified path
 if ! ls "$INPUT_PATH"/*.mp4 >/dev/null 2>&1; then
     echo "Error: No MP4 files found in '$INPUT_PATH'"
