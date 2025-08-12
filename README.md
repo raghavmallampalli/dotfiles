@@ -19,7 +19,7 @@ docker build -t dotfiles-test .
 docker run -it --name dotfiles-test dotfiles-test
 ```
 
-## Scripts
+## Setup scripts
 ### cli
 Basic setup of Ubuntu. It installs some essential packages and their dependencies. It also installs some useful command line utilites.
 
@@ -66,3 +66,7 @@ pkill -f "autossh.*SSH_CONFIG_NAME"
 ```bash
 git remote set-url origin git@github.com:raghavmallampalli/dotfiles.git
 ```
+
+# One off scripts
+Functionality that I tend to reuse.
+eg. video encoding
