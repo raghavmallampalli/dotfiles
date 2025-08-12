@@ -7,23 +7,27 @@ if [ -f ~/.env_vars ]; then
   source ~/.env_vars
 fi
 
+# If set to true, tmux will auto-attach to a session if not already in one
+export TMUX_AUTO_ATTACH=false
+export SHELL="$(command -v zsh)"
 ########################### ATTACH TO TMUX SESSION ###########################
-
-SESSION_NAME="General"
-# Auto-attach to tmux session if not already in one
-# Skip special terminals (like VS code integrated)
-if [[ -z ${TERM_PROGRAM} && -z ${TMUX} ]]; then
-	# Check if session exists and is not attached
-	if tmux ls 2>/dev/null | grep -qE "${SESSION_NAME}:.*?attached"; then
-		echo "Session exists and is attached, force attach with ta -t ${SESSION_NAME}"
-	else
-		# If session exists attach to it, otherwise create new session
-		if tmux has-session -t ${SESSION_NAME} 2>/dev/null; then
-			tmux -u attach -t ${SESSION_NAME}
-		else
-			tgex
-		fi
-	fi
+if [[ $TMUX_AUTO_ATTACH = true ]]; then
+  SESSION_NAME="General"
+  # Auto-attach to tmux session if not already in one
+  # Skip special terminals (like VS code integrated)
+  if [[ -z ${TERM_PROGRAM} && -z ${TMUX} ]]; then
+    # Check if session exists and is not attached
+    if tmux ls 2>/dev/null | grep -qE "${SESSION_NAME}:.*?attached"; then
+      echo "Session exists and is attached, force attach with ta -t ${SESSION_NAME}"
+    else
+      # If session exists attach to it, otherwise create new session
+      if tmux has-session -t ${SESSION_NAME} 2>/dev/null; then
+        tmux -u attach -t ${SESSION_NAME}
+      else
+        tgex
+      fi
+    fi
+  fi
 fi
 ######################### POWERLEVEL10K INSTANT PROMPT ###########################
 
@@ -73,6 +77,7 @@ export BAT_PAGER="less -FRX"
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # fzf
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 source <(fzf --zsh)
 [ -f ~/.fzf-git.sh ] && source ~/.fzf-git.sh
-export FZF_DEFAULT_OPTS='--height 40% --tmux center,40%'
+export FZF_DEFAULT_OPTS='--height 40% --tmux bottom,40%' # center,40% # center not supported in all tmuxversions
