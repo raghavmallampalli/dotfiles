@@ -28,44 +28,12 @@ Basic setup of Ubuntu. It installs some essential packages and their dependencie
 ### dev
 Programming languages, virtual environments, useful dev tools
 
+### extras
+Generally useful CLI tools.
+
 ### gui
 OUT OF DATE
 GUI programs I use frequently use. A number of repositories are added. Installs a IDE of your choice (Sublime/Atom/VS Code).
-
-## Guides
-### Add a quake mode shortcut to windows terminal
-Add this to your actions section of windows terminal settings json file (Ctrl+Shift+,)
-```json
-{
-    "command": 
-    {
-        "action": "globalSummon",
-        "desktop": "toCurrent",
-        "monitor": "any",
-        "toggleVisibility": true
-    },
-    "id": "User.globalSummon",
-    "keys": "win+esc"
-},
-```
-### Keep reconnecting to an ssh instance
-Use this command to auto reconnect to ssh instance whenever the connection is broken.
-
-```bash
-autossh -M 20000 SSH_CONFIG_NAME -t 'tmux has-session -t General 2>/dev/null && tmux attach -t General || tmux'
-```
-
-You can kill this automatic reconnection using:
-
-```bash
-pkill -f "autossh.*SSH_CONFIG_NAME"
-```
-
-### Switching the remote to SSH authentication
-
-```bash
-git remote set-url origin git@github.com:raghavmallampalli/dotfiles.git
-```
 
 # One off scripts
 Functionality that I tend to reuse.

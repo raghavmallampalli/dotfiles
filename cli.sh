@@ -469,13 +469,6 @@ if [[ $HAS_SUDO = y ]]; then
     finish_progress
 fi
 
-# FFMPEG
-if [[ $HAS_SUDO = y ]]; then
-    show_progress "Installing FFMPEG and related tools"
-    run_command apt-get install libhdf5-dev exiftool ffmpeg -y
-    finish_progress
-fi
-
 # WSLVIEW: wsl utilities - https://github.com/wslutilities/wslu
 if is_wsl && [[ $HAS_SUDO = y ]]; then
     show_progress "Installing WSLU"
