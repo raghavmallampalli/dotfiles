@@ -311,41 +311,41 @@ if [ -x "$(command -v zsh)"  ]; then
     cp "./dotfiles/.zshrc.common" "$HOME/.zshrc.common"
 
     if [ -d "$HOME/.oh-my-zsh" ]; then
-        log "INFO" "Oh-My-Zsh already installed."
-    else
-        log "INFO" "Setting up Oh-My-Zsh"
-        log "INFO" "Fill in options according to preference and exit zsh once it loads."
-        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-        
-        # Change default shell to zsh: cannot be done safely on root
-        if [ "$SHELL" != "$(which zsh)" ] && [[ $SET_ZSH_DEFAULT = y ]]; then
-            log "INFO" "Changing default shell to zsh"
-            if [ "$ROOT_MODE" != "true" ]; then
-                run_command chsh -s "$(which zsh)" "$(whoami)"
-                log "INFO" "Shell changed to zsh. Changes will take effect after logout."
-            else
-                log "WARN" "Adding zsh auto-start to bashrc for root users."
-                # Add zsh auto-start to bashrc for root users
-                if [ -f "$HOME/.bashrc" ]; then
-                    # Check if the configuration is already present
-                    if ! grep -q "ZSH_STARTED" "$HOME/.bashrc"; then
-                        echo "" >> "$HOME/.bashrc"
-                        echo "# Auto-start zsh for root users (safer than chsh)" >> "$HOME/.bashrc"
-                        echo 'if [ -t 1 ] && [ "$SHELL" != "$(which zsh)" ] && [ -z "$ZSH_STARTED" ]; then' >> "$HOME/.bashrc"
-                        echo '    export ZSH_STARTED=1' >> "$HOME/.bashrc"
-                        echo '    exec zsh' >> "$HOME/.bashrc"
-                        echo 'fi' >> "$HOME/.bashrc"
-                        log "INFO" "Added zsh auto-start configuration to $HOME/.bashrc"
-                    else
-                        log "INFO" "Zsh auto-start configuration already present in $HOME/.bashrc"
-                    fi
+        log "INFO" "Oh-My-Zsh already installed. Removing."
+        execute rm -rf "$HOME/.oh-my-zsh"
+    fi
+    
+    log "INFO" "Setting up Oh-My-Zsh"
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    log "INFO" "Installed Oh-My-Zsh."
+    
+    # Change default shell to zsh
+    if [ "$SHELL" != "$(which zsh)" ] && [[ $SET_ZSH_DEFAULT = y ]]; then
+        log "INFO" "Changing default shell to zsh"
+        if [ "$ROOT_MODE" != "true" ]; then
+            run_command chsh -s "$(which zsh)" "$(whoami)"
+            log "INFO" "Shell changed to zsh. Changes will take effect after logout."
+        else
+            log "WARN" "Adding zsh auto-start to bashrc for root users."
+            # Add zsh auto-start to bashrc for root users
+            if [ -f "$HOME/.bashrc" ]; then
+                # Check if the configuration is already present
+                if ! grep -q "ZSH_STARTED" "$HOME/.bashrc"; then
+                    echo "" >> "$HOME/.bashrc"
+                    echo "# Auto-start zsh for root users (safer than chsh)" >> "$HOME/.bashrc"
+                    echo 'if [ -t 1 ] && [ "$SHELL" != "$(which zsh)" ] && [ -z "$ZSH_STARTED" ]; then' >> "$HOME/.bashrc"
+                    echo '    export ZSH_STARTED=1' >> "$HOME/.bashrc"
+                    echo '    exec zsh' >> "$HOME/.bashrc"
+                    echo 'fi' >> "$HOME/.bashrc"
+                    log "INFO" "Added zsh auto-start configuration to $HOME/.bashrc"
                 else
-                    log "WARN" "No .bashrc found for root user"
+                    log "INFO" "Zsh auto-start configuration already present in $HOME/.bashrc"
                 fi
+            else
+                log "WARN" "No .bashrc found for root user"
             fi
         fi
 
-        log "INFO" "Installed Oh-My-Zsh."
 
         show_progress "Installing ZSH plugins"
         if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" ]; then
@@ -408,11 +408,8 @@ fi
 
 # ZOXIDE: directory navigation tool - https://github.com/ajeetdsouza/zoxide
 show_progress "Installing Zoxide"
-if [[ $INSTALL_FROM_PACKAGES = y ]]; then
-    run_command apt-get install zoxide -y
-else
-    wget https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.6/zoxide_0.9.6-1_amd64.deb -O /tmp/zoxide.deb && dpkg -i /tmp/zoxide.deb
-fi
+run_command apt-get install zoxide -y
+
 finish_progress
 
 # BAT: better cat - https://github.com/sharkdp/bat
