@@ -1,0 +1,112 @@
+#!/bin/zsh
+
+# Intelligent move function that uses mv for same filesystem and rsync for cross-filesystem
+# This script can be run directly or with sudo
+
+imv() {
+    local MOVE_DATA=false
+    local VERBOSE=false
+    
+    # Parse flags
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --copy-links|-L)
+                MOVE_DATA=true
+                shift
+                ;;
+            --verbose|-v)
+                VERBOSE=true
+                shift
+                ;;
+            -*)
+                echo "Unknown option: $1"
+                echo "Usage: imv [--copy-links|-L] [--verbose|-v] <source> <destination>"
+                return 1
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+    
+    # Check if the number of arguments is correct
+    if [ "$#" -ne 2 ]; then
+        echo "Usage: imv [--copy-links|-L] [--verbose|-v] <source> <destination>"
+        echo "  --copy-links, -L: For symlinks and hard links, copy the actual data instead of just the pointer"
+        echo "  --verbose, -v: Show detailed information about the move operation"
+        echo "If your move is interrupted, you can resume it with the same command."
+        return 1
+    fi
+
+    local SOURCE="$1"
+    local DEST="$2"
+
+    # Check if source exists
+    if [ ! -e "$SOURCE" ]; then
+        echo "Error: Source '$SOURCE' does not exist"
+        return 1
+    fi
+
+    # Use 'df' and 'awk' to get the filesystem device for each path.
+    # This method works well for determining if two paths are on the same disk partition.
+    local src_fs=$(df -P "$SOURCE" | awk 'NR==2 {print $1}')
+    local dest_fs=$(df -P "$DEST" | awk 'NR==2 {print $1}')
+
+    # Get the base name of the source file or directory
+    local basename_source=$(basename "$SOURCE")
+
+    # Determine the final destination path
+    local FINAL_DEST="$DEST/$basename_source"
+
+    # Check if the source and destination filesystems are the same
+    if [ "$src_fs" = "$dest_fs" ]; then
+        # If they are on the same filesystem, use 'mv'
+        [ "$VERBOSE" = true ] && echo "Source and destination are on the same filesystem. Using mv for an instant move."
+        mv "$SOURCE" "$DEST"
+        return 0
+    fi
+
+    # Check for other cases where mv would be instant even across filesystems
+    if [ -L "$SOURCE" ]; then
+        # Symlinks - mv just moves the link, rsync might copy the target
+        if [ "$MOVE_DATA" = true ]; then
+            [ "$VERBOSE" = true ] && echo "Source is a symlink and --copy-links flag is set. Using rsync to move the actual data."
+            rsync -a --remove-source-files --info=progress2 --compress --partial --inplace "$SOURCE" "$DEST"
+        else
+            [ "$VERBOSE" = true ] && echo "Source is a symlink. Using mv for an instant move of the link."
+            mv "$SOURCE" "$DEST"
+        fi
+        return 0
+    fi
+
+    if [ -d "$SOURCE" ]; then
+        # Check if directory is empty
+        if [ -z "$(ls -A "$SOURCE" 2>/dev/null)" ]; then
+            [ "$VERBOSE" = true ] && echo "Source is an empty directory. Using mv for an instant move."
+            mv "$SOURCE" "$DEST"
+            return 0
+        fi
+    fi
+
+    # For regular files, check if it's a hard link (multiple names for same file)
+    if [ -f "$SOURCE" ]; then
+        local link_count=$(stat -c %h "$SOURCE" 2>/dev/null || stat -f %l "$SOURCE" 2>/dev/null)
+        if [ "$link_count" -gt 1 ]; then
+            if [ "$MOVE_DATA" = true ]; then
+                [ "$VERBOSE" = true ] && echo "Source has multiple hard links and --copy-links flag is set. Using rsync to move the actual data."
+                rsync -a --remove-source-files --info=progress2 "$SOURCE" "$DEST"
+            else
+                [ "$VERBOSE" = true ] && echo "Source has multiple hard links. Using mv for an instant move of the link."
+                mv "$SOURCE" "$DEST"
+            fi
+            return 0
+        fi
+    fi
+
+    # If none of the above, use rsync to move
+    [ "$VERBOSE" = true ] && echo "Source and destination are on different filesystems. Using rsync for a move with progress."
+    rsync -a --remove-source-files --info=progress2 "$SOURCE" "$DEST"
+}
+
+# Execute the function with all arguments
+imv "$@"
