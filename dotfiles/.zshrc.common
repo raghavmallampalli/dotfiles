@@ -56,6 +56,11 @@ cl () {
     fi
 }
 
+
+icp() {
+    rsync --archive --verbose --compress --progress "$@"
+}
+
 bindkey -v
 setopt nonomatch # allows globbing (name* matching in apt, ls etc.), use with caution
 [[ -a /etc/zsh_command_not_found ]] && . /etc/zsh_command_not_found
