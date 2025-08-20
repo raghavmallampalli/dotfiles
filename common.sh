@@ -24,13 +24,13 @@ show_progress() {
 }
 
 finish_progress() {
-    status=$?
-    if [ $status -eq 0 ]; then
+    exit_status=$?
+    if [ $exit_status -eq 0 ]; then
         echo " Done"
     else
         echo " Failed"
     fi
-    return $status
+    return $exit_status
 }
 
 # Cleanup function
@@ -96,6 +96,16 @@ backup_and_delete() {
             log "ERROR" "Failed to remove symlink $file"
             return 4
         }
+    elif [ "$(stat -c %h "$file")" -gt 1 ]; then
+        log "INFO" "$file is a hard link"
+        cp -L "$file" "$backup_path" || {
+            log "ERROR" "Failed to backup hard link $file"
+            return 3
+        }
+        unlink "$file" || {
+            log "ERROR" "Failed to unlink hard link $file"
+            return 4
+        }
     else
         cp -L "$file" "$backup_path" || {
             log "ERROR" "Failed to backup $file"
@@ -110,14 +120,16 @@ backup_and_delete() {
 }
 
 # Improved dotfile installation
+# Default behavior: Try hard link first, fall back to soft link if hard link fails
+# This handles cross-filesystem scenarios automatically
 install_dotfile() {
     src="$1"
     dest="$2"
-    soft_link="${3:-false}"
-    if [ "$soft_link" = "true" ]; then
-        soft_link=true
+    link="${3:-false}"
+    if [ "$link" = "true" ]; then
+        link=true
     else
-        soft_link=false
+        link=false
     fi
 
     show_progress "Installing $(basename "$src")"
@@ -129,10 +141,26 @@ install_dotfile() {
 
     backup_and_delete "$dest"
 
-    if [ "$soft_link" = "true" ]; then
+    if [ "$link" = "true" ]; then
+        # Convert relative source path to absolute path for symlink
+        if [[ "$src" != /* ]]; then
+            src="$(realpath "$src")"
+        fi
         ln -s "$src" "$dest"
+        log "INFO" "Created soft link for $(basename "$src")"
     else
-        cp "$src" "$dest"
+        # Try hard link first, fall back to soft link if it fails
+        if ln "$src" "$dest" 2>/dev/null; then
+            log "INFO" "Created hard link for $(basename "$src")"
+        else
+            # Hard link failed, fall back to soft link
+            log "INFO" "Hard link failed, falling back to soft link for $(basename "$src")"
+            # Convert relative source path to absolute path for symlink
+            if [[ "$src" != /* ]]; then
+                src="$(realpath "$src")"
+            fi
+            ln -s "$src" "$dest"
+        fi
     fi
     finish_progress
 }
