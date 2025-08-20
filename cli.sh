@@ -11,7 +11,7 @@ trap 'cleanup ${LINENO} $?' EXIT
 # Parse command line arguments
 HAS_SUDO=""
 REPLACE_DOTFILES=""
-SOFT_LINK_DOTFILES=""
+LINK_DOTFILES=""
 SET_LOCAL_TIME=""
 GH_LOGIN=""
 INSTALL_FROM_PACKAGES=""
@@ -24,7 +24,7 @@ show_help() {
     echo "Options:"
     echo "  -s, --sudo-access <y/n>        Do you have sudo access?"
     echo "  -r, --replace-dotfiles <y/n>   Replace dotfiles?"
-    echo "  -l, --soft-link <y/n>          Soft link dotfiles? (only if replacing)"
+    echo "  -l, --link <y/n>               Link dotfiles? (only if replacing, default: hard link)"
     echo "  -t, --local-time <y/n>         Set hardware clock to local time?"
     echo "  -g, --github-login <y/n>       Would you like to login to GitHub?"
     echo "  -p, --package-install <y/n>    Install tools from package repositories?"
@@ -49,8 +49,8 @@ while getopts ":-:" opt; do
                     REPLACE_DOTFILES="${!OPTIND}"
                     OPTIND=$((OPTIND + 1))
                     ;;
-                soft-link)
-                    SOFT_LINK_DOTFILES="${!OPTIND}"
+                link)
+                    LINK_DOTFILES="${!OPTIND}"
                     OPTIND=$((OPTIND + 1))
                     ;;
                 local-time)
@@ -89,7 +89,7 @@ while getopts ":-:" opt; do
             REPLACE_DOTFILES="$OPTARG"
             ;;
         l)
-            SOFT_LINK_DOTFILES="$OPTARG"
+            LINK_DOTFILES="$OPTARG"
             ;;
         t)
             SET_LOCAL_TIME="$OPTARG"
@@ -163,11 +163,11 @@ if [ -z "$REPLACE_DOTFILES" ]; then
     read -p "Replace dotfiles? Read script to see which files will be replaced. [y/n] " REPLACE_DOTFILES
 fi
 
-if [[ $REPLACE_DOTFILES = y ]] && [ -z "$SOFT_LINK_DOTFILES" ]; then
-    log "INFO" "Dotfiles can be copied if you do not intend to make further edits, or soft linked if you wish to keep them up to date."
+if [[ $REPLACE_DOTFILES = y ]] && [ -z "$LINK_DOTFILES" ]; then
+    log "INFO" "Dotfiles will be hard linked by default (most efficient), or soft linked if you prefer to keep them up to date."
     log "WARN" "If you soft link, moving or deleting this repo folder will break the links."
-    read -p "Soft link dotfiles? [y/n] " SOFT_LINK_DOTFILES
-    SOFT_LINK_DOTFILES=${SOFT_LINK_DOTFILES:-n}
+    read -p "Link dotfiles? [y/n] (n=hard link, y=soft link) " LINK_DOTFILES
+    LINK_DOTFILES=${LINK_DOTFILES:-n}
 fi
 
 # Check if we can set local time (not WSL)
@@ -264,6 +264,8 @@ if [[ $HAS_SUDO = y ]]; then
     run_command apt-get install fonts-powerline aria2 -y
     run_command apt-get install moreutils -y
     finish_progress
+    
+
 fi
 
 if [ -x "$(command -v gh)" ] && [[ $GH_LOGIN = y ]]; then
@@ -290,7 +292,7 @@ if [[ $REPLACE_DOTFILES = y ]]; then
     fi
 
     for dotfile in "${dotfiles[@]}"; do
-        install_dotfile "./dotfiles/$dotfile" "$HOME/$dotfile" "$SOFT_LINK_DOTFILES"
+        install_dotfile "./dotfiles/$dotfile" "$HOME/$dotfile" "$LINK_DOTFILES"
     done
     finish_progress
 fi
@@ -308,7 +310,7 @@ if [ -x "$(command -v zsh)"  ]; then
     show_progress "Configuring ZSH"
     execute backup_and_delete "$HOME/.zshrc"
     execute backup_and_delete "$HOME/.zshrc.common"
-    cp "./dotfiles/.zshrc.common" "$HOME/.zshrc.common"
+    install_dotfile "./dotfiles/.zshrc.common" "$HOME/.zshrc.common" "$LINK_DOTFILES"
 
     if [ -d "$HOME/.oh-my-zsh" ]; then
         log "INFO" "Oh-My-Zsh already installed. Removing."
@@ -365,13 +367,6 @@ if [ -x "$(command -v zsh)"  ]; then
 
     echo "source \$HOME/.zshrc.common" | cat - "$HOME/.zshrc" > temp && mv temp "$HOME/.zshrc"
 
-else
-    show_progress "Setting up Bash environment"
-    execute backup_and_delete "$HOME/.bashrc.common"
-    cp "./dotfiles/.bashrc.common" "$HOME/.bashrc.common"
-    echo "source \$HOME/.env_vars" | cat - "$HOME/.bashrc" > temp && mv temp "$HOME/.bashrc"
-    echo "source \$HOME/.bashrc.common" | cat - "$HOME/.bashrc" > temp && mv temp "$HOME/.bashrc"
-    finish_progress
 fi
 
 if [[ $HAS_SUDO = y ]]; then
@@ -449,7 +444,7 @@ else
     wget "$url" -qO- | tar -xz -C /tmp/
     mv /tmp/ripgrep*/rg "$HOME/.local/bin/"
 fi
-cp "./dotfiles/globalgitignore" "$HOME/.rgignore"
+install_dotfile "./dotfiles/globalgitignore" "$HOME/.rgignore" "$LINK_DOTFILES"
 finish_progress
 
 # LF: command line file navigation - https://github.com/gokcehan/lf
@@ -457,9 +452,24 @@ show_progress "Installing LF"
 url=$(wget "https://api.github.com/repos/gokcehan/lf/releases/latest" -qO- | grep browser_download_url | grep "amd64" | grep "linux" | head -n 1 | cut -d \" -f 4)
 wget "$url" -qO- | tar -xz -C "$HOME/.local/bin"
 mkdir -p "$HOME/.config/lf"
-cp "./dotfiles/lfrc" "$HOME/.config/lf/lfrc"
+install_dotfile "./dotfiles/lfrc" "$HOME/.config/lf/lfrc" "$LINK_DOTFILES"
 wget https://raw.githubusercontent.com/gokcehan/lf/master/etc/colors.example -qO "$HOME/.config/lf/colors"
 wget https://raw.githubusercontent.com/gokcehan/lf/master/etc/icons.example -qO "$HOME/.config/lf/icons"
+finish_progress
+
+# IMV: intelligent move script
+show_progress "Installing IMV script"
+if [[ $HAS_SUDO = y ]]; then
+    # Install to ~/.local/bin if we have sudo access
+    cp "./scripts/imv" "$HOME/.local/bin/"
+    chmod +x "$HOME/.local/bin/imv"
+    log "INFO" "IMV script installed to ~/.local/bin"
+else
+    # Keep in current directory if no sudo access
+    cp "./scripts/imv" "$HOME/.local/bin/"
+    chmod +x "$HOME/.local/bin/imv"
+    log "INFO" "IMV script installed to $HOME/.local/bin/, will not be accessible in sudo."
+fi
 finish_progress
 
 # DUF: disk usage finder - https://github.com/muesli/duf
