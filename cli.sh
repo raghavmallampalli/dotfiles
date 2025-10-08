@@ -285,6 +285,7 @@ if [[ $REPLACE_DOTFILES = y ]]; then
         ".vimrc"
         ".p10k.zsh"
     )
+    mkdir -p "$HOME/.config/espanso/match"
     
     # Add tmux configuration only if user allows it
     if [[ $COPY_TMUX_CONFIG = y ]]; then
@@ -294,6 +295,8 @@ if [[ $REPLACE_DOTFILES = y ]]; then
     for dotfile in "${dotfiles[@]}"; do
         install_dotfile "./dotfiles/$dotfile" "$HOME/$dotfile" "$LINK_DOTFILES"
     done
+
+    install_dotfile "./dotfiles/espanso_base.yml" "$HOME/.config/espanso/match/base.yml" "$LINK_DOTFILES"
     finish_progress
 fi
 
@@ -476,6 +479,24 @@ finish_progress
 if [[ $HAS_SUDO = y ]]; then
     show_progress "Installing DUF"
     run_command apt-get install duf -y
+    finish_progress
+fi
+
+# ESPANSO: text expander - https://espanso.org/
+if [[ $HAS_SUDO = y ]] && ! is_wsl; then
+    show_progress "Installing Espanso"
+    # Note: This uses the Wayland-compatible version.
+    # For X11, the package name would be different.
+    wget "https://github.com/espanso/espanso/releases/latest/download/espanso-debian-wayland-amd64.deb" -qO /tmp/espanso.deb
+    run_command apt install /tmp/espanso.deb -y
+
+    # Register espanso to start on boot
+    # This needs to run as the user, not root
+    if [ "$ROOT_MODE" = "true" ]; then
+        log "WARN" "Skipping 'espanso register' in root mode. Run it manually as the target user."
+    else
+        /usr/bin/espanso register
+    fi
     finish_progress
 fi
 
