@@ -1,0 +1,80 @@
+# espanso match file
+
+# For a complete introduction, visit the official docs at: https://espanso.org/docs/
+
+# You can use this file to define the base matches (aka snippets)
+# that will be available in every application when using espanso.
+
+# Matches are substitution rules: when you type the "trigger" string
+# it gets replaced by the "replace" string.
+
+# yaml-language-server: $schema=https://raw.githubusercontent.com/espanso/espanso/dev/schemas/match.schema.json
+
+matches:
+  # Simple text replacement
+  - trigger: ":espanso"
+    replace: "Hi there!"
+
+  # NOTE: espanso uses YAML to define matches, so pay attention to the indentation!
+
+  # Print the output of a shell command
+  - trigger: ":shell"
+    replace: "{{output}}"
+    vars:
+      - name: output
+        type: shell
+        params:
+          cmd: "echo 'Hello from your shell'"
+
+  - trigger: "]na"
+    replace: "Raghav Mallampalli"
+
+  - trigger: "]nu"
+    replace: "9597869226"
+
+  - trigger: "]sm"
+    replace: "mm18b109@smail.iitm.ac.in"
+
+  - trigger: "]mg"
+    replace: "raghavmallampalli1234@gmail.com"
+
+  - trigger: "]ms"
+    replace: "raghav@synthefy.com"
+
+  # Addresses
+  # These AHK hotstrings require an ending character (like space or enter).
+  # This is also Espanso's default behavior.
+  - trigger: "]ad1"
+    replace: "New number 1, old 251, 43rd street, 8th sector, K.K. Nagar, Chennai, 600078"
+
+  # Date and Time
+  - trigger: "]d"
+    replace: "{{mydate}}"
+    vars:
+      - name: mydate
+        type: date
+        params:
+          # %Y = year, %m = month, %d = day, %I = 12h hour, %M = minute, %p = AM/PM
+          format: "%Y/%m/%d %I:%M %p"
+
+
+  # German characters
+  # The '?' in AHK (:*?:) allows the trigger to fire even when it's inside another word.
+  # In Espanso, this is enabled with the 'trigger_in_word' option.
+  - trigger: "]a]"
+    replace: "ä"
+    trigger_in_word: true
+
+  - trigger: "]o]"
+    replace: "ö"
+    trigger_in_word: true
+
+  - trigger: "]u]"
+    replace: "ü"
+    trigger_in_word: true
+
+  - trigger: "]s]"
+    replace: "ß"
+    trigger_in_word: true
+
+  # And much more! For more information, visit the docs: https://espanso.org/docs/
