@@ -107,7 +107,7 @@ if executable(s:clip)
         autocmd TextYankPost * if v:event.operator ==# 'y' | call system(s:clip, @0) | endif
     augroup END
 endif
-set clipboard+=unnamedplus
+set clipboard=unnamedplus
 " Clipboard does not work well in WSL. Copy works using above syntax
 " Turn on paste mode and paste text
 set pastetoggle=<F3>
