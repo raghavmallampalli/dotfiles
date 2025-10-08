@@ -1,7 +1,7 @@
 alias maxvol="pactl set-sink-volume @DEFAULT_SINK@ 150%"
 alias update="sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y"
 alias download="wget --random-wait -r -p --no-parent -e robots=off -U mozilla"
-alias server="ifconfig | grep inet && python3 -m http.server"
+alias server="ip -4 a | grep inet; python3 -m http.server"
 alias la='n'
 alias gettime='sudo date -s "$(wget -qSO- --max-redirect=0 google.com 2>&1 | grep Date: | cut -d" " -f5-8)Z";'
 alias list-repos="apt-cache policy |grep http |awk '{print $2 $3}' |sort -u"
@@ -25,6 +25,9 @@ alias fzp="fzf-tmux --preview 'bat --style=numbers --color=always {} | head -500
 alias gpom="git push origin master"
 alias ggr="git log --all --decorate --oneline --graph"
 alias lsg="git ls-files"
+alias grmh="git switch main && git pull && git switch - && git rebase main"
+alias gpf="git push --force-with-lease --force-if-includes"
+alias gsm="git rebase -i --autosquash $(git merge-base main HEAD)"
 
 # tmux aliases
 alias ta="tmux -u attach"
@@ -55,4 +58,6 @@ alias explorer.exe='/mnt/c/Windows/explorer.exe'
 
 # Web development
 # enter code folder path and remote folder path in sequence, include the trailing slash in both
-alias jb="bundle exec jekyll build && rsync -avz"
+jb() {
+    bundle exec jekyll build && rsync -avz --delete "$1" "$2"
+}
