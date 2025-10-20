@@ -6,7 +6,7 @@
 INPUT_PATH="."
 
 # Codec choice: 264 (H.264) or 265 (H.265)
-CODEC="264"
+CODEC="265"
 
 # CRF (Constant Rate Factor). Lower values mean higher quality and larger files.
 # For H.264: 28 is a good default. Range is 0-51.
@@ -18,14 +18,14 @@ CODEC="264"
 # **General Use / Sharing**          | 24 - 28         | 26 - 30       | Recommended for everyday use, such as sharing videos with friends or uploading to social media. The default CRF of 28 falls within this range and provides a good compromise between quality and file size for most situations. |
 # **Low Quality / High Compression** | 28 - 32         | 30 - 34       | Use this range when file size is the primary concern and some loss of quality is acceptable. This is suitable for situations where bandwidth or storage is very limited.                                                    |
 # A change of ±6 roughly doubles/halves the bitrate.
-# 23 in 264 is about same quality as 28 in 265
+# 28 in 264 is about same quality as 23 in 265
 CRF_VALUE=23
 
 
 # Preset affects encoding speed vs. compression efficiency.
 # Slower presets create smaller files for the same quality (CRF).
 # Options: ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow
-PRESET=slow
+PRESET=veryslow
 
 # Audio Bitrate. 128k is good for stereo. Use 192k for higher quality.
 AUDIO_BITRATE=128k
@@ -37,7 +37,7 @@ usage() {
     echo "  -c crf_value      CRF value for quality (default: 28 for H.264, 22 for H.265)"
     echo "  -p preset         Encoding preset (default: slow)"
     echo "  -a audio_bitrate  Audio bitrate (default: 128k)"
-    echo "  -x codec          Codec choice: 264 for H.264, 265 for H.265 (default: 264)"
+    echo "  -x codec          Codec choice: 264 for H.264, 265 for H.265 (default: 265)"
     echo "  -h                Show this help message"
     echo ""
     echo "Example: $0 -i /path/to/videos -c 25 -p medium -x 265"
