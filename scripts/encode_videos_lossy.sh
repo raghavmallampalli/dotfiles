@@ -39,7 +39,7 @@ fi
 
 # Set video quality preset
 CRF=23 # Constant Rate Factor (lower is better quality, 23 is a good default)
-PRESET="slower" # Encoding speed vs. compression (e.g., ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow)
+PRESET="slow" # Encoding speed vs. compression (e.g., ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow)
 
 for file in "$@"; do
     FILENAME=$(basename -- "$file")
@@ -79,6 +79,7 @@ for file in "$@"; do
     echo "--------------------------------------------------"
 
     ffmpeg -i "$file" \
+           -threads 0 \
            -c:v "${VIDEO_CODEC}" -crf "${CRF}" -preset "${PRESET}" \
            ${AUDIO_ARGS} \
            -c:s copy \
