@@ -72,6 +72,10 @@ imv() {
         if [ "$MOVE_DATA" = true ]; then
             [ "$VERBOSE" = true ] && echo "Source is a symlink and --copy-links flag is set. Using rsync to move the actual data."
             rsync -a --remove-source-files --info=progress2 --compress --partial --inplace "$SOURCE" "$DEST"
+            # Clean up empty directories after rsync
+            if [ -d "$SOURCE" ]; then
+                (cd "$(dirname "$SOURCE")" && find "$(basename "$SOURCE")" -type d -empty -delete 2>/dev/null)
+            fi
         else
             [ "$VERBOSE" = true ] && echo "Source is a symlink. Using mv for an instant move of the link."
             mv "$SOURCE" "$DEST"
@@ -95,6 +99,10 @@ imv() {
             if [ "$MOVE_DATA" = true ]; then
                 [ "$VERBOSE" = true ] && echo "Source has multiple hard links and --copy-links flag is set. Using rsync to move the actual data."
                 rsync -a --remove-source-files --info=progress2 "$SOURCE" "$DEST"
+                # Clean up empty directories after rsync
+                if [ -d "$SOURCE" ]; then
+                    (cd "$(dirname "$SOURCE")" && find "$(basename "$SOURCE")" -type d -empty -delete 2>/dev/null)
+                fi
             else
                 [ "$VERBOSE" = true ] && echo "Source has multiple hard links. Using mv for an instant move of the link."
                 mv "$SOURCE" "$DEST"
@@ -106,6 +114,10 @@ imv() {
     # If none of the above, use rsync to move
     [ "$VERBOSE" = true ] && echo "Source and destination are on different filesystems. Using rsync for a move with progress."
     rsync -a --remove-source-files --info=progress2 "$SOURCE" "$DEST"
+    # Clean up empty directories after rsync
+    if [ -d "$SOURCE" ]; then
+        (cd "$(dirname "$SOURCE")" && find "$(basename "$SOURCE")" -type d -empty -delete 2>/dev/null)
+    fi
 }
 
 # Execute the function with all arguments
