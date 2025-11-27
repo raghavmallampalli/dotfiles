@@ -32,6 +32,9 @@ cmd on-cd &{{
     zoxide add "$PWD"
 }}
 
+# Previewer
+# set previewer $HOME/.config/lf/preview
+
 # Bindings
 map c $code "$f"
 map <f-2> $printf '%s\n' "$fx" | vidir -

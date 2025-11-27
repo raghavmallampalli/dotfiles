@@ -1,0 +1,46 @@
+#!/bin/sh
+# Preview script for lf file manager
+# Routes different file types to appropriate previewers
+
+SCRIPT_DIR="$(dirname "$0")"
+file="$1"
+width="$2"
+height="$3"
+x="$4"
+y="$5"
+
+# Detect parquet files by extension or file description (case-insensitive)
+is_parquet() {
+    # Check extension (case-insensitive)
+    case "$file" in
+        *.parquet|*.PARQUET|*.Parquet)
+            return 0
+            ;;
+    esac
+    # Check file description (more reliable than MIME type, case-insensitive)
+    file_desc="$(file -Lb -- "$file" 2>/dev/null | tr 'A-Z' 'a-z')"
+    case "$file_desc" in
+        *parquet*)
+            return 0
+            ;;
+    esac
+    return 1
+}
+
+# Handle parquet files
+if is_parquet; then
+    "$SCRIPT_DIR/preview_parquet.py" "$file"
+    exit 0
+fi
+
+# Handle other file types by MIME type
+case "$(file -Lb --mime-type -- "$file" 2>/dev/null)" in
+    text/*)
+        exec cat "$file"
+        ;;
+esac
+
+# Fallback: show file info for all other files
+file -Lb -- "$file" | fold -s -w "$width"
+exit 0
+

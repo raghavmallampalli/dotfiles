@@ -456,6 +456,8 @@ url=$(wget "https://api.github.com/repos/gokcehan/lf/releases/latest" -qO- | gre
 wget "$url" -qO- | tar -xz -C "$HOME/.local/bin"
 mkdir -p "$HOME/.config/lf"
 install_dotfile "./dotfiles/lfrc" "$HOME/.config/lf/lfrc" "$LINK_DOTFILES"
+install_dotfile "./scripts/preview" "$HOME/.config/lf/preview" "$LINK_DOTFILES"
+install_dotfile "./scripts/preview_parquet.py" "$HOME/.config/lf/preview_parquet.py" "$LINK_DOTFILES"
 wget https://raw.githubusercontent.com/gokcehan/lf/master/etc/colors.example -qO "$HOME/.config/lf/colors"
 wget https://raw.githubusercontent.com/gokcehan/lf/master/etc/icons.example -qO "$HOME/.config/lf/icons"
 finish_progress
