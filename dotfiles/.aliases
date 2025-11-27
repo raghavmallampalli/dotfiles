@@ -27,7 +27,7 @@ alias ggr="git log --all --decorate --oneline --graph"
 alias lsg="git ls-files"
 alias grmh="git switch main && git pull && git switch - && git rebase main"
 alias gpf="git push --force-with-lease --force-if-includes"
-alias gsm="git rebase -i --autosquash $(git merge-base main HEAD)"
+alias gsmh='git rebase -i --autosquash $(git merge-base main HEAD)'
 
 # tmux aliases
 alias ta="tmux -u attach"
