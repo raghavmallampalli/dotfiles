@@ -82,4 +82,28 @@ bindkey -M vicmd V edit-command-line
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 source <(fzf --zsh)
 [ -f ~/.fzf-git.sh ] && source ~/.fzf-git.sh
-export FZF_DEFAULT_OPTS='--height 40% --tmux bottom,40%' # center,40% # center not supported in all tmuxversions
+
+# Configure fzf based on tmux version
+# tmux 3.2+ supports display-popup, so we can use tmux integration
+# tmux < 3.2 doesn't support it, so we disable tmux integration
+if command -v tmux &> /dev/null; then
+  tmux_version=$(tmux -V 2>/dev/null | grep -oE '[0-9]+\.[0-9]+')
+  major=$(echo $tmux_version | cut -d. -f1)
+  minor=$(echo $tmux_version | cut -d. -f2)
+  if (( major > 3 || (major == 3 && minor > 2) )); then
+    export FZF_DEFAULT_OPTS='--height 40% --tmux bottom,40%'
+  else
+    # Disable fzf's automatic tmux integration (tmux 3.1 doesn't support display-popup)
+    # This makes fzf run in the current pane instead of trying to use tmux popups
+    export FZF_TMUX=0
+    export TMUX_FZF_OPTIONS="--no-popup"
+  fi
+fi
+
+# Ensure fzf history search works in vi mode and inside tmux
+if command -v fzf &> /dev/null; then
+  # Bind Ctrl+R for fzf history search (works in both emacs and vi insert mode)
+  bindkey '^R' fzf-history-widget
+  # Also bind for vi insert mode explicitly
+  bindkey -M viins '^R' fzf-history-widget
+fi
