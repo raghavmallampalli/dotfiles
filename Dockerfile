@@ -12,7 +12,7 @@ RUN if [ -f /etc/os-release ]; then \
     if [ "$ID" = "ubuntu" ] || [ "$ID" = "debian" ]; then \
         apt-get update && apt-get install -y curl wget git sudo unzip && rm -rf /var/lib/apt/lists/*; \
     elif [ "$ID" = "arch" ] || [ "$ID" = "archarm" ]; then \
-        pacman -Sy --noconfirm curl wget git sudo unzip; \
+        pacman -Sy --noconfirm curl wget git sudo unzip ca-certificates; \
     fi \
     fi
 

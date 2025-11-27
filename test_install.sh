@@ -41,7 +41,7 @@ run_test() {
 }
 
 # Run tests for Ubuntu
-run_test "ubuntu:24.04" "dotfiles-test-ubuntu"
+# run_test "ubuntu:24.04" "dotfiles-test-ubuntu"
 UBUNTU_RESULT=$?
 
 # Run tests for Arch

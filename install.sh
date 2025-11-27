@@ -139,28 +139,31 @@ install_arch() {
     log "INFO" "Starting Arch Linux installation..."
     
     show_progress "Updating system and installing prerequisites"
-    run_command sudo pacman -S --needed --noconfirm git base-devel
+    run_command sudo pacman -S --needed --noconfirm git base-devel ca-certificates
     finish_progress
 
-    # Install yay if not present
-    if ! command -v yay >/dev/null 2>&1; then
-        show_progress "Installing yay"
-        run_command git clone https://aur.archlinux.org/yay.git /tmp/yay
-        # makepkg cannot be run as root. If we are root, this is tricky.
-        # Assuming user is non-root with sudo access as per standard Arch practice.
-        # If running as root, we should probably warn or skip, but for now we assume non-root.
-        if [ "$EUID" -eq 0 ]; then
-             log "WARN" "Running as root, yay installation might fail. Please run as non-root user."
-             # Attempting to run as nobody if root? No, too complex. Just let it fail or user handle it.
-             # Actually, makepkg -si fails as root.
-             # We can try to chown and run as nobody but that requires sudo setup for nobody.
-             # For now, we proceed.
-             cd /tmp/yay && run_command makepkg -si --noconfirm
-        else
-             cd /tmp/yay && run_command makepkg -si --noconfirm
-        fi
-        finish_progress
+    sudo pacman -S --needed --noconfirm git base-devel ca-certificates
+    
+    # Install yay
+    # If running as root (e.g. in Docker), we need to create a non-root user to run makepkg
+    if [ -d "yay-bin" ]; then rm -rf yay-bin; fi
+    git clone https://aur.archlinux.org/yay-bin.git
+    cd yay-bin
+    
+    if [ "$EUID" -eq 0 ]; then
+        log "WARN" "Running makepkg as root. Creating temporary builder user..."
+        useradd -m builder
+        echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+        chown -R builder:builder .
+        su builder -c "makepkg -si --noconfirm"
+        # Cleanup builder user? Maybe not needed for Docker, but good practice? 
+        # Actually in Docker we might want to keep it simple.
+    else
+        makepkg -si --noconfirm
     fi
+    
+    cd ..
+    rm -rf yay-bin
 
     show_progress "Installing packages via yay"
     # Install all requested tools
