@@ -19,9 +19,26 @@ docker build -t dotfiles-test .
 docker run -it --name dotfiles-test dotfiles-test
 ```
 
+### Automated Verification
+You can also run the automated test script which builds the image and runs the installation scripts:
+```bash
+./test_install.sh
+```
+Check `install_test.log` for the output.
+
 ## Setup scripts
 ### cli
 Basic setup of Ubuntu. It installs some essential packages and their dependencies. It also installs some useful command line utilites.
+
+> **Note**: The setup is split into two scripts:
+> 1. `install.sh`: Installs packages and tools.
+> 2. `setup.sh`: Configures dotfiles and shell.
+
+Run them in order:
+```bash
+./install.sh
+./setup.sh
+```
 
 > IMPORTANT: `bash` shell is replaced by a `zsh+Oh-My-Zsh` configuration.
 

@@ -22,24 +22,13 @@ fi
 export ROOT_MODE
 
 # Gather all user input at the beginning
-read -p "Install uv? [y/n] " install_uv
 install_miniconda=n
-if [[ $install_uv != y ]]; then
-    read -p "Install Miniconda? [y/n] " install_miniconda
-fi
+read -p "Install Miniconda? [y/n] " install_miniconda
 read -p "Install nvm? [y/n] " install_nvm
 read -p "Install Julia? [y/n] " install_julia
 read -p "Install R? [y/n]: " install_r
 read -p "Install GNU octave? [y/n]: " install_octave
 read -p "Install Docker? [y/n]: " install_docker
-
-# UV installation: https://docs.astral.sh/uv/getting-started/installation/#installation-methods
-if [[ $install_uv = y ]]; then
-    show_progress "Installing UV"
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    echo 'eval "$(uv generate-shell-completion zsh)"' >> "$HOME/.zshrc"
-    finish_progress
-fi
 
 if [[ $install_miniconda = y ]]; then
     show_progress "Installing Miniconda"
