@@ -421,6 +421,9 @@ else
     wget "$url" -qO- | tar -xz -C /tmp/
     mv /tmp/bat*/bat "$HOME/.local/bin/"
 fi
+mkdir -p "$(bat --config-dir)/themes"
+wget -P "$(bat --config-dir)/themes" https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20Mocha.tmTheme
+bat cache --build
 finish_progress
 
 # FD: simple find clone - https://github.com/sharkdp/fd

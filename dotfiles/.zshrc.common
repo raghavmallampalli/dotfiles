@@ -73,9 +73,6 @@ bindkey 'kj' vi-cmd-mode
 autoload edit-command-line; zle -N edit-command-line
 bindkey -M vicmd V edit-command-line
 
-# bat configuration
-export BAT_THEME="Dracula"
-export BAT_PAGER="less -FRX"
 
 # Customising prompt: powerlevel10k
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
