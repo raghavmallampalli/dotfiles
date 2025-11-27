@@ -1,18 +1,20 @@
-# Use Ubuntu 24.04 as base image
-FROM ubuntu:24.04
+# Accept base image as argument (default to ubuntu:24.04)
+ARG BASE_IMAGE=ubuntu:24.04
+FROM ${BASE_IMAGE}
 
-# Set environment variables to avoid interactive prompts during package installation
+# Set environment variables to avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
 
-# Update package list and install essential packages
-RUN apt-get update && apt-get install -y \
-    curl \
-    wget \
-    git \
-    sudo \
-    unzip \
-    && rm -rf /var/lib/apt/lists/*
+# Install essential packages depending on the OS
+RUN if [ -f /etc/os-release ]; then \
+    . /etc/os-release; \
+    if [ "$ID" = "ubuntu" ] || [ "$ID" = "debian" ]; then \
+        apt-get update && apt-get install -y curl wget git sudo unzip && rm -rf /var/lib/apt/lists/*; \
+    elif [ "$ID" = "arch" ] || [ "$ID" = "archarm" ]; then \
+        pacman -Sy --noconfirm curl wget git sudo unzip; \
+    fi \
+    fi
 
 # Copy the dotfiles project to the container
 COPY . /root/dotfiles/
@@ -28,9 +30,11 @@ ENV BACKUP_DIR=/tmp
 RUN chmod +x /root/dotfiles/install.sh /root/dotfiles/setup.sh /root/dotfiles/common.sh
 
 # Run the install.sh script
+# We pass --sudo-access y and --binaries-install n (default)
+# The script itself will handle OS detection.
 RUN ./install.sh \
     --sudo-access y \
-    --package-install n
+    --binaries-install n
 
 # Run the setup.sh script
 RUN ./setup.sh \
