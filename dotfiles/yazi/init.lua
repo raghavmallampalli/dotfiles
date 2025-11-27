@@ -1,0 +1,2 @@
+require("duckdb"):setup()
+

@@ -453,16 +453,50 @@ fi
 install_dotfile "./dotfiles/globalgitignore" "$HOME/.rgignore" "$LINK_DOTFILES"
 finish_progress
 
-# LF: command line file navigation - https://github.com/gokcehan/lf
-show_progress "Installing LF"
-url=$(wget "https://api.github.com/repos/gokcehan/lf/releases/latest" -qO- | grep browser_download_url | grep "amd64" | grep "linux" | head -n 1 | cut -d \" -f 4)
-wget "$url" -qO- | tar -xz -C "$HOME/.local/bin"
-mkdir -p "$HOME/.config/lf"
-install_dotfile "./dotfiles/lfrc" "$HOME/.config/lf/lfrc" "$LINK_DOTFILES"
-install_dotfile "./scripts/preview" "$HOME/.config/lf/preview" "$LINK_DOTFILES"
-install_dotfile "./scripts/preview_parquet.py" "$HOME/.config/lf/preview_parquet.py" "$LINK_DOTFILES"
-wget https://raw.githubusercontent.com/gokcehan/lf/master/etc/colors.example -qO "$HOME/.config/lf/colors"
-wget https://raw.githubusercontent.com/gokcehan/lf/master/etc/icons.example -qO "$HOME/.config/lf/icons"
+# YAZI: command line file navigation - https://github.com/sxyazi/yazi
+show_progress "Installing Yazi"
+wget -q https://github.com/sxyazi/yazi/releases/latest/download/yazi-x86_64-unknown-linux-musl.zip -O /tmp/yazi.zip
+unzip -q /tmp/yazi.zip -d /tmp
+mv /tmp/yazi "$HOME/.local/bin/"
+mv /tmp/yz "$HOME/.local/bin/"
+chmod +x "$HOME/.local/bin/yazi"
+chmod +x "$HOME/.local/bin/yz"
+mkdir -p "$HOME/.config/yazi"
+finish_progress
+
+# Install duckdb for yazi preview support
+show_progress "Installing DuckDB"
+curl -sSfL https://install.duckdb.org | sh
+if [ -f "$HOME/.duckdb/bin/duckdb" ]; then
+    ln -sf "$HOME/.duckdb/bin/duckdb" "$HOME/.local/bin/duckdb" 2>/dev/null || true
+fi
+finish_progress
+
+# Install rich-cli for yazi preview support
+show_progress "Installing rich-cli"
+if command -v uv >/dev/null 2>&1; then
+    uv tool add rich-cli
+else
+    log "WARN" "uv not found, skipping rich-cli installation"
+fi
+finish_progress
+
+# Install yazi duckdb plugin
+show_progress "Installing yazi duckdb plugin"
+if command -v yz >/dev/null 2>&1; then
+    yz pack -a wylie102/duckdb || log "WARN" "Failed to install yazi duckdb plugin"
+else
+    log "WARN" "yz command not found, skipping plugin installation"
+fi
+finish_progress
+
+# Install yazi configuration files
+show_progress "Installing yazi configuration files"
+for yazi_file in ./dotfiles/yazi/*; do
+    if [ -f "$yazi_file" ]; then
+        install_dotfile "$yazi_file" "$HOME/.config/yazi/$(basename "$yazi_file")" "$LINK_DOTFILES"
+    fi
+done
 finish_progress
 
 # IMV: intelligent move script
