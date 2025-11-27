@@ -83,7 +83,7 @@ Majority of syntax used in bash carries forward to zsh. No problems should be en
 ## vim
 * Programmable editor. Steep learning curve, worth it.
 * NOTE: C-S-A-p=Ctrl+Shift+Alt+p. Case matters in most CLI program shortcuts.
-* [Vim cheatsheet](https://camo.githubusercontent.com/7df123c8b1367c8cc47769f8f1f1d148df58a1ef/687474703a2f2f692e696d6775722e636f6d2f50515172642e706e67):![vim cheatsheet](config_files/vim_cheatsheet.png)
+* [Vim cheatsheet](https://camo.githubusercontent.com/7df123c8b1367c8cc47769f8f1f1d148df58a1ef/687474703a2f2f692e696d6775722e636f6d2f50515172642e706e67):![vim cheatsheet](assets/vim_cheatsheet.png)
 * [Keyboard cheatsheet](https://camo.githubusercontent.com/bf50f0478b239e1ed99acd5248c247112b82f08f/687474703a2f2f692e696d6775722e636f6d2f68503637542e706e67)
 * [Searchable cheatsheet](https://devhints.io/vim)
 * See vimrc for syntax of keybindings and changing settings
