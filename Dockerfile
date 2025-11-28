@@ -6,16 +6,6 @@ FROM ${BASE_IMAGE}
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
 
-# Install essential packages depending on the OS
-RUN if [ -f /etc/os-release ]; then \
-    . /etc/os-release; \
-    if [ "$ID" = "ubuntu" ] || [ "$ID" = "debian" ]; then \
-        apt-get update && apt-get install -y curl wget git sudo unzip && rm -rf /var/lib/apt/lists/*; \
-    elif [ "$ID" = "arch" ] || [ "$ID" = "archarm" ]; then \
-        pacman -Sy --noconfirm curl wget git sudo unzip ca-certificates; \
-    fi \
-    fi
-
 # Copy the dotfiles project to the container
 COPY . /root/dotfiles/
 
