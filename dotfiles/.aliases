@@ -32,25 +32,24 @@ alias gsmh='git rebase -i --autosquash $(git merge-base main HEAD)'
 # tmux aliases
 alias ta="tmux -u attach"
 alias tgex="tmux -u new-session -s General \; \
-        split-window -h \; \
-            select-pane -L \; \
-            resize-pane -R 30 \; \
-            select-pane -R \; \
-            send-keys ' which python && python' C-m \; \
-            rename-window 'general' \; \
-        new-window \; \
-            send-keys 'nvtop' C-m \; \
-            split-window -h \; \
-            send-keys 'htop' C-m \; \
-            split-window -v \; \
-            send-keys 'watch duf' C-m \; \
-            rename-window 'performance' \; \
-        select-window -t 1 \; \
-            select-pane -L"
+    split-window -h \; \
+        select-pane -L \; \
+        resize-pane -R 30 \; \
+        select-pane -R \; \
+        send-keys ' py' C-m \; \
+        select-pane -L"
 
 # Python
 alias uvs="source .venv/bin/activate"
 alias uvr="uv run"
+alias py=" uvx \
+    --with numpy \
+    --with pandas \
+    --with scikit-learn \
+    --with ipython \
+    --with plotly \
+    --with catppuccin \
+    ipython"
 
 # WSL compatibility commands
 alias clip.exe='/mnt/c/Windows/System32/clip.exe'
