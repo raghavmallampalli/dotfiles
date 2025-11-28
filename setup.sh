@@ -224,6 +224,7 @@ if [[ $REPLACE_DOTFILES = y ]]; then
 
     finish_progress
 fi
+source "$HOME/.aliases"
 
 ########################################### ENVIRONMENT ###########################################
 
@@ -343,3 +344,29 @@ log "INFO" "Setup completed. Restart your shell."
 if [[ $COPY_TMUX_CONFIG = y ]]; then
     log "WARN" "Press Ctrl+A I (capital I) on first run of tmux to install plugins."
 fi
+
+######## 'SYSTEM' PYTHON #############
+uv run --with ipython ipython profile create
+
+echo "Below code block, inserted into the ipython_config.py file will provide syntax highlighting for catppuccin theme."
+cat << EOF
+from IPython.utils.PyColorize import linux_theme, theme_table
+from copy import deepcopy
+
+theme = deepcopy(linux_theme)
+
+# Choose catppuccin theme
+catppuccin_theme = "catppuccin-mocha"
+# catppuccin_theme = "catppuccin-macchiato"
+# catppuccin_theme = "catppuccin-frappe"
+# catppuccin_theme = "catppuccin-latte"
+
+theme.base = catppuccin_theme
+theme_table[catppuccin_theme] = theme
+c = get_config()  #noqa`
+c.TerminalInteractiveShell.true_color = True
+c.TerminalInteractiveShell.colors = catppuccin_theme
+EOF
+# Fetch packages into cache for faster solve next time
+
+py
