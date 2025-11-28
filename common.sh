@@ -3,6 +3,7 @@
 # Constants and configuration
 BACKUP_DIR="${BACKUP_DIR:-/tmp}"
 LOG_FILE="/tmp/installation.log"
+export PATH="$HOME/.local/bin:$PATH"
 
 # Logging function
 log() {

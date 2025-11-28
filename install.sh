@@ -135,41 +135,56 @@ log "INFO" "Detected OS: $OS_ID"
 # Installation Functions
 # -----------------------------------------------------------------------------
 
-install_arch() {
+install_yay() {
     log "INFO" "Starting Arch Linux installation..."
+
+    # Helper for running yay
+    run_yay() {
+        if [ "$EUID" -eq 0 ]; then
+            execute su builder -c "yay $*"
+        else
+            execute yay "$@"
+        fi
+    }
     
     show_progress "Updating system and installing prerequisites"
-    run_command sudo pacman -S --needed --noconfirm git base-devel ca-certificates
+    run_command pacman -S --needed --noconfirm git base-devel ca-certificates
     finish_progress
-
-    sudo pacman -S --needed --noconfirm git base-devel ca-certificates
     
     # Install yay
-    # If running as root (e.g. in Docker), we need to create a non-root user to run makepkg
-    if [ -d "yay-bin" ]; then rm -rf yay-bin; fi
-    git clone https://aur.archlinux.org/yay-bin.git
-    cd yay-bin
+    # We use /tmp to avoid permission issues if the current directory is inside /root
+    local YAY_BUILD_DIR="/tmp/yay-bin"
+    if [ -d "$YAY_BUILD_DIR" ]; then rm -rf "$YAY_BUILD_DIR"; fi
+    git clone https://aur.archlinux.org/yay-bin.git "$YAY_BUILD_DIR"
+    
+    local CURRENT_DIR=$(pwd)
+    cd "$YAY_BUILD_DIR"
     
     if [ "$EUID" -eq 0 ]; then
         log "WARN" "Running makepkg as root. Creating temporary builder user..."
-        useradd -m builder
-        echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+        if ! id -u builder >/dev/null 2>&1; then
+            useradd -m builder
+            echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+        fi
         chown -R builder:builder .
         su builder -c "makepkg -si --noconfirm"
-        # Cleanup builder user? Maybe not needed for Docker, but good practice? 
-        # Actually in Docker we might want to keep it simple.
     else
         makepkg -si --noconfirm
     fi
     
-    cd ..
-    rm -rf yay-bin
+    cd "$CURRENT_DIR"
+    rm -rf "$YAY_BUILD_DIR"
+
+    install_rich_cli_manual
 
     show_progress "Installing packages via yay"
     # Install all requested tools
     # Note: 'yes |' might be needed for some prompts, but --noconfirm should handle most.
     # However, yay sometimes asks for diff review.
-    run_command yay -S --noconfirm --needed htop nvtop rsync aria2 github-cli zsh vim tmux fzf ripgrep bat fd yazi duf wget curl git zoxide
+
+    run_yay -S --noconfirm --needed wget curl github-cli aria2 openssh inetutils
+    run_yay -S --noconfirm --needed zsh tmux vim
+    run_yay -S --noconfirm --needed htop nvtop rsync fzf ripgrep bat fd yazi duf zoxide
     finish_progress
 
     # Link bat and fd if needed (Arch usually installs them with correct names, unlike Ubuntu)
@@ -180,13 +195,9 @@ install_arch() {
     # User asked for yay/pacman always if available.
     # duckdb-bin is in AUR.
     show_progress "Installing DuckDB via yay"
-    run_command yay -S --noconfirm --needed duckdb-bin
+    run_yay -S --noconfirm --needed duckdb-bin
     finish_progress
-    
-    # rich-cli for yazi
-    show_progress "Installing rich-cli via yay"
-    run_command yay -S --noconfirm --needed python-rich-cli
-    finish_progress
+
 
     # IMV script
     show_progress "Installing IMV script"
@@ -285,11 +296,6 @@ install_apt() {
 install_binaries() {
     log "INFO" "Starting Binary/Manual installation..."
     
-    # UV
-    show_progress "Installing UV"
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    echo 'eval "$(uv generate-shell-completion zsh)"' >> "$HOME/.zshrc"
-    finish_progress
 
     # FZF
     if ! command -v fzf >/dev/null 2>&1; then
@@ -369,11 +375,17 @@ install_rich_cli_manual() {
 # Main Execution
 # -----------------------------------------------------------------------------
 
+# UV
+show_progress "Installing UV"
+curl -LsSf https://astral.sh/uv/install.sh | sh
+echo 'eval "$(uv generate-shell-completion zsh)"' >> "$HOME/.zshrc"
+finish_progress
+
 if [[ "$INSTALL_FROM_BINARIES" == "y" ]]; then
     install_binaries
 else
     if [[ "$OS_ID" == "arch" ]]; then
-        install_arch
+        install_yay
     elif [[ "$OS_ID" == "ubuntu" ]] || [[ "$OS_ID" == "debian" ]]; then
         install_apt
     else
