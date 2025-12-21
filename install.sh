@@ -135,69 +135,32 @@ log "INFO" "Detected OS: $OS_ID"
 # Installation Functions
 # -----------------------------------------------------------------------------
 
-install_yay() {
-    log "INFO" "Starting Arch Linux installation..."
+# Helper for running yay
+run_yay() {
+    if [ "$EUID" -eq 0 ]; then
+        execute su builder -c "yay $*"
+    else
+        execute yay "$@"
+    fi
+}
 
-    # Helper for running yay
-    run_yay() {
-        if [ "$EUID" -eq 0 ]; then
-            execute su builder -c "yay $*"
-        else
-            execute yay "$@"
-        fi
-    }
+install_yay_always() {
+    log "INFO" "Installing bootstrap packages for Arch Linux..."
     
     show_progress "Updating system and installing prerequisites"
-    run_command pacman -S --needed --noconfirm git base-devel ca-certificates
+    # Basic tools needed to bootstrap the rest
+    run_command pacman -Sy --needed --noconfirm git base-devel ca-certificates
     finish_progress
-    
-    # Install yay
-    # We use /tmp to avoid permission issues if the current directory is inside /root
-    local YAY_BUILD_DIR="/tmp/yay-bin"
-    if [ -d "$YAY_BUILD_DIR" ]; then rm -rf "$YAY_BUILD_DIR"; fi
-    git clone https://aur.archlinux.org/yay-bin.git "$YAY_BUILD_DIR"
-    
-    local CURRENT_DIR=$(pwd)
-    cd "$YAY_BUILD_DIR"
-    
-    if [ "$EUID" -eq 0 ]; then
-        log "WARN" "Running makepkg as root. Creating temporary builder user..."
-        if ! id -u builder >/dev/null 2>&1; then
-            useradd -m builder
-            echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-        fi
-        chown -R builder:builder .
-        su builder -c "makepkg -si --noconfirm"
-    else
-        makepkg -si --noconfirm
-    fi
-    
-    cd "$CURRENT_DIR"
-    rm -rf "$YAY_BUILD_DIR"
+}
 
-    install_rich_cli_manual
+install_yay_tools_always() {
+    log "INFO" "Installing always-essential packages via yay..."
 
-    show_progress "Installing packages via yay"
-    # Install all requested tools
-    # Note: 'yes |' might be needed for some prompts, but --noconfirm should handle most.
-    # However, yay sometimes asks for diff review.
-
-    run_yay -S --noconfirm --needed wget curl github-cli aria2 openssh inetutils
-    run_yay -S --noconfirm --needed zsh tmux vim
-    run_yay -S --noconfirm --needed htop nvtop rsync fzf ripgrep bat fd yazi duf zoxide
+    show_progress "Installing essentials and base tools via yay"
+    # Essential tools and superset
+    run_yay -S --needed --noconfirm wget curl zip unzip p7zip
+    run_yay -S --needed --noconfirm github-cli aria2 openssh inetutils zsh tmux vim htop nvtop rsync xclip jq cmake moreutils
     finish_progress
-
-    # Link bat and fd if needed (Arch usually installs them with correct names, unlike Ubuntu)
-    # But just in case check names. Arch: bat, fd. Ubuntu: batcat, fdfind.
-    # So no linking needed for Arch usually.
-    
-    # Install DuckDB (not always in AUR or might be old, but let's stick to binary for consistency or AUR?)
-    # User asked for yay/pacman always if available.
-    # duckdb-bin is in AUR.
-    show_progress "Installing DuckDB via yay"
-    run_yay -S --noconfirm --needed duckdb-bin
-    finish_progress
-
 
     # IMV script
     show_progress "Installing IMV script"
@@ -206,13 +169,50 @@ install_yay() {
     finish_progress
 }
 
-install_apt() {
-    log "INFO" "Starting Debian/Ubuntu installation..."
+install_yay() {
+    log "INFO" "Starting yay installation..."
+    
+    if ! command -v yay >/dev/null 2>&1; then
+        show_progress "Installing yay"
+        # We use /tmp to avoid permission issues if the current directory is inside /root
+        local YAY_BUILD_DIR="/tmp/yay-bin"
+        if [ -d "$YAY_BUILD_DIR" ]; then rm -rf "$YAY_BUILD_DIR"; fi
+        git clone https://aur.archlinux.org/yay-bin.git "$YAY_BUILD_DIR"
+        
+        local CURRENT_DIR=$(pwd)
+        cd "$YAY_BUILD_DIR"
+        
+        if [ "$EUID" -eq 0 ]; then
+            log "WARN" "Running makepkg as root. Creating temporary builder user..."
+            if ! id -u builder >/dev/null 2>&1; then
+                useradd -m builder
+                echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+            fi
+            chown -R builder:builder .
+            su builder -c "makepkg -si --noconfirm"
+        else
+            makepkg -si --noconfirm
+        fi
+        
+        cd "$CURRENT_DIR"
+        rm -rf "$YAY_BUILD_DIR"
+        finish_progress
+    fi
+}
+
+install_arch_choice_tools() {
+    log "INFO" "Installing 'choice' packages via yay"
+    run_yay -S --noconfirm --needed fzf ripgrep bat fd zoxide duf yazi-bin duckdb-bin
+    finish_progress
+}
+
+install_apt_always() {
+    log "INFO" "Installing always-essential packages for Debian/Ubuntu..."
 
     show_progress "Updating system packages"
     run_command apt update -y
     run_command apt upgrade -y
-    run_command apt-get install git wget curl -y
+    run_command apt-get install git wget curl zip unzip 7zip -y
     finish_progress
 
     show_progress "Setting up GitHub CLI keyring"
@@ -222,50 +222,13 @@ install_apt() {
     finish_progress
     run_command apt-get install gh -y
 
-    show_progress "Installing development tools"
+    show_progress "Installing development and base tools"
+    # Superset of tools
     run_command apt-get install build-essential g++ cmake cmake-curses-gui pkg-config checkinstall automake -y
-    run_command apt-get install xclip jq autossh unzip zip -y
+    run_command apt-get install xclip jq autossh fonts-powerline aria2 rsync moreutils ca-certificates openssh-client inetutils-ping -y
     run_command apt-get install htop nvtop -y
-    run_command apt-get install fonts-powerline aria2 rsync -y
-    run_command apt-get install moreutils -y
-    finish_progress
-
-    show_progress "Installing ZSH, Vim, Tmux"
-    run_command apt-get install zsh vim -y
-    run_command apt-get install libevent-dev ncurses-dev build-essential bison pkg-config -y
-    run_command apt-get install tmux -y
-    finish_progress
-
-    # Utilities that we prefer from apt if available and up to date enough, 
-    # but the original script had manual install logic for many.
-    # We will stick to the original script's logic: if INSTALL_FROM_PACKAGES (now !INSTALL_FROM_BINARIES) is true, use apt.
-    
-    show_progress "Installing Zoxide"
-    run_command apt-get install zoxide -y
-    finish_progress
-
-    show_progress "Installing BAT"
-    run_command apt-get install bat -y
-    mkdir -p "$HOME/.local/bin"
-    ln -f /usr/bin/batcat "$HOME/.local/bin/bat"
-    finish_progress
-
-    show_progress "Installing FD"
-    run_command apt-get install fd-find -y
-    ln -sf "$(which fdfind)" "$HOME/.local/bin/fd"
-    finish_progress
-
-    show_progress "Installing Ripgrep"
-    # Ripgrep in apt might be old, original script used deb from release or source.
-    # We'll use the deb download approach as it was in the "package" block of original script.
-    url=$(wget "https://api.github.com/repos/BurntSushi/ripgrep/releases/latest" -qO-| grep browser_download_url | grep "deb" | head -n 1 | cut -d \" -f 4)
-    wget "$url" -qO /tmp/rg.deb
-    run_command dpkg -i /tmp/rg.deb
-    run_command apt-get install -f
-    finish_progress
-
-    show_progress "Installing DUF"
-    run_command apt-get install duf -y
+    run_command apt-get install zsh vim tmux -y
+    run_command apt-get install libevent-dev ncurses-dev bison -y
     finish_progress
 
     if is_wsl; then
@@ -273,19 +236,9 @@ install_apt() {
         run_command apt-get install wslu -y
         finish_progress
     fi
-    
-    # Yazi is not in standard apt repos usually, so we fall back to binary install for it even in apt mode?
-    # Original script installed yazi via binary download ALWAYS.
-    # So we should call install_binaries_yazi or similar.
-    # For simplicity, I'll include the manual yazi install here as it was the only way.
-    install_yazi_manual
-    
-    # DuckDB
-    install_duckdb_manual
-    
-    # Rich-cli
+
     install_rich_cli_manual
-    
+
     # IMV
     show_progress "Installing IMV script"
     cp "./scripts/imv" "$HOME/.local/bin/"
@@ -293,10 +246,41 @@ install_apt() {
     finish_progress
 }
 
-install_binaries() {
-    log "INFO" "Starting Binary/Manual installation..."
-    
+install_apt() {
+    log "INFO" "Starting Debian/Ubuntu installation (APT route)..."
 
+    show_progress "Installing 'choice' packages via apt"
+    run_command apt-get install zoxide bat -y
+    
+    # FD
+    run_command apt-get install fd-find -y
+    ln -sf "$(which fdfind)" "$HOME/.local/bin/fd"
+
+    # Ripgrep
+    url=$(wget "https://api.github.com/repos/BurntSushi/ripgrep/releases/latest" -qO-| grep browser_download_url | grep "deb" | head -n 1 | cut -d \" -f 4)
+    wget "$url" -qO /tmp/rg.deb
+    run_command dpkg -i /tmp/rg.deb
+    run_command apt-get install -f
+
+    # DUF
+    run_command apt-get install duf -y
+    finish_progress
+
+    # FZF
+    if ! command -v fzf >/dev/null 2>&1; then
+        show_progress "Installing FZF"
+        run_command apt-get install fzf -y
+        finish_progress
+    fi
+
+    # Yazi and DuckDB (no apt package for Yazi usually, and DuckDB is often old)
+    install_yazi_manual
+    install_duckdb_manual
+}
+
+install_binaries() {
+    log "INFO" "Starting Binary/Manual installation (Choice route)..."
+    
     # FZF
     if ! command -v fzf >/dev/null 2>&1; then
         show_progress "Installing FZF"
@@ -307,6 +291,18 @@ install_binaries() {
         wget https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh -qO "$HOME/.fzf-git.sh"
         finish_progress
     fi
+
+    # Zoxide
+    show_progress "Installing Zoxide"
+    curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+    finish_progress
+
+    # DUF
+    show_progress "Installing DUF"
+    url=$(wget "https://api.github.com/repos/muesli/duf/releases/latest" -qO-| grep browser_download_url | grep "linux_x86_64" | grep ".tar.gz" | head -n 1 | cut -d \" -f 4)
+    wget "$url" -qO- | tar -xz -C /tmp/
+    mv /tmp/duf "$HOME/.local/bin/"
+    finish_progress
 
     # BAT
     show_progress "Installing BAT"
@@ -331,13 +327,6 @@ install_binaries() {
     
     install_yazi_manual
     install_duckdb_manual
-    install_rich_cli_manual
-    
-    # IMV
-    show_progress "Installing IMV script"
-    cp "./scripts/imv" "$HOME/.local/bin/"
-    chmod +x "$HOME/.local/bin/imv"
-    finish_progress
 }
 
 # Helpers for common manual installs
@@ -381,11 +370,20 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 echo 'eval "$(uv generate-shell-completion zsh)"' >> "$HOME/.zshrc"
 finish_progress
 
+if [[ "$OS_ID" == "arch" ]]; then
+    install_yay_always
+    install_yay
+    install_yay_tools_always
+    install_rich_cli_manual
+elif [[ "$OS_ID" == "ubuntu" ]] || [[ "$OS_ID" == "debian" ]]; then
+    install_apt_always
+fi
+
 if [[ "$INSTALL_FROM_BINARIES" == "y" ]]; then
     install_binaries
 else
     if [[ "$OS_ID" == "arch" ]]; then
-        install_yay
+        install_arch_choice_tools
     elif [[ "$OS_ID" == "ubuntu" ]] || [[ "$OS_ID" == "debian" ]]; then
         install_apt
     else

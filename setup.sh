@@ -224,7 +224,6 @@ if [[ $REPLACE_DOTFILES = y ]]; then
 
     finish_progress
 fi
-source "$HOME/.aliases"
 
 ########################################### ENVIRONMENT ###########################################
 
@@ -308,8 +307,6 @@ fi
 # bat config
 if [ -x "$(command -v bat)" ]; then
     mkdir -p "$(bat --config-dir)/themes"
-    wget -P "$(bat --config-dir)/themes" https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20Mocha.tmTheme
-    bat cache --build
 else
     log "WARN" "bat command not found, skipping bat configuration"
 fi
