@@ -28,6 +28,28 @@ return {
       { "<c-l>", "<cmd><C-U>TmuxNavigateRight<cr>" },
       { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
     },
-  }
+  },
+
+  -- snacks config
+  {
+    "folke/snacks.nvim",
+    opts = {
+      picker = {
+        sources = {
+          explorer = {
+            follow = true, -- Crucial for symlinked dotfiles
+            ignored = true,
+            hidden = true, -- Ensure hidden files show up
+          },
+          files = {
+            hidden = true,
+            ignored = true,
+            follow = true,
+          }
+        },
+      },
+    },
+  },
+
   -- Import LazyVim extras (optional but recommended for your workflow)
 }

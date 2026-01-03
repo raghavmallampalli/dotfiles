@@ -18,7 +18,6 @@ require("lazy").setup({
   spec = {
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
     -- import/override with your plugins
-    { import = "lazyvim.plugins.extras.ui.mini-indentscope" },
     { import = "plugins" },
   },
   defaults = {

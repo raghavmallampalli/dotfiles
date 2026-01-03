@@ -202,7 +202,7 @@ install_yay() {
 
 install_arch_choice_tools() {
     log "INFO" "Installing 'choice' packages via yay"
-    run_yay -S --noconfirm --needed fzf ripgrep bat fd zoxide duf yazi-bin duckdb-bin
+    run_yay -S --noconfirm --needed fzf ripgrep bat fd zoxide duf yazi-bin duckdb-bin lazygit neovim
     finish_progress
 }
 
@@ -244,6 +244,11 @@ install_apt_always() {
     cp "./scripts/imv" "$HOME/.local/bin/"
     chmod +x "$HOME/.local/bin/imv"
     finish_progress
+
+    # neovim
+    run_command add-apt-repository ppa:neovim-ppa/stable
+    run_command apt-get update
+    run_command apt-get install neovim
 }
 
 install_apt() {
