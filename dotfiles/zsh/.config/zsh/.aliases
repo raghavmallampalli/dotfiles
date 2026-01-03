@@ -6,7 +6,6 @@ alias la='n'
 alias gettime='sudo date -s "$(wget -qSO- --max-redirect=0 google.com 2>&1 | grep Date: | cut -d" " -f5-8)Z";'
 alias list-repos="apt-cache policy |grep http |awk '{print $2 $3}' |sort -u"
 alias xo="xdg-open"
-alias vimdiff='vim -d'
 alias extract='atool --extract'
 alias compress='atool --add'
 alias egrep='egrep --color=auto'
@@ -15,18 +14,20 @@ alias printpath="echo \$PATH | sed 's/\\:/\\n/g'"
 
 alias cat='bat -p'
 alias aria="aria2c --file-allocation=none -c -x 10 -s 10"
-alias qcd="cd"
+
+alias vimdiff='nvim -d'
+alias n='nvim'
 
 # fzf aliases
 alias fzfupdate='cd ~/.fzf && git pull && ./install && cd -'
 alias fzp="fzf-tmux --preview 'bat --style=numbers --color=always {} | head -500'"
 
 # git aliases
-alias gpom="git push origin master"
-alias ggr="git log --all --decorate --oneline --graph"
+alias gpom="git push origin main"
+alias glgr="git log --all --decorate --oneline --graph"
 alias lsg="git ls-files"
 alias grmh="git switch main && git pull && git switch - && git rebase main"
-alias gpf="git push --force-with-lease --force-if-includes"
+alias gpff="git push --force-with-lease --force-if-includes"
 alias gsmh='git rebase -i --autosquash $(git merge-base main HEAD)'
 
 # tmux aliases

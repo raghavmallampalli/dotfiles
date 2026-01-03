@@ -159,7 +159,7 @@ install_yay_tools_always() {
     show_progress "Installing essentials and base tools via yay"
     # Essential tools and superset
     run_yay -S --needed --noconfirm wget curl zip unzip p7zip
-    run_yay -S --needed --noconfirm github-cli aria2 openssh inetutils zsh tmux vim htop nvtop rsync xclip jq cmake moreutils
+    run_yay -S --needed --noconfirm github-cli aria2 openssh inetutils zsh tmux vim htop nvtop rsync xclip jq cmake moreutils stow
     finish_progress
 
     # IMV script
@@ -212,7 +212,7 @@ install_apt_always() {
     show_progress "Updating system packages"
     run_command apt update -y
     run_command apt upgrade -y
-    run_command apt-get install git wget curl zip unzip 7zip -y
+    run_command apt-get install git wget curl zip unzip 7zip stow -y
     finish_progress
 
     show_progress "Setting up GitHub CLI keyring"

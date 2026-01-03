@@ -1,15 +1,36 @@
 #!/bin/zsh
 
-if [ -f ~/.aliases ]; then
-  source ~/.aliases
+# XDG Compliance for Zsh files
+export ZSH_COMPDUMP="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump"
+mkdir -p "${ZSH_COMPDUMP:h}"
+HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history" 
+
+if [ -f $ZDOTDIR/.aliases ]; then
+  source $ZDOTDIR/.aliases
 fi
-if [ -f ~/.env_vars ]; then
-  source ~/.env_vars
+if [ -f $ZDOTDIR/.env_vars ]; then
+  source $ZDOTDIR/.env_vars
 fi
 
+# Path to your Oh My Zsh installation.
+export ZSH="$HOME/.oh-my-zsh"
+
+# Set name of the theme to load --- if set to "random", it will
+# load a random theme each time Oh My Zsh is loaded, in which case,
+# to know which specific one was loaded, run: echo $RANDOM_THEME
+# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+ZSH_THEME="powerlevel10k/powerlevel10k"
+
+# Which plugins would you like to load?
+# Standard plugins can be found in $ZSH/plugins/
+# Custom plugins may be added to $ZSH_CUSTOM/plugins/
+# Example format: plugins=(git dotenv conda-zsh-completion zsh-autosuggestions zoxide fzf)
+# Add wisely, as too many plugins slow down shell startup.
+plugins=(git dotenv conda-zsh-completion zsh-autosuggestions zoxide fzf)
+
+source $ZSH/oh-my-zsh.sh
+
 # If set to true, tmux will auto-attach to a session if not already in one
-export TMUX_AUTO_ATTACH=true
-export SHELL="$(command -v zsh)"
 ########################### ATTACH TO TMUX SESSION ###########################
 if [[ $TMUX_AUTO_ATTACH = true ]]; then
   SESSION_NAME="General"
@@ -30,6 +51,10 @@ if [[ $TMUX_AUTO_ATTACH = true ]]; then
 fi
 ######################### POWERLEVEL10K INSTANT PROMPT ###########################
 
+# Customising prompt: powerlevel10k
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ${XDG_CONFIG_HOME:-$HOME/.config}/p10k.zsh ]] || source ${XDG_CONFIG_HOME:-$HOME/.config}/p10k.zsh
+
 # DO NOT MOVE THIS BLOCK ABOVE THE ATTACH TO TMUX SESSION BLOCK
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
@@ -40,21 +65,16 @@ fi
 
 ##################################################################################
 
-# Change directory with lf
-cl () {
-    tmp="$(mktemp)"
-    lf -last-dir-path="$tmp" "$@"
-    if [ -f "$tmp" ]; then
-        dir="$(cat "$tmp")"
-        rm -f "$tmp"
-        if [ -d "$dir" ]; then
-            if [ "$dir" != "$(pwd)" ]; then
-                cd "$dir"
-            fi
-        fi
-    fi
+# Change directory with yazi
+function yy() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		cd -- "$cwd"
+                zle reset-prompt
+	fi
+	rm -f -- "$tmp"
 }
-
 
 icp() {
     rsync --archive --verbose --compress --progress "$@"
@@ -72,29 +92,14 @@ bindkey 'kj' vi-cmd-mode
 autoload edit-command-line; zle -N edit-command-line
 bindkey -M vicmd V edit-command-line
 
-
 # Customising prompt: powerlevel10k
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# Correcting logic for p10k location
+[[ ! -f $ZDOTDIR/.p10k.zsh ]] || source $ZDOTDIR/.p10k.zsh
 
 # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 source <(fzf --zsh)
 [ -f ~/.fzf-git.sh ] && source ~/.fzf-git.sh
 
-# Configure fzf based on tmux version
-# tmux 3.2+ supports display-popup, so we can use tmux integration
-# tmux < 3.2 doesn't support it, so we disable tmux integration
-if command -v tmux &> /dev/null; then
-  tmux_version=$(tmux -V 2>/dev/null | grep -oE '[0-9]+\.[0-9]+')
-  major=$(echo $tmux_version | cut -d. -f1)
-  minor=$(echo $tmux_version | cut -d. -f2)
-  if (( major > 3 || (major == 3 && minor > 2) )); then
-    export FZF_DEFAULT_OPTS='--height 40% --tmux center,40%'
-  else
-    # Disable fzf's automatic tmux integration (tmux 3.1 doesn't support display-popup)
-    # This makes fzf run in the current pane instead of trying to use tmux popups
-    export FZF_TMUX=0
-    export TMUX_FZF_OPTIONS="--no-popup"
-  fi
-fi

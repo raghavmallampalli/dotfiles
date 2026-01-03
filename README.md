@@ -52,6 +52,15 @@ Run them in order:
 
 > IMPORTANT: `bash` shell is replaced by a `zsh+Oh-My-Zsh` configuration.
 
+### Dotfiles Management (Stow)
+We use [GNU Stow](https://www.gnu.org/software/stow/) to manage dotfiles.
+- **Install**: `setup.sh` runs `stow` to link configurations to your home directory.
+- **Move Repo**: If you move this repository, the symlinks will break. To fix them, run:
+  ```bash
+  stow -R -d dotfiles -t $HOME zsh tmux nvim yazi
+  ```
+within the directory of the repository.
+
 ### dev
 Programming languages, virtual environments, useful dev tools
 

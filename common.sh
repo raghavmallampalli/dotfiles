@@ -180,9 +180,16 @@ backup_configs() {
     backup_dir="$BACKUP_DIR/config_backup_$(date +%Y%m%d_%H%M%S)"
     show_progress "Backing up configurations"
     mkdir -p "$backup_dir"
-    for file in .zshrc .bashrc .vimrc .tmux.conf; do
+    for file in .zshrc .bashrc .vimrc .tmux.conf .zshenv; do
         if [ -f "$HOME/$file" ]; then
             cp "$HOME/$file" "$backup_dir/"
+        fi
+    done
+
+    # Backup XDG configs
+    for dir in nvim tmux zsh yazi hypr; do
+        if [ -d "$HOME/.config/$dir" ]; then
+             cp -r "$HOME/.config/$dir" "$backup_dir/$dir"
         fi
     done
     log "INFO" "Configurations backed up to $backup_dir"

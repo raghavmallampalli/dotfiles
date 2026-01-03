@@ -9,8 +9,7 @@ source "$(dirname "$0")/common.sh"
 trap 'cleanup ${LINENO} $?' EXIT
 
 # Parse command line arguments
-REPLACE_DOTFILES=""
-LINK_DOTFILES=""
+# Parse command line arguments
 SET_LOCAL_TIME=""
 GH_LOGIN=""
 SET_ZSH_DEFAULT=""
@@ -20,8 +19,6 @@ COPY_TMUX_CONFIG=""
 show_help() {
     echo "Usage: $0 [OPTIONS]"
     echo "Options:"
-    echo "  -r, --replace-dotfiles <y/n>   Replace dotfiles?"
-    echo "  -l, --link <y/n>               Soft-link dotfiles? (only if replacing, default: hard link)"
     echo "  -t, --local-time <y/n>         Set hardware clock to local time?"
     echo "  -g, --github-login <y/n>       Would you like to login to GitHub?"
     echo "  -z, --zsh-default <y/n>        Set zsh as default shell?"
@@ -37,14 +34,6 @@ while getopts ":-:" opt; do
     case $opt in
         -)
             case "${OPTARG}" in
-                replace-dotfiles)
-                    REPLACE_DOTFILES="${!OPTIND}"
-                    OPTIND=$((OPTIND + 1))
-                    ;;
-                link)
-                    LINK_DOTFILES="${!OPTIND}"
-                    OPTIND=$((OPTIND + 1))
-                    ;;
                 local-time)
                     SET_LOCAL_TIME="${!OPTIND}"
                     OPTIND=$((OPTIND + 1))
@@ -69,12 +58,6 @@ while getopts ":-:" opt; do
                     show_help
                     ;;
             esac
-            ;;
-        r)
-            REPLACE_DOTFILES="$OPTARG"
-            ;;
-        l)
-            LINK_DOTFILES="$OPTARG"
             ;;
         t)
             SET_LOCAL_TIME="$OPTARG"
@@ -131,17 +114,6 @@ log "INFO" "Starting setup..."
 backup_configs
 
 # Collect all user inputs at the start
-if [ -z "$REPLACE_DOTFILES" ]; then
-    read -p "Replace dotfiles? Read script to see which files will be replaced. [y/n] " REPLACE_DOTFILES
-fi
-
-if [[ $REPLACE_DOTFILES = y ]] && [ -z "$LINK_DOTFILES" ]; then
-    log "INFO" "Dotfiles will be hard linked by default (most efficient), or soft linked if you prefer."
-    log "WARN" "If you soft link, moving or deleting this repo folder will break the links."
-    read -p "Soft-link dotfiles? [y/n] (n=hard link, y=soft link) " LINK_DOTFILES
-    LINK_DOTFILES=${LINK_DOTFILES:-n}
-fi
-
 # Check if we can set local time (not WSL)
 if ! is_wsl; then
     if [ -z "$SET_LOCAL_TIME" ]; then
@@ -204,34 +176,29 @@ fi
 
 ########################################### DOT FILES ############################################
 
-if [[ $REPLACE_DOTFILES = y ]]; then
-    show_progress "Installing dotfiles"
-    dotfiles=(
-        ".aliases"
-        ".env_vars"
-        ".vimrc"
-        ".p10k.zsh"
-    )
+show_progress "Stowing dotfiles"
+# Ensure stow is installed (should be from install.sh)
+if command -v stow >/dev/null 2>&1; then
+    # We assume the script is run from the repo root or one level deep. 
+    # Best to be absolute or relative to script location.
+    REPO_ROOT="$(dirname "$(readlink -f "$0")")"
     
-    # Add tmux configuration only if user allows it
-    if [[ $COPY_TMUX_CONFIG = y ]]; then
-        dotfiles+=(".tmux.conf")
-    fi
-
-    for dotfile in "${dotfiles[@]}"; do
-        install_dotfile "./dotfiles/$dotfile" "$HOME/$dotfile" "$LINK_DOTFILES"
-    done
-
+    # Execute stow
+    # -d sets the directory to look for packages (relative to current or absolute)
+    # -t sets the target directory (Home)
+    stow -d "$REPO_ROOT/dotfiles" -t "$HOME" zsh tmux nvim yazi hypr
+    
     finish_progress
+else
+     log "ERROR" "Stow is not installed. Please run install.sh first."
+     finish_progress 1
+     exit 1
 fi
 
 ########################################### ENVIRONMENT ###########################################
 
 if [ -x "$(command -v zsh)"  ]; then
     show_progress "Configuring ZSH"
-    execute backup_and_delete "$HOME/.zshrc"
-    execute backup_and_delete "$HOME/.zshrc.common"
-    install_dotfile "./dotfiles/.zshrc.common" "$HOME/.zshrc.common" "$LINK_DOTFILES"
 
     if [ -d "$HOME/.oh-my-zsh" ]; then
         log "INFO" "Oh-My-Zsh already installed. Removing."
@@ -288,19 +255,14 @@ if [ -x "$(command -v zsh)"  ]; then
         finish_progress
     fi
 
-    echo "source \$HOME/.zshrc.common" | cat - "$HOME/.zshrc" > temp && mv temp "$HOME/.zshrc"
-
 fi
 
-if [ -d "$HOME/.tmux/plugins/tpm" ]; then
-    # Already installed, but check if we need to install it?
-    # Actually, install.sh installs tmux, but setup.sh configures it.
-    # We should probably ensure TPM is there if tmux is there.
-    :
+if [ -d "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tpm" ]; then
+    log "INFO" "TPM already installed, skipping installation."
 else
     if [ -x "$(command -v tmux)" ]; then
-        mkdir -p "$HOME/.tmux/plugins"
-        git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+        mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins"
+        git clone https://github.com/tmux-plugins/tpm "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tpm"
     fi
 fi
 
@@ -310,27 +272,6 @@ if [ -x "$(command -v bat)" ]; then
 else
     log "WARN" "bat command not found, skipping bat configuration"
 fi
-
-
-# Install yazi configuration files
-show_progress "Installing yazi plugins"
-if command -v ya >/dev/null 2>&1; then
-    ya pkg add wylie102/duckdb || log "WARN" "Failed to install yazi duckdb plugin"
-    ya pkg add AnirudhG07/rich-preview || log "WARN" "Failed to install yazi rich-preview plugin"
-else
-    log "WARN" "ya command not found, skipping plugin installation"
-fi
-finish_progress
-
-show_progress "Installing yazi configuration files"
-mkdir -p "$HOME/.config/yazi"
-for yazi_file in ./dotfiles/yazi/*; do
-    if [ -f "$yazi_file" ]; then
-        install_dotfile "$yazi_file" "$HOME/.config/yazi/$(basename "$yazi_file")" "$LINK_DOTFILES"
-    fi
-done
-
-finish_progress
 
 if ! is_wsl; then
     log "INFO" "Mount windows partitions at startup using 'sudo fdisk -l' and by editing /etc/fstab"
