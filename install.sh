@@ -246,9 +246,9 @@ install_apt_always() {
     finish_progress
 
     # neovim
-    run_command add-apt-repository ppa:neovim-ppa/stable
+    run_command add-apt-repository -y ppa:neovim-ppa/stable
     run_command apt-get update
-    run_command apt-get install neovim
+    run_command apt-get install neovim -y
 }
 
 install_apt() {
