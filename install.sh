@@ -27,38 +27,38 @@ show_help() {
 # Parse options
 while getopts ":-:" opt; do
     case $opt in
-        -)
-            case "${OPTARG}" in
-                sudo-access)
-                    HAS_SUDO="${!OPTIND}"
-                    OPTIND=$((OPTIND + 1))
-                    ;;
-                binaries-install)
-                    INSTALL_FROM_BINARIES="${!OPTIND}"
-                    OPTIND=$((OPTIND + 1))
-                    ;;
-                help)
-                    show_help
-                    ;;
-                *)
-                    echo "Unknown option: --${OPTARG}"
-                    show_help
-                    ;;
-            esac
+    -)
+        case "${OPTARG}" in
+        sudo-access)
+            HAS_SUDO="${!OPTIND}"
+            OPTIND=$((OPTIND + 1))
             ;;
-        s)
-            HAS_SUDO="$OPTARG"
+        binaries-install)
+            INSTALL_FROM_BINARIES="${!OPTIND}"
+            OPTIND=$((OPTIND + 1))
             ;;
-        b)
-            INSTALL_FROM_BINARIES="$OPTARG"
-            ;;
-        h)
+        help)
             show_help
             ;;
-        \?)
-            echo "Invalid option: -$OPTARG"
+        *)
+            echo "Unknown option: --${OPTARG}"
             show_help
             ;;
+        esac
+        ;;
+    s)
+        HAS_SUDO="$OPTARG"
+        ;;
+    b)
+        INSTALL_FROM_BINARIES="$OPTARG"
+        ;;
+    h)
+        show_help
+        ;;
+    \?)
+        echo "Invalid option: -$OPTARG"
+        show_help
+        ;;
     esac
 done
 
@@ -146,7 +146,7 @@ run_yay() {
 
 install_yay_always() {
     log "INFO" "Installing bootstrap packages for Arch Linux..."
-    
+
     show_progress "Updating system and installing prerequisites"
     # Basic tools needed to bootstrap the rest
     run_command pacman -Sy --needed --noconfirm git base-devel ca-certificates
@@ -171,29 +171,29 @@ install_yay_tools_always() {
 
 install_yay() {
     log "INFO" "Starting yay installation..."
-    
+
     if ! command -v yay >/dev/null 2>&1; then
         show_progress "Installing yay"
         # We use /tmp to avoid permission issues if the current directory is inside /root
         local YAY_BUILD_DIR="/tmp/yay-bin"
         if [ -d "$YAY_BUILD_DIR" ]; then rm -rf "$YAY_BUILD_DIR"; fi
         git clone https://aur.archlinux.org/yay-bin.git "$YAY_BUILD_DIR"
-        
+
         local CURRENT_DIR=$(pwd)
         cd "$YAY_BUILD_DIR"
-        
+
         if [ "$EUID" -eq 0 ]; then
             log "WARN" "Running makepkg as root. Creating temporary builder user..."
             if ! id -u builder >/dev/null 2>&1; then
                 useradd -m builder
-                echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+                echo "builder ALL=(ALL) NOPASSWD: ALL" >>/etc/sudoers
             fi
             chown -R builder:builder .
             su builder -c "makepkg -si --noconfirm"
         else
             makepkg -si --noconfirm
         fi
-        
+
         cd "$CURRENT_DIR"
         rm -rf "$YAY_BUILD_DIR"
         finish_progress
@@ -218,7 +218,7 @@ install_apt_always() {
     show_progress "Setting up GitHub CLI keyring"
     curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | run_command dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
     run_command chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | run_command tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | run_command tee /etc/apt/sources.list.d/github-cli.list >/dev/null
     finish_progress
     run_command apt-get install gh -y
 
@@ -245,10 +245,8 @@ install_apt_always() {
     chmod +x "$HOME/.local/bin/imv"
     finish_progress
 
-    # neovim
-    run_command add-apt-repository -y ppa:neovim-ppa/stable
-    run_command apt-get update
-    run_command apt-get install neovim -y
+    # neovim: no other stable version exists
+    run_command snap install nvim --classic
 }
 
 install_apt() {
@@ -256,13 +254,13 @@ install_apt() {
 
     show_progress "Installing 'choice' packages via apt"
     run_command apt-get install zoxide bat -y
-    
+
     # FD
     run_command apt-get install fd-find -y
     ln -sf "$(which fdfind)" "$HOME/.local/bin/fd"
 
     # Ripgrep
-    url=$(wget "https://api.github.com/repos/BurntSushi/ripgrep/releases/latest" -qO-| grep browser_download_url | grep "deb" | head -n 1 | cut -d \" -f 4)
+    url=$(wget "https://api.github.com/repos/BurntSushi/ripgrep/releases/latest" -qO- | grep browser_download_url | grep "deb" | head -n 1 | cut -d \" -f 4)
     wget "$url" -qO /tmp/rg.deb
     run_command dpkg -i /tmp/rg.deb
     run_command apt-get install -f
@@ -285,7 +283,7 @@ install_apt() {
 
 install_binaries() {
     log "INFO" "Starting Binary/Manual installation (Choice route)..."
-    
+
     # FZF
     if ! command -v fzf >/dev/null 2>&1; then
         show_progress "Installing FZF"
@@ -304,32 +302,32 @@ install_binaries() {
 
     # DUF
     show_progress "Installing DUF"
-    url=$(wget "https://api.github.com/repos/muesli/duf/releases/latest" -qO-| grep browser_download_url | grep "linux_x86_64" | grep ".tar.gz" | head -n 1 | cut -d \" -f 4)
+    url=$(wget "https://api.github.com/repos/muesli/duf/releases/latest" -qO- | grep browser_download_url | grep "linux_x86_64" | grep ".tar.gz" | head -n 1 | cut -d \" -f 4)
     wget "$url" -qO- | tar -xz -C /tmp/
     mv /tmp/duf "$HOME/.local/bin/"
     finish_progress
 
     # BAT
     show_progress "Installing BAT"
-    url=$(wget "https://api.github.com/repos/sharkdp/bat/releases/latest" -qO-| grep browser_download_url | grep "gnu" | grep "x86_64" | grep "linux" | head -n 1 | cut -d \" -f 4)
+    url=$(wget "https://api.github.com/repos/sharkdp/bat/releases/latest" -qO- | grep browser_download_url | grep "gnu" | grep "x86_64" | grep "linux" | head -n 1 | cut -d \" -f 4)
     wget "$url" -qO- | tar -xz -C /tmp/
     mv /tmp/bat*/bat "$HOME/.local/bin/"
     finish_progress
 
     # FD
     show_progress "Installing FD"
-    url=$(wget "https://api.github.com/repos/sharkdp/fd/releases/latest" -qO-|grep browser_download_url | grep "gnu" | grep "x86_64" | grep "linux" | head -n 1 | cut -d \" -f 4)
+    url=$(wget "https://api.github.com/repos/sharkdp/fd/releases/latest" -qO- | grep browser_download_url | grep "gnu" | grep "x86_64" | grep "linux" | head -n 1 | cut -d \" -f 4)
     wget "$url" -qO- | tar -xz -C /tmp
     mv /tmp/fd*/fd "$HOME/.local/bin/"
     finish_progress
 
     # RIPGREP
     show_progress "Installing Ripgrep"
-    url=$(wget "https://api.github.com/repos/BurntSushi/ripgrep/releases/latest" -qO-| grep browser_download_url | grep "x86_64" | grep "linux" | head -n 1 | cut -d \" -f 4)
+    url=$(wget "https://api.github.com/repos/BurntSushi/ripgrep/releases/latest" -qO- | grep browser_download_url | grep "x86_64" | grep "linux" | head -n 1 | cut -d \" -f 4)
     wget "$url" -qO- | tar -xz -C /tmp/
     mv /tmp/ripgrep*/rg "$HOME/.local/bin/"
     finish_progress
-    
+
     install_yazi_manual
     install_duckdb_manual
 }
@@ -372,7 +370,7 @@ install_rich_cli_manual() {
 # UV
 show_progress "Installing UV"
 curl -LsSf https://astral.sh/uv/install.sh | sh
-echo 'eval "$(uv generate-shell-completion zsh)"' >> "$HOME/.zshrc"
+echo 'eval "$(uv generate-shell-completion zsh)"' >>"$HOME/.zshrc"
 finish_progress
 
 if [[ "$OS_ID" == "arch" ]]; then

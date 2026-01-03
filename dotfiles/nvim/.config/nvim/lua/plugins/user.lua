@@ -1,9 +1,9 @@
 return {
   -- Theme
-  { 
-    "catppuccin/nvim", 
-    name = "catppuccin", 
-    opts = { flavour = "mocha", transparent_background = false } 
+  {
+    "catppuccin/nvim",
+    name = "catppuccin",
+    opts = { flavour = "mocha", transparent_background = false },
   },
 
   -- Logic to ensure Catppuccin loads
@@ -45,7 +45,7 @@ return {
             hidden = true,
             ignored = true,
             follow = true,
-          }
+          },
         },
       },
     },
