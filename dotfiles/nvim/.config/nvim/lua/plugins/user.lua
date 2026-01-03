@@ -12,7 +12,7 @@ return {
   -- Essential logic from your old setup not in LazyVim core
   {
     "christoomey/vim-tmux-navigator",
-    event = "VeryLazy"
+    event = "VeryLazy",
     cmd = {
       "TmuxNavigateLeft",
       "TmuxNavigateDown",
