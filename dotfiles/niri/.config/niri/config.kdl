@@ -2,16 +2,6 @@
 // Check the wiki for a full description of the configuration:
 // https://yalter.github.io/niri/Configuration:-Introduction
 
-// Output configuration.
-// Run `niri msg outputs` to find the names of your outputs.
-include "monitors.kdl"
-include "dms/colors.kdl"
-include "dms/layout.kdl"
-include "dms/wpblur.kdl"
-include "dms/alttab.kdl"
-include "bindings.kdl"
-include "windowrules.kdl"
-
 // Autostart
 spawn-at-startup "copyq" "--start-server"
 spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP" "DISPLAY"
@@ -25,8 +15,6 @@ prefer-no-csd
 // Scratchpad Terminal
 // spawn-at-startup "ghostty" "--class" "scratchpad"
 
-// Named Workspaces (for scratchpad/persistent)
-workspace "scratchpad"
 
 // Input device configuration.
 input {
@@ -65,3 +53,10 @@ animations {
     // slowdown 3.0
 }
 
+include "monitors.kdl"
+include "dms/colors.kdl"
+include "dms/layout.kdl"
+include "dms/wpblur.kdl"
+include "dms/alttab.kdl"
+include "windowrules.kdl"
+include "bindings.kdl"

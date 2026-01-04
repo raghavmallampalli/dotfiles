@@ -12,23 +12,24 @@ binds {
     // Applications
     Mod+Return { spawn "ghostty"; }
     Mod+Shift+C { spawn "cursor"; }
-    Mod+A { spawn "antigravity"; }
+    Mod+Shift+A { spawn "antigravity"; }
     Mod+E { spawn "nautilus"; }
-    Mod+B { spawn "brave"; }
-    Mod+Shift+B { spawn "google-chrome-stable"; }
+    Mod+Shift+B { spawn "brave"; }
+    Mod+B { spawn "google-chrome-stable"; }
 
     // Scratchpad Toggle
-    Mod+S { focus-workspace "scratchpad"; } 
-    // Hyprland: Mod+Grave -> special:termspace. Mapping to Mod+S for simplicity or keep Mod+Grave
-    Mod+Grave { focus-workspace "scratchpad"; }
-
+    // Hacky solution to create a special workspace equivalent
+    Mod+Grave { spawn "ndrop" "ghostty" "--class=com.mitchellh.quake"; }
+    Mod+A     { spawn "ndrop" "-c" "chrome-gemini.google.com__app-Default" "google-chrome-stable" "--app=https://gemini.google.com/app"; }
+    
     // System
-    Super+Alt+L { spawn "dms ipc call lock lock"; } // Or dms ipc call lock lock
-    Mod+Shift+E { quit; }
+    Super+Alt+L     { spawn "dms" "ipc" "call" "lock" "lock"; } // Or dms ipc call lock lock
+    Mod+Shift+E     { quit; }
     Ctrl+Alt+Delete { spawn "dms" "ipc" "call" "processlist" "focusOrToggle"; }
-    Mod+Shift+P { power-off-monitors; }
-    XF86PowerOff allow-when-locked=true { spawn "systemctl" "sleep"; }
-    Alt+F4 { spawn "dms" "ipc" "call" "powermenu" "toggle"; }
+    Mod+Shift+P     { power-off-monitors; }
+    XF86PowerOff    allow-when-locked=true { spawn "systemctl" "sleep"; }
+    Alt+F4          { spawn "dms" "ipc" "call" "powermenu" "toggle"; }
+    Mod+Tab         { toggle-overview; }
 
     // Audio / Media
     XF86AudioRaiseVolume allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "increment" "3"; }
@@ -41,17 +42,17 @@ binds {
     XF86AudioPrev        allow-when-locked=true { spawn "playerctl" "previous"; }
     XF86AudioNext        allow-when-locked=true { spawn "playerctl" "next"; }
 
-    Ctrl+Alt+O        allow-when-locked=true { spawn "playerctl" "play-pause"; }
-    Ctrl+Alt+P        allow-when-locked=true { spawn "playerctl" "next"; }
-    Ctrl+Alt+I        allow-when-locked=true { spawn "playerctl" "previous"; }
+    Ctrl+Alt+O           allow-when-locked=true { spawn "playerctl" "play-pause"; }
+    Ctrl+Alt+P           allow-when-locked=true { spawn "playerctl" "next"; }
+    Ctrl+Alt+I           allow-when-locked=true { spawn "playerctl" "previous"; }
     
     // Brightness
     XF86MonBrightnessUp   allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "increment" "5" ""; }
     XF86MonBrightnessDown allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "decrement" "5" ""; }
 
     // Window Management
-    Mod+W { close-window; }
-    Mod+F { maximize-column; }
+    Mod+W       { close-window; }
+    Mod+F       { maximize-column; }
     Mod+Shift+F { fullscreen-window; }
     Mod+V       { toggle-window-floating; }
     Mod+T       { toggle-window-floating; }
@@ -95,30 +96,26 @@ binds {
     // Workspaces
     Mod+Page_Down { focus-workspace-down; }
     Mod+Page_Up   { focus-workspace-up; }
-    Mod+U         { focus-workspace-down; }
-    Mod+I         { focus-workspace-up; }
+    Mod+D         { focus-workspace-down; }
+    Mod+U         { focus-workspace-up; }
 
-    Mod+Ctrl+Page_Down { move-column-to-workspace-down; }
-    Mod+Ctrl+Page_Up   { move-column-to-workspace-up; }
-    Mod+Ctrl+U         { move-column-to-workspace-down; }
-    Mod+Ctrl+I         { move-column-to-workspace-up; }
+    Mod+Shift+Page_Down { move-column-to-workspace-down; }
+    Mod+Shift+Page_Up   { move-column-to-workspace-up; }
+    Mod+Shift+D         { move-column-to-workspace-down; }
+    Mod+Shift+U         { move-column-to-workspace-up; }
 
     // Mouse Wheel
     Mod+WheelScrollDown      cooldown-ms=150 { focus-workspace-down; }
     Mod+WheelScrollUp        cooldown-ms=150 { focus-workspace-up; }
-    Mod+Ctrl+WheelScrollDown cooldown-ms=150 { move-column-to-workspace-down; }
-    Mod+Ctrl+WheelScrollUp   cooldown-ms=150 { move-column-to-workspace-up; }
+    Mod+Shift+WheelScrollDown cooldown-ms=150 { move-column-to-workspace-down; }
+    Mod+Shift+WheelScrollUp   cooldown-ms=150 { move-column-to-workspace-up; }
 
     // Numbered Workspaces
-    Mod+1 { focus-workspace 1; }
-    Mod+2 { focus-workspace 2; }
-    Mod+3 { focus-workspace 3; }
-    Mod+4 { focus-workspace 4; }
-    Mod+5 { focus-workspace 5; }
-    Mod+6 { focus-workspace 6; }
-    Mod+7 { focus-workspace 7; }
-    Mod+8 { focus-workspace 8; }
-    Mod+9 { focus-workspace 9; }
+    Mod+1 { focus-workspace "work-code"; }
+    Mod+2 { focus-workspace "projects"; }
+    Mod+3 { focus-workspace "work"; }
+    Mod+4 { focus-workspace "personal"; }
+    Mod+5 { focus-workspace "music"; }
 
     Mod+Shift+1 { move-column-to-workspace 1; }
     Mod+Shift+2 { move-column-to-workspace 2; }
@@ -131,19 +128,20 @@ binds {
     Mod+Shift+9 { move-column-to-workspace 9; }
 
     // Layout Adjustment
-    Mod+R { switch-preset-column-width; }
+    Mod+R            { switch-preset-column-width; }
     Mod+BracketLeft  { consume-or-expel-window-left; }
     Mod+BracketRight { consume-or-expel-window-right; }
-    Mod+C { center-column; }
+    Mod+Shift+W      { toggle-column-tabbed-display; }
+    Mod+C            { center-column; }
 
     Mod+Minus { set-column-width "-10%"; }
     Mod+Equal { set-column-width "+10%"; }
 
     // Screenshots
     Mod+Shift+S { screenshot;}
-    Print { screenshot; }
-    Ctrl+Print { screenshot-screen; }
-    Alt+Print { screenshot-window; }
+    Print       { screenshot; }
+    Ctrl+Print  { screenshot-screen; }
+    Alt+Print   { screenshot-window; }
 
     // CopyQ
     Ctrl+Alt+V { spawn "copyq" "show"; }

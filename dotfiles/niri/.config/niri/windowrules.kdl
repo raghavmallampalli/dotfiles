@@ -1,75 +1,123 @@
+workspace "work-code" {
+    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
+}
+workspace "projects" {
+    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
+}
+workspace "socials" {
+    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
+}
+workspace "media" {
+    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
+}
+workspace "work" {
+    open-on-output "PNP(BNQ) BenQ GW2283 WCL01584019"
+}
+workspace "personal" {
+    open-on-output "PNP(BNQ) BenQ GW2283 WCL01584019"
+}
+workspace "music" {
+    open-on-output "eDP-1"
+}
+workspace "draw" {
+    open-on-output "eDP-1"
+}
+workspace "ndrop"
+
 window-rule {
     match title="Picture in picture"
-
+    open-on-workspace "music"
     open-floating true
 }
 
+// Scratch windows
 window-rule {
-    match app-id=r#"^org\.wezfurlong\.wezterm$"#
-    default-column-width {}
-}
-
-window-rule {
-    match app-id="firefox$" title="^Picture-in-Picture$"
+    match app-id="chrome-gemini.google.com__app-Default"
     open-floating true
+    default-column-width  { proportion 0.8; }
+    default-window-height { proportion 0.8; }
 }
-
-// window-rule {
-//     match app-id="scratchpad"
-//     open-on-workspace "scratchpad"
-//     open-floating true
-//     default-column-width { fixed 1000; }
-//     default-window-height { fixed 600; }
-// }
+window-rule {
+    match app-id="com.mitchellh.quake"
+    open-floating true
+    default-column-width  { proportion 0.6; }
+    default-window-height { proportion 0.6; }
+}
 
 window-rule {
     match app-id="com.github.hluk.copyq"
     open-floating true
+    open-focused true
+}
+
+// Extension pop-ups
+//window-rule {
+//    match app-id=r#"^chrome-.*$"#
+//    open-floating true
+//}
+
+window-rule {
+    match app-id="spotify"
+    open-focused true
+    open-maximized true
+    open-on-workspace "music"
 }
 
 window-rule {
-    match app-id=r#"^(_crx_.*)$"#
-    open-floating true
-}
-
-window-rule {
-    match app-id="Spotify"
-    open-on-output "eDP-1"
-    open-on-workspace "1"
-}
-
-window-rule {
-    match app-id="Cursor"
-    open-on-workspace "1"
+    match app-id="cursor"
+    open-on-workspace "work-code"
+    open-focused true
+    open-maximized true
     opacity 0.9
 }
 
 window-rule {
     match app-id="Code"
-    open-on-workspace "4"
+    open-on-workspace "projects"
+    open-focused true
+    open-maximized true
     opacity 0.9
 }
 
 window-rule {
-    match app-id="Antigravity"
-    open-on-workspace "4"
+    match app-id="antigravity"
+    open-on-workspace "projects"
+    open-focused true
+    open-maximized true
     opacity 0.9
 }
 
 window-rule {
     match app-id="google-chrome"
-    open-on-workspace "8"
+    open-focused true
+    open-maximized true
+    open-on-workspace "personal"
 }
 
 window-rule {
     match app-id="brave-browser"
-    open-on-workspace "7"
+    open-focused true
+    open-maximized true
+    open-on-workspace "work"
+}
+
+window-rule {
+    match title="OBS"
+    open-on-output "eDP-1"
+}
+
+window-rule {
+    match title="Krita"
+    open-focused true
+    open-maximized true
+    open-on-workspace "draw"
 }
 
 // Whatsapp Web
 window-rule {
     match app-id=".*hnpfjngllnobngcgfapefoaidbinmjnm.*"
-    open-on-workspace "5"
+    open-focused true
+    open-on-workspace "socials"
 }
 
 // Example: block out password managers from screen capture
