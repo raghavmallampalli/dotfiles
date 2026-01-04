@@ -1,0 +1,5 @@
+window-rule {
+    match title="Picture in picture"
+
+    open-floating true
+}
