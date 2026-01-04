@@ -2,6 +2,14 @@
 // Check the wiki for a full description of the configuration:
 // https://yalter.github.io/niri/Configuration:-Introduction
 
+// Output configuration.
+// Run `niri msg outputs` to find the names of your outputs.
+include "monitors.kdl"
+include "dms/colors.kdl"
+include "dms/layout.kdl"
+include "dms/wpblur.kdl"
+include "dms/alttab.kdl"
+
 // Input device configuration.
 input {
     keyboard {
@@ -17,7 +25,6 @@ input {
         // off
         tap
         natural-scroll
-        // Hyprland: scroll_factor = 0.4. Niri needs this in touchpad section.
         scroll-factor 0.4
     }
 
@@ -28,56 +35,19 @@ input {
     }
 
     // focus-follows-mouse
-    warp-mouse-to-focus
-}
-
-// Output configuration.
-// Run `niri msg outputs` to find the names of your outputs.
-// output "eDP-1" {
-//     mode "1920x1080@60"
-//     scale 1
-//     transform "normal"
-//     position x=0 y=0
-// }
-
-layout {
-    gaps 16
-    center-focused-column "never"
-
-    preset-column-widths {
-        proportion 0.33333
-        proportion 0.5
-        proportion 0.66667
-    }
-
-    default-column-width { proportion 0.5; }
-
-    focus-ring {
-        width 4
-        active-color "#7fc8ff"
-        inactive-color "#505050"
-    }
-
-    border {
-        off
-        width 4
-        active-color "#ffc87f"
-        inactive-color "#505050"
-    }
+    // warp-mouse-to-focus
+    focus-follows-mouse max-scroll-amount="10%"
 }
 
 // Autostart
-spawn-at-startup "dms" "run"
 spawn-at-startup "copyq" "--start-server"
 spawn-at-startup "dbus-update-activation-environment" "--systemd" "--all"
 spawn-at-startup "gnome-keyring-daemon" "--start" "--components=secrets"
 spawn-at-startup "wl-paste" "--watch" "cliphist" "store"
-
-// Polkit Agent (Essential for GUI apps to request privileges)
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 
 // Scratchpad Terminal
-spawn-at-startup "ghostty" "--class" "scratchpad"
+// spawn-at-startup "ghostty" "--class" "scratchpad"
 
 // Screenshot path
 screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
@@ -294,7 +264,11 @@ binds {
     Mod+Equal { set-column-width "+10%"; }
 
     // Screenshots
+    Mod+Shift+S { screenshot;}
     Print { screenshot; }
     Ctrl+Print { screenshot-screen; }
     Alt+Print { screenshot-window; }
+
+    // CopyQ
+    Ctrl+Alt+V { spawn "copyq"; }
 }
