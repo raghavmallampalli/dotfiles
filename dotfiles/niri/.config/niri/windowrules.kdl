@@ -3,3 +3,77 @@ window-rule {
 
     open-floating true
 }
+
+window-rule {
+    match app-id=r#"^org\.wezfurlong\.wezterm$"#
+    default-column-width {}
+}
+
+window-rule {
+    match app-id="firefox$" title="^Picture-in-Picture$"
+    open-floating true
+}
+
+// window-rule {
+//     match app-id="scratchpad"
+//     open-on-workspace "scratchpad"
+//     open-floating true
+//     default-column-width { fixed 1000; }
+//     default-window-height { fixed 600; }
+// }
+
+window-rule {
+    match app-id="com.github.hluk.copyq"
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"^(_crx_.*)$"#
+    open-floating true
+}
+
+window-rule {
+    match app-id="Spotify"
+    open-on-output "eDP-1"
+    open-on-workspace "1"
+}
+
+window-rule {
+    match app-id="Cursor"
+    open-on-workspace "1"
+    opacity 0.9
+}
+
+window-rule {
+    match app-id="Code"
+    open-on-workspace "4"
+    opacity 0.9
+}
+
+window-rule {
+    match app-id="Antigravity"
+    open-on-workspace "4"
+    opacity 0.9
+}
+
+window-rule {
+    match app-id="google-chrome"
+    open-on-workspace "8"
+}
+
+window-rule {
+    match app-id="brave-browser"
+    open-on-workspace "7"
+}
+
+// Whatsapp Web
+window-rule {
+    match app-id=".*hnpfjngllnobngcgfapefoaidbinmjnm.*"
+    open-on-workspace "5"
+}
+
+// Example: block out password managers from screen capture
+// window-rule {
+//     match app-id=r#"^org\.keepassxc\.KeePassXC$"#
+//     block-out-from "screen-capture"
+// }

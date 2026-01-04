@@ -20,6 +20,14 @@ spawn-at-startup "wl-paste" "--watch" "cliphist" "store"
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 spawn-at-startup "xwayland-satellite"
 
+prefer-no-csd
+
+// Scratchpad Terminal
+// spawn-at-startup "ghostty" "--class" "scratchpad"
+
+// Named Workspaces (for scratchpad/persistent)
+workspace "scratchpad"
+
 // Input device configuration.
 input {
     keyboard {
@@ -49,90 +57,11 @@ input {
     focus-follows-mouse max-scroll-amount="10%"
 }
 
-// Scratchpad Terminal
-// spawn-at-startup "ghostty" "--class" "scratchpad"
-
 // Screenshot path
-screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
+screenshot-path "~/Pictures/Screenshots/Screenshot_%Y-%m-%d_%H-%M-%S.png"
 
 // Animations
 animations {
     // slowdown 3.0
 }
 
-// Window Rules
-window-rule {
-    match app-id=r#"^org\.wezfurlong\.wezterm$"#
-    default-column-width {}
-}
-
-window-rule {
-    match app-id="firefox$" title="^Picture-in-Picture$"
-    open-floating true
-}
-
-window-rule {
-    match app-id="scratchpad"
-    open-on-workspace "scratchpad"
-    open-floating true
-    default-column-width { fixed 1000; }
-    default-window-height { fixed 600; }
-}
-
-window-rule {
-    match app-id="com.github.hluk.copyq"
-    open-floating true
-}
-
-window-rule {
-    match app-id=r#"^(_crx_.*)$"#
-    open-floating true
-}
-
-window-rule {
-    match app-id="Spotify"
-    open-on-workspace "9"
-}
-
-window-rule {
-    match app-id="Cursor"
-    open-on-workspace "1"
-    opacity 0.9
-}
-
-window-rule {
-    match app-id="Code"
-    open-on-workspace "4"
-    opacity 0.9
-}
-
-window-rule {
-    match app-id="Antigravity"
-    open-on-workspace "4"
-    opacity 0.9
-}
-
-window-rule {
-    match app-id="google-chrome"
-    open-on-workspace "8"
-}
-
-window-rule {
-    match app-id="brave-browser"
-    open-on-workspace "7"
-}
-
-// Whatsapp Web
-window-rule {
-    match app-id=".*hnpfjngllnobngcgfapefoaidbinmjnm.*"
-    open-on-workspace "5"
-}
-
-// Example: block out password managers from screen capture
-// window-rule {
-//     match app-id=r#"^org\.keepassxc\.KeePassXC$"#
-//     block-out-from "screen-capture"
-// }
-
-// Named Workspaces (for scratchpad/persistent)
-workspace "scratchpad"
