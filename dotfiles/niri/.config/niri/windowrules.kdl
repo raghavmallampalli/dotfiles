@@ -22,7 +22,9 @@ workspace "music" {
 workspace "draw" {
     open-on-output "eDP-1"
 }
-workspace "ndrop"
+workspace "ndrop" {
+    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
+}
 
 window-rule {
     match title="Picture in picture"
@@ -138,4 +140,5 @@ window-rule {
     match app-id=".*hnpfjngllnobngcgfapefoaidbinmjnm.*"
     open-focused      true
     open-on-workspace "socials"
+    default-column-width { proportion 0.75; }
 }

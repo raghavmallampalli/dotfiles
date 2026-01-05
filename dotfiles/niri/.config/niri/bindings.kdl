@@ -23,7 +23,7 @@ binds {
     Mod+A     { spawn "ndrop" "-c" "chrome-gemini.google.com__app-Default" "google-chrome-stable" "--app=https://gemini.google.com/app"; }
     
     // System
-    Super+Alt+L     { spawn "dms" "ipc" "call" "lock" "lock"; } // Or dms ipc call lock lock
+    Mod+Alt+L     { spawn "dms" "ipc" "call" "lock" "lock"; } // Or dms ipc call lock lock
     Mod+Shift+E     { quit; }
     Ctrl+Alt+Delete { spawn "dms" "ipc" "call" "processlist" "focusOrToggle"; }
     Mod+Shift+P     { power-off-monitors; }
@@ -58,52 +58,53 @@ binds {
     Mod+V     { toggle-window-floating; }
     Mod+T     { toggle-window-floating; }
 
+    // MOVING WINDOWS AND FOCUS HINTS
+    // Shift: move window
+    // Alt:   move workspace
+    // Ctrl:  monitor
+    // Vim-like motions
+
     // Focus Navigation
-    Mod+Left  { focus-column-left; }
-    Mod+Down  { focus-window-down; }
-    Mod+Up    { focus-window-up; }
-    Mod+Right { focus-column-right; }
     Mod+H     { focus-column-left; }
     Mod+J     { focus-window-down; }
     Mod+K     { focus-window-up; }
     Mod+L     { focus-column-right; }
 
     // Move Window/Column
-    Mod+Shift+Left  { move-column-left; }
-    Mod+Shift+Down  { move-window-down; }
-    Mod+Shift+Up    { move-window-up; }
-    Mod+Shift+Right { move-column-right; }
     Mod+Shift+H     { move-column-left; }
     Mod+Shift+J     { move-window-down; }
     Mod+Shift+K     { move-window-up; }
     Mod+Shift+L     { move-column-right; }
 
     // Monitor Navigation
-    Mod+Ctrl+Left  { focus-monitor-left; }
-    Mod+Ctrl+Right { focus-monitor-right; }
     Mod+Ctrl+H     { focus-monitor-left; }
     Mod+Ctrl+J     { focus-monitor-down; }
     Mod+Ctrl+K     { focus-monitor-up; }
     Mod+Ctrl+L     { focus-monitor-right; }
 
-    // Move to Monitor
-    Mod+Shift+Ctrl+Left  { move-column-to-monitor-left; }
-    Mod+Shift+Ctrl+Right { move-column-to-monitor-right; }
+    // Move column to Monitor
     Mod+Shift+Ctrl+H     { move-column-to-monitor-left; }
     Mod+Shift+Ctrl+J     { move-column-to-monitor-down; }
     Mod+Shift+Ctrl+K     { move-column-to-monitor-up; }
     Mod+Shift+Ctrl+L     { move-column-to-monitor-right; }
 
-    // Workspaces
-    Mod+Page_Down { focus-workspace-down; }
-    Mod+Page_Up   { focus-workspace-up; }
+    // Focus Workspaces
     Mod+D         { focus-workspace-down; }
     Mod+U         { focus-workspace-up; }
 
-    Mod+Shift+Page_Down { move-column-to-workspace-down; }
-    Mod+Shift+Page_Up   { move-column-to-workspace-up; }
+    // Move columns between workspaces
     Mod+Shift+D         { move-column-to-workspace-down; }
     Mod+Shift+U         { move-column-to-workspace-up; }
+
+    // Move workspace (swap them within a monitor)
+    Mod+Alt+D         { move-workspace-down; }
+    Mod+Alt+U         { move-workspace-up; }
+    
+    // Move workspace between monitors
+    Mod+Ctrl+Alt+J         { move-workspace-to-monitor-down; }
+    Mod+Ctrl+Alt+K         { move-workspace-to-monitor-up; }
+    Mod+Ctrl+Alt+H         { move-workspace-to-monitor-left; }
+    Mod+Ctrl+Alt+L         { move-workspace-to-monitor-right; }
 
     // Mouse Wheel
     Mod+WheelScrollDown      cooldown-ms=150 { focus-workspace-down; }

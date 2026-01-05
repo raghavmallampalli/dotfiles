@@ -202,7 +202,7 @@ install_yay() {
 
 install_arch_choice_tools() {
     log "INFO" "Installing 'choice' packages via yay"
-    run_yay -S --noconfirm --needed fzf ripgrep bat fd zoxide duf yazi-bin duckdb-bin lazygit neovim
+    run_yay -S --noconfirm --needed fzf ripgrep bat fd zoxide duf yazi-bin lazygit neovim
     finish_progress
 }
 
@@ -276,9 +276,7 @@ install_apt() {
         finish_progress
     fi
 
-    # Yazi and DuckDB (no apt package for Yazi usually, and DuckDB is often old)
     install_yazi_manual
-    install_duckdb_manual
 }
 
 install_binaries() {
@@ -329,7 +327,6 @@ install_binaries() {
     finish_progress
 
     install_yazi_manual
-    install_duckdb_manual
 }
 
 # Helpers for common manual installs
@@ -344,14 +341,6 @@ install_yazi_manual() {
     finish_progress
 }
 
-install_duckdb_manual() {
-    show_progress "Installing DuckDB"
-    curl -sSfL https://install.duckdb.org | sh
-    if [ -f "$HOME/.duckdb/bin/duckdb" ]; then
-        ln -sf "$HOME/.duckdb/cli/latest/duckdb" "$HOME/.local/bin/duckdb" 2>/dev/null || true
-    fi
-    finish_progress
-}
 
 install_rich_cli_manual() {
     show_progress "Installing rich-cli"
