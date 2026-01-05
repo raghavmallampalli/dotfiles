@@ -23,7 +23,7 @@ binds {
     Mod+A     { spawn "ndrop" "-c" "chrome-gemini.google.com__app-Default" "google-chrome-stable" "--app=https://gemini.google.com/app"; }
     
     // System
-    Super+Alt+L     { spawn "dms" "ipc" "call" "lock" "lock"; } // Or dms ipc call lock lock
+    Mod+Alt+L     { spawn "dms" "ipc" "call" "lock" "lock"; } // Or dms ipc call lock lock
     Mod+Shift+E     { quit; }
     Ctrl+Alt+Delete { spawn "dms" "ipc" "call" "processlist" "focusOrToggle"; }
     Mod+Shift+P     { power-off-monitors; }
@@ -58,6 +58,12 @@ binds {
     Mod+V     { toggle-window-floating; }
     Mod+T     { toggle-window-floating; }
 
+    // MOVING WINDOWS AND FOCUS HINTS
+    // Shift: move window
+    // Alt:   move workspace
+    // Ctrl:  monitor
+    // Vim-like motions
+
     // Focus Navigation
     Mod+H     { focus-column-left; }
     Mod+J     { focus-window-down; }
@@ -76,22 +82,29 @@ binds {
     Mod+Ctrl+K     { focus-monitor-up; }
     Mod+Ctrl+L     { focus-monitor-right; }
 
-    // Move to Monitor
+    // Move column to Monitor
     Mod+Shift+Ctrl+H     { move-column-to-monitor-left; }
     Mod+Shift+Ctrl+J     { move-column-to-monitor-down; }
     Mod+Shift+Ctrl+K     { move-column-to-monitor-up; }
     Mod+Shift+Ctrl+L     { move-column-to-monitor-right; }
 
-    // Workspaces
-    Mod+Page_Down { focus-workspace-down; }
-    Mod+Page_Up   { focus-workspace-up; }
+    // Focus Workspaces
     Mod+D         { focus-workspace-down; }
     Mod+U         { focus-workspace-up; }
 
-    Mod+Shift+Page_Down { move-column-to-workspace-down; }
-    Mod+Shift+Page_Up   { move-column-to-workspace-up; }
+    // Move columns between workspaces
     Mod+Shift+D         { move-column-to-workspace-down; }
     Mod+Shift+U         { move-column-to-workspace-up; }
+
+    // Move workspace (swap them within a monitor)
+    Mod+Alt+D         { move-workspace-down; }
+    Mod+Alt+U         { move-workspace-up; }
+    
+    // Move workspace between monitors
+    Mod+Ctrl+Alt+J         { move-workspace-to-monitor-down; }
+    Mod+Ctrl+Alt+K         { move-workspace-to-monitor-up; }
+    Mod+Ctrl+Alt+H         { move-workspace-to-monitor-left; }
+    Mod+Ctrl+Alt+L         { move-workspace-to-monitor-right; }
 
     // Mouse Wheel
     Mod+WheelScrollDown      cooldown-ms=150 { focus-workspace-down; }
