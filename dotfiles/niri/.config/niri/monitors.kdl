@@ -1,0 +1,17 @@
+output "Acer Technologies KA270 G0 14490A6233W01" {
+    mode "1920x1080@60.0"
+    scale 1.0
+    position x=0 y=0
+}
+
+output "PNP(BNQ) BenQ GW2283 WCL01584019" {
+    mode "1920x1080@60.0"
+    scale 1.0
+    position x=1920 y=0
+}
+
+output "eDP-1" {
+    mode "1920x1200@60.0"
+    scale 1.5
+    position x=1920 y=1080
+}

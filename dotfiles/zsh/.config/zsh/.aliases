@@ -12,7 +12,7 @@ alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias printpath="echo \$PATH | sed 's/\\:/\\n/g'"
 
-alias cat='bat -p'
+alias cat='bat --plain --paging=never'
 alias aria="aria2c --file-allocation=none -c -x 10 -s 10"
 
 alias vimdiff='nvim -d'

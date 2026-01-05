@@ -1,0 +1,141 @@
+workspace "work-code" {
+    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
+}
+workspace "projects" {
+    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
+}
+workspace "socials" {
+    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
+}
+workspace "media" {
+    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
+}
+workspace "work" {
+    open-on-output "PNP(BNQ) BenQ GW2283 WCL01584019"
+}
+workspace "personal" {
+    open-on-output "PNP(BNQ) BenQ GW2283 WCL01584019"
+}
+workspace "music" {
+    open-on-output "eDP-1"
+}
+workspace "draw" {
+    open-on-output "eDP-1"
+}
+workspace "ndrop"
+
+window-rule {
+    match title="Picture in picture"
+    open-on-workspace "music"
+    open-floating     true
+}
+
+// Scratch windows
+window-rule {
+    match app-id="chrome-gemini.google.com__app-Default"
+    open-floating         true
+    default-column-width  { proportion 0.8; }
+    default-window-height { proportion 0.8; }
+}
+window-rule {
+    match app-id="com.mitchellh.quake"
+    open-floating         true
+    default-column-width  { proportion 0.6; }
+    default-window-height { proportion 0.6; }
+}
+
+window-rule {
+    match app-id=r#"(?i)copyq"#
+    open-floating           true
+    open-focused            true
+    open-maximized          false
+    open-maximized-to-edges false
+    open-fullscreen         false
+}
+
+// Extension pop-ups
+window-rule {
+    // match app-id=r#"^chrome-.*$"#
+    match title=r#".*[bB]itwarden"#
+    open-floating           true
+    open-maximized          false
+    open-maximized-to-edges false
+    open-fullscreen         false
+    open-focused            true
+    block-out-from          "screen-capture"
+}
+
+window-rule {
+    match app-id="spotify"
+    open-focused            true
+    open-maximized          true
+    open-maximized-to-edges false
+    open-fullscreen         false
+    open-on-workspace       "music"
+}
+
+window-rule {
+    match app-id="cursor"
+    open-on-workspace "work-code"
+    open-focused      true
+    open-maximized    true
+    open-fullscreen   false
+    opacity           0.98
+}
+
+window-rule {
+    match app-id="Code"
+    open-on-workspace "projects"
+    open-focused      true
+    open-maximized    true
+    open-fullscreen   false
+    opacity           0.98
+}
+
+window-rule {
+    match app-id="antigravity"
+    open-on-workspace "projects"
+    open-focused      true
+    open-maximized    true
+    open-fullscreen   false
+    opacity           0.98
+}
+
+window-rule {
+    match app-id="google-chrome"
+    open-focused      true
+    open-maximized    true
+    open-on-workspace "personal"
+}
+
+window-rule {
+    match app-id="brave-browser"
+    open-focused      true
+    open-maximized    true
+    open-on-workspace "work"
+}
+
+window-rule {
+    match title="OBS"
+    open-on-output "eDP-1"
+}
+
+window-rule {
+    match title="Krita"
+    open-focused      true
+    open-maximized    true
+    open-on-workspace "draw"
+}
+
+window-rule {
+    match app-id="obsidian"
+    open-maximized    true
+    open-on-workspace "projects"
+}
+
+// Whatsapp Web
+window-rule {
+    match app-id=".*hnpfjngllnobngcgfapefoaidbinmjnm.*"
+    open-focused      true
+    open-on-workspace "socials"
+}
