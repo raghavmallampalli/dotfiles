@@ -34,6 +34,13 @@ input {
         scroll-factor 0.4
     }
 
+    touch {
+        map-to-output "eDP-1"
+    }
+
+    tablet {
+        map-to-output "eDP-1"
+    }
     mouse {
         // off
         // natural-scroll
