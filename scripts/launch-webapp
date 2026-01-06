@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# launch-webapp - Launch a web application using the default browser's app mode
+
+# Get the default browser desktop file name
+if command -v xdg-settings &> /dev/null; then
+    browser_desktop=$(xdg-settings get default-web-browser)
+fi
+
+# Fallback if xdg-settings fails or is missing
+if [[ -z "$browser_desktop" ]]; then
+    browser_desktop="google-chrome.desktop"
+fi
+
+# Normalize/Handle common browsers
+case $browser_desktop in
+  google-chrome* | brave-browser* | microsoft-edge* | opera* | vivaldi* | helium*) ;;
+  *) 
+    # Check if we can find any chrome-like browser
+    if command -v google-chrome-stable &> /dev/null; then browser_desktop="google-chrome.desktop"
+    elif command -v brave-browser &> /dev/null; then browser_desktop="brave-browser.desktop"
+    else browser_desktop="chromium.desktop"
+    fi
+    ;;
+esac
+
+# Find the executable path from the desktop file
+# We look into standard application directories
+desktop_file=$(find /usr/share/applications /usr/local/share/applications $HOME/.local/share/applications -name "$browser_desktop" 2>/dev/null | head -1)
+
+if [[ -n "$desktop_file" ]]; then
+    exec_path=$(grep -m1 '^Exec=' "$desktop_file" | sed 's/^Exec=//;s/ %[uU]//g;s/ -f//')
+fi
+
+# Fallback if no desktop file or exec path found
+if [[ -z "$exec_path" ]]; then
+    case $browser_desktop in
+        google-chrome*) exec_path="google-chrome-stable" ;;
+        brave-browser*) exec_path="brave-browser" ;;
+        microsoft-edge*) exec_path="microsoft-edge-stable" ;;
+        *) exec_path="chromium" ;;
+    esac
+fi
+
+# Use eval to handle potential spaces or complex commands in exec_path
+eval "$exec_path --app=\"$1\" \"${@:2}\""

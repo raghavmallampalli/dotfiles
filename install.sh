@@ -159,13 +159,21 @@ install_yay_tools_always() {
     show_progress "Installing essentials and base tools via yay"
     # Essential tools and superset
     run_yay -S --needed --noconfirm wget curl zip unzip p7zip
-    run_yay -S --needed --noconfirm github-cli aria2 openssh inetutils zsh tmux vim htop nvtop rsync xclip jq cmake moreutils stow
+    run_yay -S --needed --noconfirm github-cli aria2 openssh inetutils zsh tmux vim htop nvtop rsync xclip jq cmake moreutils stow gum
     finish_progress
 
     # IMV script
     show_progress "Installing IMV script"
     run_command sudo cp "./scripts/imv" "/usr/local/bin/imv"
     run_command sudo chmod +x "/usr/local/bin/imv"
+    finish_progress
+
+    # Webapp scripts
+    show_progress "Installing Webapp management scripts"
+    run_command sudo cp "./scripts/launch-webapp" "/usr/local/bin/launch-webapp"
+    run_command sudo chmod +x "/usr/local/bin/launch-webapp"
+    run_command sudo cp "./scripts/manage-webapp" "/usr/local/bin/manage-webapp"
+    run_command sudo chmod +x "/usr/local/bin/manage-webapp"
     finish_progress
 }
 
@@ -243,6 +251,15 @@ install_apt_always() {
     show_progress "Installing IMV script"
     cp "./scripts/imv" "$HOME/.local/bin/"
     chmod +x "$HOME/.local/bin/imv"
+    finish_progress
+
+    # Gum and Webapp scripts
+    install_gum_manual
+    show_progress "Installing Webapp management scripts"
+    cp "./scripts/launch-webapp" "$HOME/.local/bin/"
+    chmod +x "$HOME/.local/bin/launch-webapp"
+    cp "./scripts/manage-webapp" "$HOME/.local/bin/"
+    chmod +x "$HOME/.local/bin/manage-webapp"
     finish_progress
 
     # neovim: no other stable version exists
@@ -324,6 +341,15 @@ install_binaries() {
     url=$(wget "https://api.github.com/repos/BurntSushi/ripgrep/releases/latest" -qO- | grep browser_download_url | grep "x86_64" | grep "linux" | head -n 1 | cut -d \" -f 4)
     wget "$url" -qO- | tar -xz -C /tmp/
     mv /tmp/ripgrep*/rg "$HOME/.local/bin/"
+    # GUM
+    install_gum_manual
+
+    # Webapp scripts
+    show_progress "Installing Webapp management scripts"
+    cp "./scripts/launch-webapp" "$HOME/.local/bin/"
+    chmod +x "$HOME/.local/bin/launch-webapp"
+    cp "./scripts/manage-webapp" "$HOME/.local/bin/"
+    chmod +x "$HOME/.local/bin/manage-webapp"
     finish_progress
 
     install_yazi_manual
@@ -339,6 +365,20 @@ install_yazi_manual() {
     chmod +x "$HOME/.local/bin/yazi"
     chmod +x "$HOME/.local/bin/ya"
     finish_progress
+}
+
+install_gum_manual() {
+    if ! command -v gum >/dev/null 2>&1; then
+        show_progress "Installing Gum"
+        url=$(wget "https://api.github.com/repos/charmbracelet/gum/releases/latest" -qO- | grep browser_download_url | grep "linux_x86_64" | grep ".tar.gz" | head -n 1 | cut -d \" -f 4)
+        wget "$url" -qO- | tar -xz -C /tmp/
+        # Use find to handle the versioned directory name
+        local temp_gum_dir=$(find /tmp/ -maxdepth 1 -type d -name "gum_*" | head -n 1)
+        mv "$temp_gum_dir/gum" "$HOME/.local/bin/"
+        chmod +x "$HOME/.local/bin/gum"
+        rm -rf "$temp_gum_dir"
+        finish_progress
+    fi
 }
 
 

@@ -1,7 +1,4 @@
-workspace "work-code" {
-    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
-}
-workspace "projects" {
+workspace "code" {
     open-on-output "Acer Technologies KA270 G0 14490A6233W01"
 }
 workspace "socials" {
@@ -10,10 +7,7 @@ workspace "socials" {
 workspace "media" {
     open-on-output "Acer Technologies KA270 G0 14490A6233W01"
 }
-workspace "work" {
-    open-on-output "PNP(BNQ) BenQ GW2283 WCL01584019"
-}
-workspace "personal" {
+workspace "browser" {
     open-on-output "PNP(BNQ) BenQ GW2283 WCL01584019"
 }
 workspace "music" {
@@ -22,8 +16,8 @@ workspace "music" {
 workspace "draw" {
     open-on-output "eDP-1"
 }
-workspace "ndrop" {
-    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
+workspace "scratch" {
+    open-on-output "PNP(BNQ) BenQ GW2283 WCL01584019"
 }
 
 window-rule {
@@ -35,17 +29,18 @@ window-rule {
 // Scratch windows
 window-rule {
     match app-id="chrome-gemini.google.com__app-Default"
-    open-floating         true
+    open-on-workspace     "scratch"
+    open-focused          true
     default-column-width  { proportion 0.8; }
-    default-window-height { proportion 0.8; }
-}
-window-rule {
-    match app-id="com.mitchellh.quake"
-    open-floating         true
-    default-column-width  { proportion 0.6; }
-    default-window-height { proportion 0.6; }
 }
 
+window-rule {
+    match app-id="com.mitchellh.ghostty"
+    default-column-width  { proportion 0.7; }
+    open-on-workspace     "scratch"
+}
+
+// Clipboard
 window-rule {
     match app-id=r#"(?i)copyq"#
     open-floating           true
@@ -78,7 +73,7 @@ window-rule {
 
 window-rule {
     match app-id="cursor"
-    open-on-workspace "work-code"
+    open-on-workspace "code"
     open-focused      true
     open-maximized    true
     open-fullscreen   false
@@ -87,7 +82,7 @@ window-rule {
 
 window-rule {
     match app-id="Code"
-    open-on-workspace "projects"
+    open-on-workspace "code"
     open-focused      true
     open-maximized    true
     open-fullscreen   false
@@ -96,7 +91,7 @@ window-rule {
 
 window-rule {
     match app-id="antigravity"
-    open-on-workspace "projects"
+    open-on-workspace "code"
     open-focused      true
     open-maximized    true
     open-fullscreen   false
@@ -107,14 +102,14 @@ window-rule {
     match app-id="google-chrome"
     open-focused      true
     open-maximized    true
-    open-on-workspace "personal"
+    open-on-workspace "browser"
 }
 
 window-rule {
     match app-id="brave-browser"
     open-focused      true
     open-maximized    true
-    open-on-workspace "work"
+    open-on-workspace "browser"
 }
 
 window-rule {
@@ -137,8 +132,15 @@ window-rule {
 
 // Whatsapp Web
 window-rule {
-    match app-id=".*hnpfjngllnobngcgfapefoaidbinmjnm.*"
+    match app-id="chrome-web.whatsapp.com__-Default"
     open-focused      true
     open-on-workspace "socials"
     default-column-width { proportion 0.75; }
+}
+
+window-rule {
+    match app-id="discord"
+    open-focused      true
+    open-maximized    true
+    open-on-workspace "socials"
 }
