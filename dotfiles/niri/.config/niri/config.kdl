@@ -52,6 +52,14 @@ input {
     focus-follows-mouse max-scroll-amount="10%"
 }
 
+layout {
+    preset-column-widths {
+        proportion 0.5
+        proportion 0.7
+    }
+    default-column-width { proportion 0.5; }
+}
+
 // Screenshot path
 screenshot-path "~/Pictures/Screenshots/Screenshot_%Y-%m-%d_%H-%M-%S.png"
 
