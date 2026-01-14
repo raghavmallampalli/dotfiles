@@ -9,6 +9,7 @@ spawn-at-startup "gnome-keyring-daemon" "--start" "--components=secrets"
 spawn-at-startup "wl-paste" "--watch" "cliphist" "store"
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 spawn-at-startup "xwayland-satellite"
+spawn-at-startup "kanshi"
 
 prefer-no-csd
 
@@ -68,7 +69,6 @@ animations {
     // slowdown 3.0
 }
 
-include "monitors.kdl"
 include "dms/colors.kdl"
 include "dms/layout.kdl"
 include "dms/wpblur.kdl"
