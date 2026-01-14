@@ -8,7 +8,7 @@ source "$(dirname "$0")/common.sh"
 
 trap 'cleanup ${LINENO} $?' EXIT
 
-log "INFO"  "Proceed if you have run cli.sh (and restarted shell), changed directory to the parent folder of this script and gone through it. Ctrl+C and do so first if not. [ENTER] to continue."
+log "INFO" "Proceed if you have run cli.sh (and restarted shell), changed directory to the parent folder of this script and gone through it. Ctrl+C and do so first if not. [ENTER] to continue."
 read dump
 
 # Detect if running as root
@@ -21,32 +21,32 @@ else
 fi
 export ROOT_MODE
 
-# Gather all user input at the beginning
-install_miniconda=n
-read -p "Install Miniconda? [y/n] " install_miniconda
-read -p "Install nvm? [y/n] " install_nvm
-read -p "Install Julia? [y/n] " install_julia
-read -p "Install R? [y/n]: " install_r
-read -p "Install GNU octave? [y/n]: " install_octave
-read -p "Install Docker? [y/n]: " install_docker
+# OS Detection
+OS_ID="unknown"
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    OS_ID=$ID
+fi
 
-if [[ $install_miniconda = y ]]; then
-    show_progress "Installing Miniconda"
-    tempvar=${tempvar:-n}
-    if [ -d "$HOME/miniconda3" ]; then
-        read -p "miniconda3 installed in default location directory. delete/manually enter install location/quit [d/m/Ctrl+C]: " tempvar
-        tempvar=${tempvar:-n}
-        if [[ $tempvar = d ]]; then
-            rm -rf "$HOME/miniconda3"
-        elif [[ $tempvar = m ]]; then
-            log "INFO" "Ensure that you enter a different location during installation."
-        fi
-    fi
-    wget -q https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh
-    chmod +x /tmp/miniconda.sh
-    bash /tmp/miniconda.sh
-    "$HOME/miniconda3/bin/conda" init zsh
-    finish_progress
+# Gather all user input at the beginning using gum
+install_nvm=n
+if gum confirm "Install nvm?"; then
+    install_nvm=y
+fi
+
+install_rust=n
+if gum confirm "Install Rust?"; then
+    install_rust=y
+fi
+
+install_uv=n
+if gum confirm "Install uv?"; then
+    install_uv=y
+fi
+
+install_docker=n
+if gum confirm "Install Docker Engine?"; then
+    install_docker=y
 fi
 
 # NVM (node version manager) installation
@@ -56,56 +56,66 @@ if [[ $install_nvm = y ]]; then
     finish_progress
 fi
 
-
-
-if [[ $install_julia = y ]]; then
-    show_progress "Installing Julia"
-    curl -fsSL https://install.julialang.org | sh
-    log "INFO" "To use Julia with Jupyter Notebook https://github.com/JuliaLang/IJulia.jl#quick-start"
+# Rust installation
+if [[ $install_rust = y ]]; then
+    show_progress "Installing Rust"
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     finish_progress
 fi
 
-if [[ $install_r = y ]]; then
-    show_progress "Installing R"
-    run_command apt-get install --no-install-recommends software-properties-common dirmngr -y
-    run_command apt-get install libzmq3-dev libcurl4-openssl-dev libssl-dev jupyter-core jupyter-client -y
-    wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | run_command tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc >> /dev/null
-    run_command add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/" -y >> /dev/null
-    run_command apt-get install --no-install-recommends r-base -y
-    run_command add-apt-repository ppa:c2d4u.team/c2d4u4.0+ -y >> /dev/null
-    show_progress "Installing RStudio"
-    run_command apt-get install rstudio -y
+# UV installation
+if [[ $install_uv = y ]]; then
+    show_progress "Installing UV"
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    echo 'eval "$(uv generate-shell-completion zsh)"' >>"$HOME/.zshrc"
     finish_progress
 fi
 
-if [[ $install_octave = y ]]; then
-    run_command apt-get install octave -y
-fi
-
-# Docker installation (only on non-WSL systems)
+# Docker installation
 if [[ $install_docker = y ]]; then
     if is_wsl; then
-        log "WARN" "Docker Desktop installation skipped - running in WSL environment"
+        log "WARN" "Docker installation skipped - running in WSL environment"
     else
-        show_progress "Installing Docker Desktop"
+        show_progress "Installing Docker Engine"
         
-        # Add Docker's official GPG key
-        run_command apt-get update
-        run_command apt-get install ca-certificates curl -y
-        run_command install -m 0755 -d /etc/apt/keyrings
-        run_command curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-        run_command chmod a+r /etc/apt/keyrings/docker.asc
+        if [[ "$OS_ID" == "arch" ]]; then
+            # Arch Linux installation via yay
+            # Docker and docker-compose
+            execute yay -S --needed --noconfirm docker docker-compose
+            
+            # Post-install steps
+            log "INFO" "Enabling Docker service..."
+            run_command systemctl enable --now docker.service
+            
+            log "INFO" "Adding user to docker group..."
+            run_command usermod -aG docker "$USER"
+            
+        elif [[ "$OS_ID" == "ubuntu" ]] || [[ "$OS_ID" == "debian" ]]; then
+            # Ubuntu installation (Official Docker Repo)
+            
+            # Add Docker's official GPG key
+            run_command apt-get update
+            run_command apt-get install ca-certificates curl -y
+            run_command install -m 0755 -d /etc/apt/keyrings
+            run_command curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+            run_command chmod a+r /etc/apt/keyrings/docker.asc
 
-        # Add the repository to Apt sources
-        echo \
-          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-          $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
-          run_command tee /etc/apt/sources.list.d/docker.list > /dev/null
-        run_command apt-get update
+            # Add the repository to Apt sources
+            echo \
+              "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+              $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+              run_command tee /etc/apt/sources.list.d/docker.list > /dev/null
+            run_command apt-get update
 
-        # Download and install Docker Desktop
-        wget -O /tmp/docker-desktop-amd64.deb https://desktop.docker.com/linux/main/amd64/docker-desktop-amd64.deb
-        run_command dpkg -i /tmp/docker-desktop-amd64.deb
+            # Download and install Docker Engine
+            run_command apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+            
+            # Post-install steps
+            log "INFO" "Adding user to docker group..."
+            run_command usermod -aG docker "$USER"
+        else
+            log "WARN" "Unsupported OS for Docker installation: $OS_ID"
+        fi
         
         finish_progress
     fi

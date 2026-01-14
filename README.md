@@ -37,13 +37,12 @@ You can also run the automated test script which builds the images and runs the 
 Check `install_test.log` for the output.
 
 ## Setup scripts
-### cli
-Basic setup of Linux. It installs some essential packages and their dependencies. It also installs some useful command line utilites.
+1. `install.sh`: Installs packages and tools.
+2. `setup.sh`: Configures dotfiles and shell.
+3. `dev.sh`: Programming languages and environments.
+4. `extras.sh`: General tools. Includes my preferred desktop environment set-up on Arch.
 
-> **Note**: The setup is split into two scripts:
-> 1. `install.sh`: Installs packages and tools.
-> 2. `setup.sh`: Configures dotfiles and shell.
-
+> IMPORTANT: `extras.sh` is only kept up to date for Arch, which is my primary OS.
 Run them in order:
 ```bash
 ./install.sh
@@ -57,20 +56,10 @@ We use [GNU Stow](https://www.gnu.org/software/stow/) to manage dotfiles.
 - **Install**: `setup.sh` runs `stow` to link configurations to your home directory.
 - **Move Repo**: If you move this repository, the symlinks will break. To fix them, run:
   ```bash
-  stow -R -d dotfiles -t $HOME zsh tmux nvim yazi
+  stow -R -d dotfiles -t $HOME zsh tmux nvim yazi neovim ...
   ```
 within the directory of the repository.
 
-### dev
-Programming languages, virtual environments, useful dev tools
-
-### extras
-Generally useful CLI tools.
-
-### gui
-OUT OF DATE
-GUI programs I use frequently use. A number of repositories are added. Installs a IDE of your choice (Sublime/Atom/VS Code).
-
-# One off scripts
-Functionality that I tend to reuse.
+# Scripts
+Functionality that I tend to reuse. They will be avaiable on PATH after a standard installation.
 eg. video encoding
