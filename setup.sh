@@ -186,7 +186,7 @@ if command -v stow >/dev/null 2>&1; then
     # Execute stow
     # -d sets the directory to look for packages (relative to current or absolute)
     # -t sets the target directory (Home)
-    stow -d "$REPO_ROOT/dotfiles" -t "$HOME" zsh tmux nvim yazi hypr niri
+    stow -d "$REPO_ROOT/dotfiles" -t "$HOME" zsh tmux nvim yazi niri
     
     finish_progress
 else
