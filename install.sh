@@ -278,12 +278,6 @@ install_custom_scripts() {
 main() {
     log "INFO" "Starting main execution..."
     
-    # UV
-    show_progress "Installing UV"
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    echo 'eval "$(uv generate-shell-completion zsh)"' >>"$HOME/.zshrc"
-    finish_progress
-    
     # Custom Scripts (Always install these)
     install_custom_scripts
 
