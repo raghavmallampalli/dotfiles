@@ -9,15 +9,12 @@ source "$(dirname "$0")/common.sh"
 trap 'cleanup ${LINENO} $?' EXIT
 
 # Parse command line arguments
-HAS_SUDO=""
-INSTALL_FROM_BINARIES=""
+# (No logic flags remaining, only help)
 
 # Function to show help
 show_help() {
     echo "Usage: $0 [OPTIONS]"
     echo "Options:"
-    echo "  -s, --sudo-access <y/n>        Do you have sudo access?"
-    echo "  -b, --binaries-install <y/n>   Install tools from binaries (manual) instead of package manager?"
     echo "  -h, --help                     Show this help message"
     echo ""
     echo "If any option is not provided, the script will prompt interactively."
@@ -29,14 +26,6 @@ while getopts ":-:" opt; do
     case $opt in
     -)
         case "${OPTARG}" in
-        sudo-access)
-            HAS_SUDO="${!OPTIND}"
-            OPTIND=$((OPTIND + 1))
-            ;;
-        binaries-install)
-            INSTALL_FROM_BINARIES="${!OPTIND}"
-            OPTIND=$((OPTIND + 1))
-            ;;
         help)
             show_help
             ;;
@@ -45,12 +34,6 @@ while getopts ":-:" opt; do
             show_help
             ;;
         esac
-        ;;
-    s)
-        HAS_SUDO="$OPTARG"
-        ;;
-    b)
-        INSTALL_FROM_BINARIES="$OPTARG"
         ;;
     h)
         show_help
@@ -93,26 +76,6 @@ log "INFO" "Starting installation..."
 log "WARN" "Do not execute this file without reading it first and changing directory to the parent folder of this script."
 log "INFO" "If it exits without completing install run 'sudo apt --fix-broken install' (on Debian/Ubuntu)."
 
-# Collect all user inputs at the start
-if [ "$ROOT_MODE" = false ]; then
-    if [ -z "$HAS_SUDO" ]; then
-        read -p "Do you have sudo access? [y/n] " HAS_SUDO
-    fi
-else
-    HAS_SUDO="y"
-fi
-
-# Determine installation method preference
-if [[ $HAS_SUDO = y ]]; then
-    if [ -z "$INSTALL_FROM_BINARIES" ]; then
-        log "INFO" "You have sudo access. Defaulting to package manager installation."
-        read -p "Install from binaries (manual) instead of package manager? [y/N] " INSTALL_FROM_BINARIES
-        INSTALL_FROM_BINARIES=${INSTALL_FROM_BINARIES:-n}
-    fi
-else
-    log "INFO" "No sudo access or running in root mode. Forcing installation from binaries."
-    INSTALL_FROM_BINARIES="y"
-fi
 
 show_progress "Creating local bin directory"
 mkdir -p "$HOME/.local/bin"
@@ -135,37 +98,25 @@ log "INFO" "Detected OS: $OS_ID"
 # Installation Functions
 # -----------------------------------------------------------------------------
 
-# Helper for running yay
-run_yay() {
-    if [ "$EUID" -eq 0 ]; then
-        execute su builder -c "yay $*"
-    else
-        execute yay "$@"
-    fi
-}
+# Helper/wrapper for running yay is deprecated/removed. We call yay directly.
 
-install_yay_always() {
-    log "INFO" "Installing bootstrap packages for Arch Linux..."
+install_tools_yay() {
+    log "INFO" "Installing tools via yay..."
 
-    show_progress "Updating system and installing prerequisites"
-    # Basic tools needed to bootstrap the rest
-    run_command pacman -Sy --needed --noconfirm git base-devel ca-certificates
-    finish_progress
-}
+    show_progress "Installing essentials and tools via yay"
+    
+    # Combined package list
+    local PACKAGES=(
+        github-cli wget openssh aria2 curl rsync
+        zip unzip p7zip
+        cmake moreutils inetutils
+        zsh tmux vim htop nvtop
+        xclip jq stow gum copyq
+        fzf ripgrep bat fd zoxide duf yazi-bin lazygit neovim
+    )
 
-install_yay_tools_always() {
-    log "INFO" "Installing always-essential packages via yay..."
-
-    show_progress "Installing essentials and base tools via yay"
-    # Essential tools and superset
-    run_yay -S --needed --noconfirm wget curl zip unzip p7zip
-    run_yay -S --needed --noconfirm github-cli aria2 openssh inetutils zsh tmux vim htop nvtop rsync xclip jq cmake moreutils stow
-    finish_progress
-
-    # IMV script
-    show_progress "Installing IMV script"
-    run_command sudo cp "./scripts/imv" "/usr/local/bin/imv"
-    run_command sudo chmod +x "/usr/local/bin/imv"
+    execute yay -S --needed --noconfirm "${PACKAGES[@]}" 
+    
     finish_progress
 }
 
@@ -200,12 +151,6 @@ install_yay() {
     fi
 }
 
-install_arch_choice_tools() {
-    log "INFO" "Installing 'choice' packages via yay"
-    run_yay -S --noconfirm --needed fzf ripgrep bat fd zoxide duf yazi-bin lazygit neovim
-    finish_progress
-}
-
 install_apt_always() {
     log "INFO" "Installing always-essential packages for Debian/Ubuntu..."
 
@@ -236,51 +181,13 @@ install_apt_always() {
         run_command apt-get install wslu -y
         finish_progress
     fi
-
-    install_rich_cli_manual
-
-    # IMV
-    show_progress "Installing IMV script"
-    cp "./scripts/imv" "$HOME/.local/bin/"
-    chmod +x "$HOME/.local/bin/imv"
-    finish_progress
-
-    # neovim: no other stable version exists
+    
+    # neovim: no other stable version exists via apt usually, using snap or bob is better but keeping snap here as per original
     run_command snap install nvim --classic
 }
 
-install_apt() {
-    log "INFO" "Starting Debian/Ubuntu installation (APT route)..."
-
-    show_progress "Installing 'choice' packages via apt"
-    run_command apt-get install zoxide bat -y
-
-    # FD
-    run_command apt-get install fd-find -y
-    ln -sf "$(which fdfind)" "$HOME/.local/bin/fd"
-
-    # Ripgrep
-    url=$(wget "https://api.github.com/repos/BurntSushi/ripgrep/releases/latest" -qO- | grep browser_download_url | grep "deb" | head -n 1 | cut -d \" -f 4)
-    wget "$url" -qO /tmp/rg.deb
-    run_command dpkg -i /tmp/rg.deb
-    run_command apt-get install -f
-
-    # DUF
-    run_command apt-get install duf -y
-    finish_progress
-
-    # FZF
-    if ! command -v fzf >/dev/null 2>&1; then
-        show_progress "Installing FZF"
-        run_command apt-get install fzf -y
-        finish_progress
-    fi
-
-    install_yazi_manual
-}
-
-install_binaries() {
-    log "INFO" "Starting Binary/Manual installation (Choice route)..."
+install_tools_binaries() {
+    log "INFO" "Installing tools via Binaries (Manual)..."
 
     # FZF
     if ! command -v fzf >/dev/null 2>&1; then
@@ -325,12 +232,21 @@ install_binaries() {
     wget "$url" -qO- | tar -xz -C /tmp/
     mv /tmp/ripgrep*/rg "$HOME/.local/bin/"
     finish_progress
+    
+    # GUM - Inlined here
+    if ! command -v gum >/dev/null 2>&1; then
+        show_progress "Installing Gum"
+        url=$(wget "https://api.github.com/repos/charmbracelet/gum/releases/latest" -qO- | grep browser_download_url | grep "linux_x86_64" | grep ".tar.gz" | head -n 1 | cut -d \" -f 4)
+        wget "$url" -qO- | tar -xz -C /tmp/
+        # Use find to handle the versioned directory name
+        local temp_gum_dir=$(find /tmp/ -maxdepth 1 -type d -name "gum_*" | head -n 1)
+        mv "$temp_gum_dir/gum" "$HOME/.local/bin/"
+        chmod +x "$HOME/.local/bin/gum"
+        rm -rf "$temp_gum_dir"
+        finish_progress
+    fi
 
-    install_yazi_manual
-}
-
-# Helpers for common manual installs
-install_yazi_manual() {
+    # Yazi - via helper
     show_progress "Installing Yazi"
     wget -q https://github.com/sxyazi/yazi/releases/latest/download/yazi-x86_64-unknown-linux-musl.zip -O /tmp/yazi.zip
     unzip -oq /tmp/yazi.zip -d /tmp
@@ -341,47 +257,59 @@ install_yazi_manual() {
     finish_progress
 }
 
-
-install_rich_cli_manual() {
-    show_progress "Installing rich-cli"
-    if command -v uv >/dev/null 2>&1; then
-        uv tool install rich-cli
-    else
-        log "WARN" "uv not found, skipping rich-cli installation"
-    fi
+install_custom_scripts() {
+    show_progress "Installing custom management scripts"
+    run_command cp "./scripts/imv" "$HOME/.local/bin/imv"
+    run_command chmod +x "$HOME/.local/bin/imv"
+    run_command cp "./scripts/launch-webapp" "$HOME/.local/bin/launch-webapp"
+    run_command chmod +x "$HOME/.local/bin/launch-webapp"
+    run_command cp "./scripts/manage-webapp" "$HOME/.local/bin/manage-webapp"
+    run_command chmod +x "$HOME/.local/bin/manage-webapp"
+    run_command cp "./scripts/niri-to-kanshi" "$HOME/.local/bin/niri-to-kanshi"
+    run_command chmod +x "$HOME/.local/bin/niri-to-kanshi"
     finish_progress
 }
+
 
 # -----------------------------------------------------------------------------
 # Main Execution
 # -----------------------------------------------------------------------------
 
-# UV
-show_progress "Installing UV"
-curl -LsSf https://astral.sh/uv/install.sh | sh
-echo 'eval "$(uv generate-shell-completion zsh)"' >>"$HOME/.zshrc"
-finish_progress
+main() {
+    log "INFO" "Starting main execution..."
+    
+    # UV
+    show_progress "Installing UV"
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    echo 'eval "$(uv generate-shell-completion zsh)"' >>"$HOME/.zshrc"
+    finish_progress
+    
+    # Custom Scripts (Always install these)
+    install_custom_scripts
 
-if [[ "$OS_ID" == "arch" ]]; then
-    install_yay_always
-    install_yay
-    install_yay_tools_always
-    install_rich_cli_manual
-elif [[ "$OS_ID" == "ubuntu" ]] || [[ "$OS_ID" == "debian" ]]; then
-    install_apt_always
-fi
-
-if [[ "$INSTALL_FROM_BINARIES" == "y" ]]; then
-    install_binaries
-else
     if [[ "$OS_ID" == "arch" ]]; then
-        install_arch_choice_tools
-    elif [[ "$OS_ID" == "ubuntu" ]] || [[ "$OS_ID" == "debian" ]]; then
-        install_apt
-    else
-        log "WARN" "Unsupported OS for package manager: $OS_ID. Falling back to binary installation."
-        install_binaries
-    fi
-fi
+        log "INFO" "Installing bootstrap packages for Arch Linux..."
 
-log "INFO" "Installation completed."
+        show_progress "Updating system and installing prerequisites"
+        # Basic tools needed to bootstrap the rest
+        run_command pacman -Sy --needed --noconfirm git base-devel ca-certificates
+        finish_progress
+        
+        install_yay
+        install_tools_yay
+        
+    elif [[ "$OS_ID" == "ubuntu" ]] || [[ "$OS_ID" == "debian" ]]; then
+        # On Ubuntu, we start with minimal system setup, then use binaries for tools
+        install_apt_always
+        install_tools_binaries
+    else
+        log "WARN" "Unsupported OS for package manager: $OS_ID. Attempting binary installation for tools..."
+        install_tools_binaries
+    fi
+
+    log "INFO" "Installation completed."
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi

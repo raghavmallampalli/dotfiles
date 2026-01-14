@@ -17,10 +17,7 @@ binds {
     Mod+Shift+B { spawn "brave"; }
     Mod+B { spawn "google-chrome-stable"; }
 
-    // Scratchpad Toggle
-    // Hacky solution to create a special workspace equivalent
-    Mod+Grave { spawn "ndrop" "ghostty" "--class=com.mitchellh.quake"; }
-    Mod+A     { spawn "ndrop" "-c" "chrome-gemini.google.com__app-Default" "google-chrome-stable" "--app=https://gemini.google.com/app"; }
+    Mod+A     { spawn "launch-webapp" "https://gemini.google.com/app"; }
     
     // System
     Mod+Alt+L     { spawn "dms" "ipc" "call" "lock" "lock"; } // Or dms ipc call lock lock
@@ -113,17 +110,15 @@ binds {
     Mod+Shift+WheelScrollUp   cooldown-ms=150 { move-column-to-workspace-up; }
 
     // Numbered Workspaces
-    Mod+1 { focus-workspace "work-code"; }
-    Mod+2 { focus-workspace "projects"; }
-    Mod+3 { focus-workspace "work"; }
-    Mod+4 { focus-workspace "personal"; }
-    Mod+5 { focus-workspace "music"; }
-    Mod+6 { focus-workspace "draw"; }
+    Mod+1 { focus-workspace "code"; }
+    Mod+2 { focus-workspace "browser"; }
+    Mod+3 { focus-workspace "scratch"; }
+    Mod+4 { focus-workspace "music"; }
+    Mod+5 { focus-workspace "draw"; }
 
-    Mod+Shift+1 { move-column-to-workspace "work-code"; }
-    Mod+Shift+2 { move-column-to-workspace "projects"; }
-    Mod+Shift+3 { move-column-to-workspace "work"; }
-    Mod+Shift+4 { move-column-to-workspace "personal"; }
+    Mod+Shift+1 { move-column-to-workspace "code"; }
+    Mod+Shift+2 { move-column-to-workspace "browser"; }
+    Mod+Shift+3 { move-column-to-workspace "scratch"; }
     Mod+Shift+5 { move-column-to-workspace "music"; }
     Mod+Shift+6 { move-column-to-workspace "draw"; }
 

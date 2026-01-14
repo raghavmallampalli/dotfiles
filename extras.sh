@@ -27,6 +27,17 @@ if [[ $OS_ID = "arch" ]]; then
     if [[ $HAS_SUDO = y ]]; then
         show_progress "Installing extra tools via yay"
         execute yay -S --needed --noconfirm hdf5 perl-image-exiftool ffmpeg imagemagick ghostscript
+    
+        # Wayland specific
+        local WAYLAND_PACKAGES=(
+            xwayland-satellite xdg-desktop-portal-gnome xdg-desktop-portal-gtk
+            ghostty dms-shell-bin matugen cava qt6-multimedia-ffmpeg
+            kanshi wlr-randr niri
+        )
+        execute yay -S --needed --noconfirm "${WAYLAND_PACKAGES[@]}"
+        systemctl --user add-wants niri.service dms
+        mkdir -p ~/.config/niri/dms
+        touch ~/.config/niri/dms/{colors,layout,alttab,binds}.kdl
         finish_progress
     fi
 

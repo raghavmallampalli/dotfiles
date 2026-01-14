@@ -3,18 +3,13 @@
 // https://yalter.github.io/niri/Configuration:-Introduction
 
 // Autostart
-spawn-at-startup "copyq" "--start-server"
 spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP" "DISPLAY"
-spawn-at-startup "gnome-keyring-daemon" "--start" "--components=secrets"
-spawn-at-startup "wl-paste" "--watch" "cliphist" "store"
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 spawn-at-startup "xwayland-satellite"
+// spawn-at-startup "kanshi" // Preferring DMS monitor management for now
+spawn-at-startup "copyq" "--start-server"
 
 prefer-no-csd
-
-// Scratchpad Terminal
-// spawn-at-startup "ghostty" "--class" "scratchpad"
-
 
 // Input device configuration.
 input {
@@ -52,6 +47,14 @@ input {
     focus-follows-mouse max-scroll-amount="10%"
 }
 
+layout {
+    preset-column-widths {
+        proportion 0.5
+        proportion 0.7
+    }
+    default-column-width { proportion 0.5; }
+}
+
 // Screenshot path
 screenshot-path "~/Pictures/Screenshots/Screenshot_%Y-%m-%d_%H-%M-%S.png"
 
@@ -60,10 +63,11 @@ animations {
     // slowdown 3.0
 }
 
-include "monitors.kdl"
+include "windowrules.kdl"
 include "dms/colors.kdl"
 include "dms/layout.kdl"
 include "dms/wpblur.kdl"
 include "dms/alttab.kdl"
-include "windowrules.kdl"
-include "bindings.kdl"
+include "dms/binds.kdl"
+include "dms/cursor.kdl"
+include "dms/outputs.kdl"
