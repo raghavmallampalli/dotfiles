@@ -3,13 +3,11 @@
 // https://yalter.github.io/niri/Configuration:-Introduction
 
 // Autostart
-spawn-at-startup "copyq" "--start-server"
 spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP" "DISPLAY"
-spawn-at-startup "gnome-keyring-daemon" "--start" "--components=secrets"
-spawn-at-startup "wl-paste" "--watch" "cliphist" "store"
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 spawn-at-startup "xwayland-satellite"
 spawn-at-startup "kanshi"
+spawn-at-startup "copyq" "--start-server"
 
 prefer-no-csd
 
