@@ -187,7 +187,7 @@ backup_configs() {
     done
 
     # Backup XDG configs
-    for dir in nvim tmux zsh yazi hypr; do
+    for dir in nvim tmux zsh yazi; do
         if [ -d "$HOME/.config/$dir" ]; then
              cp -r "$HOME/.config/$dir" "$backup_dir/$dir"
         fi
