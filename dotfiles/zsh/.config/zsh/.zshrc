@@ -103,3 +103,5 @@ bindkey -M vicmd V edit-command-line
 source <(fzf --zsh)
 [ -f ~/.fzf-git.sh ] && source ~/.fzf-git.sh
 
+# Prevent Ctrl-S from stopping
+stty -ixon

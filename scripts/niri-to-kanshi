@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Configuration
+KANSHI_CONFIG="$HOME/.config/kanshi/config"
+PROFILE_NAME=$1
+
+# 1. Get Profile Name
+if [ -z "$PROFILE_NAME" ]; then
+    PROFILE_NAME=$(gum input --placeholder "Enter profile name (e.g., desk, laptop)")
+fi
+[ -z "$PROFILE_NAME" ] && exit 1
+
+# 2. Universal Hardware Extraction via wlr-randr
+# This works on niri, hyprland, sway, and any wlroots compositor.
+GEN_PROFILE=$(wlr-randr --json | jq -r --arg name "$PROFILE_NAME" '
+  "profile \($name) {",
+  (.[] | . as $out | (.modes[] | select(.current == true)) as $mode | 
+    "  output \"\($out.make) \($out.model) \($out.serial // "Unknown")\" mode \($mode.width)x\($mode.height) position \($out.position.x),\($out.position.y) scale \($out.scale // 1.0)"),
+  "}"')
+
+# 3. Preview
+echo "### Universal Kanshi Profile (via wlr-randr)" | gum format
+echo "$GEN_PROFILE" | gum format --type code
+
+# 4. Save
+if gum confirm "Append to $KANSHI_CONFIG?"; then
+    mkdir -p "$(dirname "$KANSHI_CONFIG")"
+    echo -e "\n$GEN_PROFILE" >>"$KANSHI_CONFIG"
+    gum style --foreground 212 "✔ Profile appended."
+else
+    gum style --foreground 161 "✘ Aborted."
+fi
