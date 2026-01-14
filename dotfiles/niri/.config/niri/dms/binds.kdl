@@ -1,13 +1,27 @@
 binds {
-    Mod+Shift+Slash { show-hotkey-overlay; }
 
     // DMS
-    Mod+Space { spawn "dms" "ipc" "call" "spotlight" "toggle"; } 
-    Mod+M { spawn "dms" "ipc" "call" "processlist" "focusOrToggle"; }
-    Mod+Comma { spawn "dms" "ipc" "call" "settings" "focusOrToggle"; }
-    Mod+N { spawn "dms" "ipc" "call" "notifications" "toggle"; }
-    Mod+Shift+N { spawn "dms" "ipc" "call" "notepad" "toggle"; }
-    Mod+Y { spawn "dms" "ipc" "call" "dankdash" "wallpaper"; }
+    Mod+Space hotkey-overlay-title="Application Launcher" {
+        spawn "dms" "ipc" "call" "spotlight" "toggle";
+    }
+    Mod+M hotkey-overlay-title="Task Manager" {
+        spawn "dms" "ipc" "call" "processlist" "focusOrToggle";
+    }
+    Mod+Comma hotkey-overlay-title="Settings" {
+        spawn "dms" "ipc" "call" "settings" "focusOrToggle";
+    }
+    Mod+N hotkey-overlay-title="Notification Center" {
+        spawn "dms" "ipc" "call" "notifications" "toggle";
+    }
+    Mod+Shift+N hotkey-overlay-title="Notepad" {
+        spawn "dms" "ipc" "call" "notepad" "toggle";
+    }
+    Mod+Y hotkey-overlay-title="Browse Wallpapers" {
+        spawn "dms" "ipc" "call" "dankdash" "wallpaper";
+    }
+    Mod+Shift+Slash hotkey-overlay-title="Keybinds" {
+        spawn "dms" "ipc" "call" "keybinds" "toggle" "niri";
+    }
     
     // Applications
     Mod+Return { spawn "ghostty"; }
@@ -20,7 +34,7 @@ binds {
     Mod+A     { spawn "launch-webapp" "https://gemini.google.com/app"; }
     
     // System
-    Mod+Alt+L     { spawn "dms" "ipc" "call" "lock" "lock"; } // Or dms ipc call lock lock
+    Mod+Alt+L       { spawn "dms" "ipc" "call" "lock" "lock"; }
     Mod+Shift+E     { quit; }
     Ctrl+Alt+Delete { spawn "dms" "ipc" "call" "processlist" "focusOrToggle"; }
     Mod+Shift+P     { power-off-monitors; }
