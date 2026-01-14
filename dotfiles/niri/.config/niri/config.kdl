@@ -67,9 +67,9 @@ animations {
     // slowdown 3.0
 }
 
+include "windowrules.kdl"
 include "dms/colors.kdl"
 include "dms/layout.kdl"
 include "dms/wpblur.kdl"
 include "dms/alttab.kdl"
-include "windowrules.kdl"
-include "bindings.kdl"
+include "dms/binds.kdl"

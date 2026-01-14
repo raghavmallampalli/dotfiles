@@ -1,1 +1,2 @@
-dms
+dms/*
+!dms/binds.kdl

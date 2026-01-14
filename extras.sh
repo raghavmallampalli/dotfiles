@@ -36,7 +36,8 @@ if [[ $OS_ID = "arch" ]]; then
         )
         execute yay -S --needed --noconfirm "${WAYLAND_PACKAGES[@]}"
         systemctl --user add-wants niri.service dms
-
+        mkdir -p ~/.config/niri/dms
+        touch ~/.config/niri/dms/{colors,layout,alttab,binds}.kdl
         finish_progress
     fi
 
