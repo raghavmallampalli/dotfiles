@@ -61,5 +61,5 @@ We use [GNU Stow](https://www.gnu.org/software/stow/) to manage dotfiles.
 within the directory of the repository.
 
 # Scripts
-Functionality that I tend to reuse.
+Functionality that I tend to reuse. They will be avaiable on PATH after a standard installation.
 eg. video encoding
