@@ -6,14 +6,10 @@
 spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP" "DISPLAY"
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 spawn-at-startup "xwayland-satellite"
-spawn-at-startup "kanshi"
+// spawn-at-startup "kanshi" // Preferring DMS monitor management for now
 spawn-at-startup "copyq" "--start-server"
 
 prefer-no-csd
-
-// Scratchpad Terminal
-// spawn-at-startup "ghostty" "--class" "scratchpad"
-
 
 // Input device configuration.
 input {
@@ -73,3 +69,5 @@ include "dms/layout.kdl"
 include "dms/wpblur.kdl"
 include "dms/alttab.kdl"
 include "dms/binds.kdl"
+include "dms/cursor.kdl"
+include "dms/outputs.kdl"
