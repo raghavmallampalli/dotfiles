@@ -257,16 +257,22 @@ install_tools_binaries() {
     finish_progress
 }
 
-install_custom_scripts() {
-    show_progress "Installing custom management scripts"
-    run_command cp "./scripts/imv" "$HOME/.local/bin/imv"
-    run_command chmod +x "$HOME/.local/bin/imv"
-    run_command cp "./scripts/launch-webapp" "$HOME/.local/bin/launch-webapp"
-    run_command chmod +x "$HOME/.local/bin/launch-webapp"
-    run_command cp "./scripts/manage-webapp" "$HOME/.local/bin/manage-webapp"
-    run_command chmod +x "$HOME/.local/bin/manage-webapp"
-    run_command cp "./scripts/niri-to-kanshi" "$HOME/.local/bin/niri-to-kanshi"
-    run_command chmod +x "$HOME/.local/bin/niri-to-kanshi"
+stow_custom_scripts() {
+    show_progress "Stowing custom scripts to ~/.local/scripts"
+    
+    local TARGET_DIR="$HOME/.local/scripts"
+    
+    # Backup existing directory if it's not a symlink and exists
+    if [ -d "$TARGET_DIR" ] && [ ! -L "$TARGET_DIR" ]; then
+        log "INFO" "Backing up existing $TARGET_DIR to $TARGET_DIR.bak"
+        mv "$TARGET_DIR" "$TARGET_DIR.bak"
+    fi
+    
+    mkdir -p "$TARGET_DIR"
+    
+    # We use stow to symlink everything from ./scripts to ~/.local/scripts
+    run_command stow -d . -t "$TARGET_DIR" scripts
+    
     finish_progress
 }
 
@@ -279,7 +285,7 @@ main() {
     log "INFO" "Starting main execution..."
     
     # Custom Scripts (Always install these)
-    install_custom_scripts
+
 
     if [[ "$OS_ID" == "arch" ]]; then
         log "INFO" "Installing bootstrap packages for Arch Linux..."
@@ -300,6 +306,9 @@ main() {
         log "WARN" "Unsupported OS for package manager: $OS_ID. Attempting binary installation for tools..."
         install_tools_binaries
     fi
+
+    # Custom Scripts (Always install these after stow is installed)
+    stow_custom_scripts
 
     log "INFO" "Installation completed."
 }
