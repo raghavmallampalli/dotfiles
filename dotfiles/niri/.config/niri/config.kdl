@@ -8,8 +8,13 @@ spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 spawn-at-startup "xwayland-satellite"
 // spawn-at-startup "kanshi" // Preferring DMS monitor management for now
 spawn-at-startup "copyq" "--start-server"
+spawn-at-startup "iio-niri" "--monitor" "eDP-1"
 
+// Miscellaneous
 prefer-no-csd
+clipboard {
+    disable-primary // Turns off the middle click register
+}
 
 // Input device configuration.
 input {
@@ -40,6 +45,9 @@ input {
         // off
         // natural-scroll
         accel-speed 0.35
+        // scroll-method "on-button-down"
+        // scroll-button 274
+        // scroll-button-lock
     }
 
     // focus-follows-mouse

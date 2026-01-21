@@ -32,7 +32,7 @@ if [[ $OS_ID = "arch" ]]; then
         local WAYLAND_PACKAGES=(
             xwayland-satellite xdg-desktop-portal-gnome xdg-desktop-portal-gtk
             ghostty dms-shell-bin matugen cava qt6-multimedia-ffmpeg
-            kanshi wlr-randr niri
+            kanshi wlr-randr niri iio-niri
         )
         yay -S --needed --noconfirm "${WAYLAND_PACKAGES[@]}"
         systemctl --user add-wants niri.service dms
