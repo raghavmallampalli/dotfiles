@@ -6,6 +6,15 @@ ICON_DIR="$HOME/.local/share/applications/icons"
 DESKTOP_DIR="$HOME/.local/share/applications"
 mkdir -p "$ICON_DIR"
 
+DEFAULT_BROWSER=$(xdg-settings get default-web-browser)
+if [[ "$DEFAULT_BROWSER" == *"chrome"* ]]; then
+  BROWSER="chrome"
+elif [[ "$DEFAULT_BROWSER" == *"brave"* ]]; then
+  BROWSER="brave"
+fi
+
+PROFILE_NAME="Profile_4"
+
 if ! command -v gum &> /dev/null; then
   echo "Error: 'gum' is not installed. Please install it first."
   exit 1
@@ -67,8 +76,8 @@ case "$ACTION" in
     fi
 
     # Extract domain from URL for StartupWMClass
-    URL_DOMAIN=$(echo "$APP_URL" | sed -r 's/https?:\/\///' | sed 's/\/.*//')
-    WM_CLASS="chrome-${URL_DOMAIN}__-Default" # May not work with chrome
+    URL_DOMAIN=$(echo "$APP_URL" | sed -r 's/https?:\/\///; s/\/.*//; s/:.*//')
+    WM_CLASS="${BROWSER}-${URL_DOMAIN}__-${PROFILE_NAME}"
 
     # Create application .desktop file
     DESKTOP_FILE="$DESKTOP_DIR/$APP_NAME.desktop"

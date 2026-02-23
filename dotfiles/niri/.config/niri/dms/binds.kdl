@@ -28,8 +28,8 @@ binds {
     Mod+Shift+C { spawn "cursor"; }
     Mod+Shift+A { spawn "antigravity"; }
     Mod+E { spawn "nautilus"; }
-    Mod+Shift+B { spawn "brave"; }
-    Mod+B { spawn "google-chrome-stable"; }
+    Mod+B { spawn "brave"; }
+    Mod+Shift+B { spawn "google-chrome-stable"; }
 
     Mod+A     { spawn "launch-webapp" "https://gemini.google.com/app"; }
     
@@ -129,13 +129,14 @@ binds {
     Mod+3 { focus-workspace "scratch"; }
     Mod+4 { focus-workspace "music"; }
     Mod+5 { focus-workspace "draw"; }
+    Mod+6 { focus-workspace "media"; }
 
     Mod+Shift+1 { move-column-to-workspace "code"; }
     Mod+Shift+2 { move-column-to-workspace "browser"; }
     Mod+Shift+3 { move-column-to-workspace "scratch"; }
-    Mod+Shift+5 { move-column-to-workspace "music"; }
-    Mod+Shift+6 { move-column-to-workspace "draw"; }
-
+    Mod+Shift+4 { move-column-to-workspace "music"; }
+    Mod+Shift+5 { move-column-to-workspace "draw"; }
+    Mod+Shift+6 { move-column-to-workspace "media"; }
     // Layout Adjustment
     Mod+R            { switch-preset-column-width; }
     Mod+BracketLeft  { consume-or-expel-window-left; }

@@ -1,13 +1,10 @@
 workspace "code" {
     open-on-output "Acer Technologies KA270 G0 14490A6233W01"
 }
-workspace "socials" {
-    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
-}
-workspace "media" {
-    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
-}
 workspace "browser" {
+    open-on-output "PNP(BNQ) BenQ GW2283 WCL01584019"
+}
+workspace "scratch" {
     open-on-output "PNP(BNQ) BenQ GW2283 WCL01584019"
 }
 workspace "music" {
@@ -16,8 +13,8 @@ workspace "music" {
 workspace "draw" {
     open-on-output "eDP-1"
 }
-workspace "scratch" {
-    open-on-output "PNP(BNQ) BenQ GW2283 WCL01584019"
+workspace "media" {
+    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
 }
 
 window-rule {
@@ -28,7 +25,7 @@ window-rule {
 
 // Scratch windows
 window-rule {
-    match app-id="chrome-gemini.google.com__app-Default"
+    match app-id=r#".*-gemini\.google\.com__app-.*"#
     open-on-workspace     "scratch"
     open-focused          true
     default-column-width  { proportion 0.8; }
@@ -52,7 +49,7 @@ window-rule {
 
 // Extension pop-ups
 window-rule {
-    // match app-id=r#"^chrome-.*$"#
+    // match app-id=r#"^brave-.*$"#
     match title=r#".*[bB]itwarden"#
     open-floating           true
     open-maximized          false
@@ -132,9 +129,9 @@ window-rule {
 
 // Whatsapp Web
 window-rule {
-    match app-id="chrome-web.whatsapp.com__-Default"
+    match app-id=r#".*-web\.whatsapp\.com__-.*"#
     open-focused      true
-    open-on-workspace "socials"
+    open-on-workspace "media"
     default-column-width { proportion 0.75; }
 }
 
