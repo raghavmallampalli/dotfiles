@@ -105,3 +105,8 @@ source <(fzf --zsh)
 
 # Prevent Ctrl-S from stopping
 stty -ixon
+
+# Set timezone based on IP address
+# Only sets for terminal - system is left unaffected 
+# useful for multiple timezone clusters
+export TZ=$(curl -s --max-time 2 https://ipapi.co/timezone)

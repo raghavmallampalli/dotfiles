@@ -16,6 +16,12 @@ clipboard {
     disable-primary // Turns off the middle click register
 }
 
+environment {
+    QT_QPA_PLATFORMTHEME "qt6ct"
+    GTK_USE_PORTAL "1" 
+    XDG_CURRENT_DESKTOP "GNOME"
+}
+
 // Input device configuration.
 input {
     keyboard {
