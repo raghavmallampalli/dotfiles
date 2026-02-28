@@ -9,6 +9,7 @@ spawn-at-startup "xwayland-satellite"
 // spawn-at-startup "kanshi" // Preferring DMS monitor management for now
 spawn-at-startup "copyq" "--start-server"
 spawn-at-startup "iio-niri" "--monitor" "eDP-1"
+spawn-at-startup "brave" "--no-startup-window"
 
 // Miscellaneous
 prefer-no-csd
@@ -77,10 +78,9 @@ animations {
     // slowdown 3.0
 }
 
-include "windowrules.kdl"
+include "dms/windowrules.kdl"
 include "dms/colors.kdl"
 include "dms/layout.kdl"
-include "dms/wpblur.kdl"
 include "dms/alttab.kdl"
 include "dms/binds.kdl"
 include "dms/cursor.kdl"

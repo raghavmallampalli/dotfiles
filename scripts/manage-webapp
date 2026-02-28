@@ -13,7 +13,7 @@ elif [[ "$DEFAULT_BROWSER" == *"brave"* ]]; then
   BROWSER="brave"
 fi
 
-PROFILE_NAME="Profile_4"
+PROFILE_NAME="Default"
 
 if ! command -v gum &> /dev/null; then
   echo "Error: 'gum' is not installed. Please install it first."

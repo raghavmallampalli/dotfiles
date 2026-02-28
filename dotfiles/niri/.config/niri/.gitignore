@@ -1,2 +1,3 @@
 dms/*
 !dms/binds.kdl
+!dms/windowrules.kdl

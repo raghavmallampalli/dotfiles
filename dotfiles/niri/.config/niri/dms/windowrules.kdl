@@ -1,3 +1,23 @@
+// KKN
+//workspace "code" {
+//    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
+//}
+//workspace "browser" {
+//    open-on-output "PNP(BNQ) BenQ GW2480 98P0346401Q"
+//}
+//workspace "scratch" {
+//    open-on-output "PNP(BNQ) BenQ GW2480 98P0346401Q"
+//}
+//workspace "music" {
+//    open-on-output "eDP-1"
+//}
+//workspace "draw" {
+//    open-on-output "eDP-1"
+//}
+//workspace "media" {
+//    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
+//}
+// SN
 workspace "code" {
     open-on-output "Acer Technologies KA270 G0 14490A6233W01"
 }

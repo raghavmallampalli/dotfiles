@@ -122,3 +122,13 @@ if [[ $install_docker = y ]]; then
 fi
 
 log "INFO" "Installation complete."
+
+# TODO: check this
+$HOME/.local/bin/uvx \
+    --with numpy \
+    --with pandas \
+    --with scikit-learn \
+    --with ipython \
+    --with plotly \
+    --with catppuccin \
+    ipython

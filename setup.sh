@@ -305,13 +305,3 @@ c = get_config()  #noqa
 c.TerminalInteractiveShell.true_color = True
 c.TerminalInteractiveShell.colors = catppuccin_theme
 EOF
-# Fetch packages into cache for faster solve next time
-
- uvx \
-    --with numpy \
-    --with pandas \
-    --with scikit-learn \
-    --with ipython \
-    --with plotly \
-    --with catppuccin \
-    ipython

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 set -e
 set -u
 set -o pipefail
@@ -10,13 +12,24 @@ trap 'cleanup ${LINENO} $?' EXIT
 OS_ID="unknown"
 if [ -f /etc/os-release ]; then
     . /etc/os-release
-    OS_ID=$ID
+    OS_ID=${ID:-unknown}
 fi
+
+# Detect if running as root
+if [ "$EUID" -eq 0 ]; then
+    ROOT_MODE=true
+    HOME="/root"
+    log "INFO" "Running in root mode. Home directory set to /root"
+else
+    ROOT_MODE=false
+fi
+export ROOT_MODE
+
 
 log "INFO" "Detected OS: $OS_ID"
 # Collect all user inputs at the start
 if [ "$ROOT_MODE" = false ]; then
-    if [ -z "$HAS_SUDO" ]; then
+    if [ -z "${HAS_SUDO:-}" ]; then
         read -p "Do you have sudo access? [y/n] " HAS_SUDO
     fi
 else
@@ -29,7 +42,7 @@ if [[ $OS_ID = "arch" ]]; then
         yay -S --needed --noconfirm hdf5 perl-image-exiftool ffmpeg imagemagick ghostscript playerctl
     
         # Wayland specific: Niri + DMS
-        local WAYLAND_PACKAGES=(
+        WAYLAND_PACKAGES=(
             xwayland-satellite xdg-desktop-portal-gnome xdg-desktop-portal-gtk
             ghostty dms-shell-bin matugen cava qt6-multimedia-ffmpeg
             kanshi wlr-randr niri iio-niri
@@ -41,7 +54,7 @@ if [[ $OS_ID = "arch" ]]; then
         finish_progress
 
         # GUIs
-        local PACKAGES=()
+        PACKAGES=()
         if gum confirm "Install Brave?"; then
             PACKAGES+=(brave-bin)
         fi
