@@ -31,7 +31,7 @@ binds {
     Mod+B { spawn "brave"; }
     Mod+Shift+B { spawn "google-chrome-stable"; }
 
-    Mod+A     { spawn "launch-webapp" "https://gemini.google.com/app"; }
+    Mod+A     { spawn "launch-webapp" "https://gemini.google.com"; }
     
     // System
     Mod+Alt+L       { spawn "dms" "ipc" "call" "lock" "lock"; }

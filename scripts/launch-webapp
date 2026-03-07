@@ -14,11 +14,12 @@ fi
 
 # Normalize/Handle common browsers
 case $browser_desktop in
-  google-chrome* | brave-browser* | microsoft-edge* | opera* | vivaldi* | helium*) ;;
+  google-chrome* | brave* | microsoft-edge* | opera* | vivaldi* | helium*) ;;
   *) 
     # Check if we can find any chrome-like browser
     if command -v google-chrome-stable &> /dev/null; then browser_desktop="google-chrome.desktop"
     elif command -v brave-browser &> /dev/null; then browser_desktop="brave-browser.desktop"
+    elif command -v brave &> /dev/null; then browser_desktop="brave_brave.desktop"
     else browser_desktop="chromium.desktop"
     fi
     ;;
@@ -26,8 +27,8 @@ esac
 
 # Find the executable path from the desktop file
 # We look into standard application directories
-desktop_file=$(find /usr/share/applications /usr/local/share/applications $HOME/.local/share/applications -name "$browser_desktop" 2>/dev/null | head -1)
-
+desktop_file=$(find /usr/share/applications /usr/local/share/applications $HOME/.local/share/applications /var/lib/snapd/desktop/applications -name "$browser_desktop" 2>/dev/null | head -1)
+echo $desktop_file
 if [[ -n "$desktop_file" ]]; then
     exec_path=$(grep -m1 '^Exec=' "$desktop_file" | sed 's/^Exec=//;s/ %[uU]//g;s/ -f//')
 fi
@@ -37,10 +38,12 @@ if [[ -z "$exec_path" ]]; then
     case $browser_desktop in
         google-chrome*) exec_path="google-chrome-stable" ;;
         brave-browser*) exec_path="brave-browser" ;;
+        brave*) exec_path="brave" ;;
         microsoft-edge*) exec_path="microsoft-edge-stable" ;;
         *) exec_path="chromium" ;;
     esac
 fi
 
+# echo $exec_path
 # Use eval to handle potential spaces or complex commands in exec_path
 eval "$exec_path --app=\"$1\" \"${@:2}\""

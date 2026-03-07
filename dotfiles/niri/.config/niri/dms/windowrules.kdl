@@ -45,7 +45,7 @@ window-rule {
 
 // Scratch windows
 window-rule {
-    match app-id=r#".*-gemini\.google\.com__app-.*"#
+    match app-id=r#"gemini\.google\.com"#
     open-on-workspace     "scratch"
     open-focused          true
     default-column-width  { proportion 0.8; }
@@ -123,7 +123,7 @@ window-rule {
 }
 
 window-rule {
-    match app-id="brave-browser"
+    match app-id=r#"^brave$"#
     open-focused      true
     open-maximized    true
     open-on-workspace "browser"
