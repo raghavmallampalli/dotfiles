@@ -260,7 +260,7 @@ install_apt_always() {
 
     show_progress "Updating system packages"
     run_command apt update -y
-    run_command apt upgrade -y
+    # run_command apt upgrade -y # causes frequent failures in server setups
     run_command apt-get install git wget curl zip unzip 7zip stow -y
     finish_progress
 
