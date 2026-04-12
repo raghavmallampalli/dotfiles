@@ -155,6 +155,23 @@ window-rule {
     default-column-width { proportion 0.75; }
 }
 
+// Media servers
+window-rule {
+    match app-id=r#".*-media-server\.taile3ae02\.ts\.net__-.*"#
+    open-focused      true
+    open-on-workspace "media"
+    default-column-width { proportion 0.75; }
+}
+
+window-rule {
+    match app-id=r#".*\.preformedoutlook\.online.*"#
+    open-focused      true
+    open-on-workspace "media"
+    default-column-width { proportion 0.75; }
+}
+
+
+
 window-rule {
     match app-id="discord"
     open-focused      true
