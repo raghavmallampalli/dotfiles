@@ -155,4 +155,7 @@ binds {
 
     // CopyQ
     Ctrl+Alt+V { spawn "copyq" "show"; }
+
+    // Spotify
+    Mod+S { spawn "spotify"; }
 }
