@@ -105,3 +105,5 @@ source <(fzf --zsh)
 
 # Prevent Ctrl-S from stopping
 stty -ixon
+
+export PATH=$PATH:/home/raghav/.spicetify
