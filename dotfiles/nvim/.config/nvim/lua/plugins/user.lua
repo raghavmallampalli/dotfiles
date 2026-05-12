@@ -4,7 +4,7 @@ return {
     "catppuccin/nvim",
     name = "catppuccin",
     opts = {
-      flavour = "auto", -- Use "latte" for light and "mocha" for dark
+      flavour = "mocha", -- Use "latte" for light and "mocha" for dark, auto for auto-switching
       background = {
         light = "latte",
         dark = "mocha",
