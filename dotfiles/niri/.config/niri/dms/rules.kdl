@@ -36,6 +36,17 @@ workspace "draw" {
 workspace "media" {
     open-on-output "Acer Technologies KA270 G0 14490A6233W01"
 }
+window-rule {
+    // This empty match applies to all windows
+    match {}
+
+    opacity 0.8;
+    background-effect {
+        blur true;
+        saturation 1.0;
+        noise 0.06;
+    }
+}
 
 window-rule {
     match title="Picture in picture"
@@ -49,12 +60,17 @@ window-rule {
     open-on-workspace     "scratch"
     open-focused          true
     default-column-width  { proportion 0.8; }
+    opacity           0.90
+    background-effect {
+        blur true
+    }    
 }
 
  window-rule {
-     match app-id="com.mitchellh.ghostty"
-     default-column-width  { proportion 0.7; }
-//     open-on-workspace     "scratch"
+    match app-id="com.mitchellh.ghostty"
+    default-column-width  { proportion 0.7; }
+    opacity           0.90
+    // open-on-workspace     "scratch"
 }
 
 // Clipboard
@@ -62,22 +78,15 @@ window-rule {
     match app-id=r#"(?i)copyq"#
     open-floating           true
     open-focused            true
-    open-maximized          false
-    open-maximized-to-edges false
-    open-fullscreen         false
+    default-column-width    { proportion 0.5; }
+    default-window-height   { proportion 0.8; }
+    opacity           0.80
+    background-effect {
+        blur true;
+        xray false;
+    }
 }
 
-// Extension pop-ups
-window-rule {
-    // match app-id=r#"^brave-.*$"#
-    match title=r#".*[bB]itwarden"#
-    open-floating           true
-    open-maximized          false
-    open-maximized-to-edges false
-    open-fullscreen         false
-    open-focused            true
-    block-out-from          "screen-capture"
-}
 
 window-rule {
     match app-id="spotify"
@@ -85,53 +94,39 @@ window-rule {
     open-maximized          true
     open-maximized-to-edges false
     open-fullscreen         false
+    opacity           0.80
+    background-effect {
+        blur true
+    }
     open-on-workspace       "music"
 }
 
 window-rule {
     match app-id="cursor"
-    open-on-workspace "code"
-    open-focused      true
-    open-maximized    true
-    open-fullscreen   false
-    opacity           0.98
-}
-
-window-rule {
     match app-id="Code"
-    open-on-workspace "code"
-    open-focused      true
-    open-maximized    true
-    open-fullscreen   false
-    opacity           0.98
-}
-
-window-rule {
     match app-id="antigravity"
     open-on-workspace "code"
     open-focused      true
     open-maximized    true
     open-fullscreen   false
-    opacity           0.98
+    opacity           0.90
 }
 
 window-rule {
     match app-id="google-chrome"
-    open-focused      true
-    open-maximized    true
-    open-on-workspace "browser"
-}
-
-window-rule {
     match app-id=r#"^brave$"#
+    match app-id="firefox"
     open-focused      true
     open-maximized    true
     open-on-workspace "browser"
+    opacity 1.0;
 }
 
 window-rule {
     match title="OBS"
-    open-on-output "eDP-1"
+    open-on-output  "eDP-1"
+    block-out-from  "screen-capture"
+    opacity 1.0;
 }
 
 window-rule {
@@ -139,6 +134,7 @@ window-rule {
     open-focused      true
     open-maximized    true
     open-on-workspace "draw"
+    opacity 1.0;
 }
 
 window-rule {
@@ -147,34 +143,31 @@ window-rule {
     open-on-workspace "projects"
 }
 
-// Whatsapp Web
+// Media apps
 window-rule {
     match app-id=r#".*-web\.whatsapp\.com__-.*"#
-    open-focused      true
-    open-on-workspace "media"
-    default-column-width { proportion 0.75; }
-}
-
-// Media servers
-window-rule {
-    match app-id=r#".*-media-server\.taile3ae02\.ts\.net__-.*"#
-    open-focused      true
-    open-on-workspace "media"
-    default-column-width { proportion 0.75; }
-}
-
-window-rule {
-    match app-id=r#".*\.preformedoutlook\.online.*"#
-    open-focused      true
-    open-on-workspace "media"
-    default-column-width { proportion 0.75; }
-}
-
-
-
-window-rule {
+    match app-id="steam"
     match app-id="discord"
-    open-focused      true
-    open-maximized    true
-    open-on-workspace "socials"
+    open-focused         true
+    open-on-workspace    "media"
+    default-column-width { proportion 0.75; }
+}
+
+// Needs to be the last rule - should override default properties
+window-rule {
+    match is-floating=true
+
+    open-focused   true
+    block-out-from "screen-capture"
+    opacity        0.70
+    background-effect {
+        blur true
+        xray false
+    }
+}
+
+layer-rule {
+    match namespace="^notifications$"
+
+    block-out-from "screen-capture"
 }

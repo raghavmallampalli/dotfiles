@@ -1,3 +1,4 @@
 dms/*
 !dms/binds.kdl
-!dms/windowrules.kdl
+!dms/rules.kdl
+!dms/dynamic-float.py

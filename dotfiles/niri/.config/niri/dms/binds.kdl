@@ -28,11 +28,8 @@ binds {
     Mod+Shift+C { spawn "cursor"; }
     Mod+Shift+A { spawn "antigravity"; }
     Mod+E { spawn "nautilus"; }
-    Mod+B { spawn "brave"; }
-    Mod+Shift+B { spawn "google-chrome-stable"; }
+    Mod+B { spawn "firefox"; }
 
-    Mod+A     { spawn "launch-webapp" "https://gemini.google.com"; }
-    
     // System
     Mod+Alt+L       { spawn "dms" "ipc" "call" "lock" "lock"; }
     Mod+Shift+E     { quit; }

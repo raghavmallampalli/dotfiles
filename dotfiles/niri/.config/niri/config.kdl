@@ -3,13 +3,18 @@
 // https://yalter.github.io/niri/Configuration:-Introduction
 
 // Autostart
-spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP" "DISPLAY"
+spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "DISPLAY" "XDG_CURRENT_DESKTOP=niri"
+
 spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 spawn-at-startup "xwayland-satellite"
 // spawn-at-startup "kanshi" // Preferring DMS monitor management for now
 spawn-at-startup "copyq" "--start-server"
 spawn-at-startup "iio-niri" "--monitor" "eDP-1"
 spawn-at-startup "brave" "--no-startup-window"
+// This line polls until Niri is ready, then kicks the portal to recognize it
+spawn-at-startup "sh" "-c" "while ! busctl --user status org.gnome.Mutter.ScreenCast >/dev/null 2>&1; do sleep 0.2; done; pkill -f xdg-desktop-portal-gnome"
+spawn-at-startup "/home/raghav/src/dotfiles/dotfiles/niri/.config/niri/dms/dynamic-float.py"
+
 
 // Miscellaneous
 prefer-no-csd
@@ -78,10 +83,12 @@ animations {
     // slowdown 3.0
 }
 
-include "dms/windowrules.kdl"
-include "dms/colors.kdl"
-include "dms/layout.kdl"
 include "dms/alttab.kdl"
 include "dms/binds.kdl"
+include "dms/colors.kdl"
 include "dms/cursor.kdl"
+include "dms/layout.kdl"
 include "dms/outputs.kdl"
+include "dms/rules.kdl"
+include "dms/wpblur.kdl"
+
