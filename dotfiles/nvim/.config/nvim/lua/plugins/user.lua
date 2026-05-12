@@ -3,7 +3,30 @@ return {
   {
     "catppuccin/nvim",
     name = "catppuccin",
-    opts = { flavour = "mocha", transparent_background = false },
+    opts = {
+      flavour = "auto", -- Use "latte" for light and "mocha" for dark
+      background = {
+        light = "latte",
+        dark = "mocha",
+      },
+      transparent_background = false,
+    },
+  },
+
+  -- Auto-switch dark/light mode
+  {
+    "f-person/auto-dark-mode.nvim",
+    opts = {
+      update_interval = 1000,
+      set_dark_mode = function()
+        vim.api.nvim_set_option("background", "dark")
+        vim.cmd("colorscheme catppuccin")
+      end,
+      set_light_mode = function()
+        vim.api.nvim_set_option("background", "light")
+        vim.cmd("colorscheme catppuccin")
+      end,
+    },
   },
 
   -- Logic to ensure Catppuccin loads
