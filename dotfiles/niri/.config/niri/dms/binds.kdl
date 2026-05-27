@@ -28,7 +28,7 @@ binds {
     Mod+Shift+C { spawn "cursor"; }
     Mod+Shift+A { spawn "antigravity"; }
     Mod+E { spawn "nautilus"; }
-    Mod+B { spawn "firefox"; }
+    Mod+B { spawn "brave"; }
 
     // System
     Mod+Alt+L       { spawn "dms" "ipc" "call" "lock" "lock"; }
