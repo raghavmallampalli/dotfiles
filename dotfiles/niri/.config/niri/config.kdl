@@ -14,7 +14,7 @@ spawn-at-startup "brave" "--no-startup-window"
 // This line polls until Niri is ready, then kicks the portal to recognize it
 spawn-at-startup "sh" "-c" "while ! busctl --user status org.gnome.Mutter.ScreenCast >/dev/null 2>&1; do sleep 0.2; done; pkill -f xdg-desktop-portal-gnome"
 spawn-at-startup "/home/raghav/src/dotfiles/dotfiles/niri/.config/niri/dms/dynamic-float.py"
-
+spawn-at-startup "~/.local/scripts/toggle-theme"
 
 // Miscellaneous
 prefer-no-csd
