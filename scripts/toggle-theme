@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+# Function to update themes based on portal status
+sync_theme() {
+    # Query the current portal state
+    local current_state
+    current_state=$(busctl --user call org.freedesktop.portal.Desktop /org/freedesktop/portal/desktop org.freedesktop.portal.Settings Read ss "org.freedesktop.appearance" "color-scheme" 2>/dev/null)
+
+    # If the output contains 'u 1', it's dark mode. If it's 'u 0' (or anything else), map it to light mode.
+    if [[ "$current_state" == *"u 1"* ]]; then
+        gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+        gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+    else
+        gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita'
+        gsettings set org.gnome.desktop.interface color-scheme 'prefer-light'
+    fi
+}
+
+# Run once at startup to set the initial state
+sync_theme
+
+# Subscribe to D-Bus SettingChanged signals from the XDG Desktop Portal
+gdbus monitor --session --dest org.freedesktop.portal.Desktop --object-path /org/freedesktop/portal/desktop | while read -r line; do
+    # Trigger a sync whenever the color-scheme property is modified
+    if [[ "$line" == *"SettingChanged"* && "$line" == *"color-scheme"* ]]; then
+        # Small sleep ensures the portal backend has fully written its new state
+        sleep 0.2
+        sync_theme
+    fi
+done

@@ -362,20 +362,39 @@ install_tools_binaries() {
 }
 
 stow_custom_scripts() {
-    show_progress "Stowing custom scripts to ~/.local/scripts"
-    
+    show_progress "Symlinking scripts directory to ~/.local/scripts"
+
     local TARGET_DIR="$HOME/.local/scripts"
-    
-    # Backup existing directory if it's not a symlink and exists
-    if [ -d "$TARGET_DIR" ] && [ ! -L "$TARGET_DIR" ]; then
-        log "INFO" "Backing up existing $TARGET_DIR to $TARGET_DIR.bak"
-        mv "$TARGET_DIR" "$TARGET_DIR.bak"
+    local SCRIPTS_DIR
+    SCRIPTS_DIR="$(realpath "$(dirname "$0")/scripts")"
+
+    # If TARGET_DIR is already a symlink pointing to the right place, nothing to do
+    if [ -L "$TARGET_DIR" ] && [ "$(readlink -f "$TARGET_DIR")" = "$SCRIPTS_DIR" ]; then
+        log "INFO" "$TARGET_DIR already points to $SCRIPTS_DIR"
+        finish_progress
+        return 0
     fi
-    
-    mkdir -p "$TARGET_DIR"
-    
-    # We use stow to symlink everything from ./scripts to ~/.local/scripts
-    stow -d . -t "$TARGET_DIR" scripts
-    
+
+    # If it's a real directory, copy any files not already in the repo, then remove it
+    if [ -d "$TARGET_DIR" ] && [ ! -L "$TARGET_DIR" ]; then
+        log "INFO" "Copying any untracked scripts from $TARGET_DIR into repo..."
+        for f in "$TARGET_DIR"/*; do
+            [ -e "$f" ] || continue
+            base="$(basename "$f")"
+            if [ ! -e "$SCRIPTS_DIR/$base" ]; then
+                log "INFO" "Copying missing script: $base"
+                cp -p "$f" "$SCRIPTS_DIR/$base"
+            fi
+        done
+        log "INFO" "Removing $TARGET_DIR so it can be replaced with a symlink"
+        rm -rf "$TARGET_DIR"
+    elif [ -L "$TARGET_DIR" ]; then
+        # Stale or wrong symlink
+        rm "$TARGET_DIR"
+    fi
+
+    ln -s "$SCRIPTS_DIR" "$TARGET_DIR"
+    log "INFO" "Created symlink: $TARGET_DIR -> $SCRIPTS_DIR"
+
     finish_progress
 }
