@@ -4,6 +4,7 @@
 export ZSH_COMPDUMP="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump"
 mkdir -p "${ZSH_COMPDUMP:h}"
 HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history" 
+mkdir -p "${HISTFILE:h}"
 
 if [ -f $ZDOTDIR/.aliases ]; then
   source $ZDOTDIR/.aliases
@@ -105,5 +106,3 @@ source <(fzf --zsh)
 
 # Prevent Ctrl-S from stopping
 stty -ixon
-
-export PATH=$PATH:/home/raghav/.spicetify

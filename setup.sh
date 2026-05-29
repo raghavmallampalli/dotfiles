@@ -200,6 +200,10 @@ fi
 if [ -x "$(command -v zsh)"  ]; then
     show_progress "Configuring ZSH"
 
+    # Create cache and state directories for XDG compliance
+    mkdir -p "${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
+    mkdir -p "${XDG_STATE_HOME:-$HOME/.local/state}/zsh"
+
     if [ -d "$HOME/.oh-my-zsh" ]; then
         log "INFO" "Oh-My-Zsh already installed. Removing."
         execute rm -rf "$HOME/.oh-my-zsh"
