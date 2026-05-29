@@ -37,12 +37,15 @@ You can also run the automated test script which builds the images and runs the 
 Check `install_test.log` for the output.
 
 ## Setup scripts
+Run them in this order. Every subsequent step needs all previous to have been run.
+
 1. `install.sh`: Installs packages and tools.
 2. `setup.sh`: Configures dotfiles and shell.
-3. `dev.sh`: Programming languages and environments.
-4. `extras.sh`: General tools. Includes my preferred desktop environment set-up on Arch.
+3. These two are independent, run them in any order:
+    - `dev.sh`: Programming languages and environments.
+    - `extras.sh`: General tools. Includes my preferred desktop environment set-up on Arch.
 
-> IMPORTANT: `extras.sh` is only kept up to date for Arch, which is my primary OS.
+> IMPORTANT: `extras.sh` is only kept up to date for Ubuntu, which is my primary OS.
 Run them in order:
 ```bash
 ./install.sh

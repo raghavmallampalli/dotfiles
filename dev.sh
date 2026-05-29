@@ -49,6 +49,11 @@ if gum confirm "Install Docker Engine?"; then
     install_docker=y
 fi
 
+install_claude=n
+if gum confirm "Install Claude Code?"; then
+    install_claude=y
+fi
+
 # NVM (node version manager) installation
 if [[ $install_nvm = y ]]; then
     show_progress "Installing NVM"
@@ -119,6 +124,13 @@ if [[ $install_docker = y ]]; then
         
         finish_progress
     fi
+fi
+
+# Claude Code installation
+if [[ $install_claude = y ]]; then
+    show_progress "Installing Claude Code"
+    curl -fsSL https://claude.ai/install.sh | bash
+    finish_progress
 fi
 
 log "INFO" "Installation complete."
