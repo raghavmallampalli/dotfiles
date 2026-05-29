@@ -28,7 +28,8 @@ binds {
     Mod+Shift+C { spawn "cursor"; }
     Mod+Shift+A { spawn "antigravity"; }
     Mod+E { spawn "nautilus"; }
-    Mod+B { spawn "brave"; }
+    Mod+B { spawn "brave" "--profile-directory=Default" "--new-window"; }
+    Mod+Shift+B { spawn "brave" "--profile-directory=Profile 1" "--new-window"; }
 
     // System
     Mod+Alt+L       { spawn "dms" "ipc" "call" "lock" "lock"; }
