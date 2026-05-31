@@ -89,7 +89,7 @@ window-rule {
 
 
 window-rule {
-    match app-id="spotify"
+    match app-id=r#"[sS]potify"#
     open-focused            true
     open-maximized          true
     open-maximized-to-edges false
