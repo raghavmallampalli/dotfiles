@@ -48,12 +48,6 @@ window-rule {
     }
 }
 
-window-rule {
-    match title="Picture in picture"
-    open-on-workspace "music"
-    open-floating     true
-}
-
 // Scratch windows
 window-rule {
     match app-id=r#"gemini\.google\.com"#
@@ -63,7 +57,7 @@ window-rule {
     opacity           0.90
     background-effect {
         blur true
-    }    
+    }
 }
 
  window-rule {
@@ -101,6 +95,7 @@ window-rule {
     open-on-workspace       "music"
 }
 
+// Code apps
 window-rule {
     match app-id="cursor"
     match app-id="Code"
@@ -110,16 +105,6 @@ window-rule {
     open-maximized    true
     open-fullscreen   false
     opacity           0.90
-}
-
-window-rule {
-    match app-id="google-chrome"
-    match app-id=r#"^brave$"#
-    match app-id="firefox"
-    open-focused      true
-    open-maximized    true
-    open-on-workspace "browser"
-    opacity 1.0;
 }
 
 window-rule {
@@ -140,10 +125,19 @@ window-rule {
 window-rule {
     match app-id="obsidian"
     open-maximized    true
-    open-on-workspace "projects"
 }
 
 // Media apps
+window-rule {
+    match app-id="mpv"
+    match app-id="org.gnome.Loupe"
+    open-focused      true
+    open-fullscreen   true
+    open-on-workspace "media"
+    opacity 1.0;
+}
+
+// Chat apps
 window-rule {
     match app-id=r#".*-web\.whatsapp\.com__-.*"#
     match app-id="steam"
@@ -153,19 +147,60 @@ window-rule {
     default-column-width { proportion 0.75; }
 }
 
-// Needs to be the last rule - should override default properties
+// Browsers
 window-rule {
-    match is-floating=true
+    match app-id="google-chrome"
+    match app-id=r#"^brave$"#
+    match app-id="firefox"
+    
+    exclude title=r#"^Meet - \S+$"#
+    open-focused      true
+    open-maximized    true
+    open-on-workspace "browser"
+    opacity 1.0;
+}
 
-    open-focused   true
-    block-out-from "screen-capture"
-    opacity        0.70
+// Floating windows
+// Bitwarden pop-up
+window-rule {
+    match title=r#"^Bitwarden$"#
+    // Initial title for Brave pop-up windows
+    match title=r#"_crx_.*?"#
+    open-floating           true
+    default-column-width    { proportion 0.3; }
+    default-window-height   { proportion 0.8; }
+    opacity                 0.70
     background-effect {
         blur true
         xray false
     }
 }
 
+// Google Meet popout windows
+window-rule {
+    match app-id=r#"^brave$"# title=r#"^Meet - \S+$"#
+    open-floating     true
+    open-focused      true
+    open-on-output "eDP-1"    
+    opacity 1.0
+}
+
+window-rule {
+    match title="Picture in picture"
+    open-on-output "eDP-1"
+    open-floating     true
+    default-window-height   { proportion 0.76; }
+    default-column-width    { proportion 0.8; }
+}
+
+// Needs to be the last rule - should override default properties
+window-rule {
+    match is-floating=true
+
+    open-focused   true
+    block-out-from "screen-capture"
+}
+// Layer rules
 layer-rule {
     match namespace="^notifications$"
     match namespace=r#"dms:.*"#
