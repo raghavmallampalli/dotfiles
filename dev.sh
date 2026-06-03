@@ -21,13 +21,6 @@ else
 fi
 export ROOT_MODE
 
-# OS Detection
-OS_ID="unknown"
-if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    OS_ID=$ID
-fi
-
 # Gather all user input at the beginning using gum
 install_nvm=n
 if gum confirm "Install nvm?"; then
@@ -83,10 +76,10 @@ if [[ $install_docker = y ]]; then
     else
         show_progress "Installing Docker Engine"
         
-        if [[ "$OS_ID" == "arch" ]]; then
-            # Arch Linux installation via yay
+        if [[ "$IS_ARCH" == "true" ]]; then
+            # Arch Linux installation via AUR helper
             # Docker and docker-compose
-            execute yay -S --needed --noconfirm docker docker-compose
+            execute "$AUR_HELPER" -S --needed --noconfirm docker docker-compose
             
             # Post-install steps
             log "INFO" "Enabling Docker service..."
@@ -95,7 +88,7 @@ if [[ $install_docker = y ]]; then
             log "INFO" "Adding user to docker group..."
             run_command usermod -aG docker "$USER"
             
-        elif [[ "$OS_ID" == "ubuntu" ]] || [[ "$OS_ID" == "debian" ]]; then
+        elif [[ "$IS_DEBIAN" == "true" ]]; then
             # Ubuntu installation (Official Docker Repo)
             
             # Add Docker's official GPG key

@@ -29,6 +29,12 @@ while getopts ":-:" opt; do
         help)
             show_help
             ;;
+        sudo-access)
+            OPTIND=$((OPTIND + 1))
+            ;;
+        binaries-install)
+            OPTIND=$((OPTIND + 1))
+            ;;
         *)
             echo "Unknown option: --${OPTARG}"
             show_help
@@ -85,12 +91,6 @@ if [ ! -w "$HOME/.local/bin" ]; then
 fi
 export PATH="$HOME/.local/bin:$PATH"
 
-# OS Detection
-OS_ID="unknown"
-if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    OS_ID=$ID
-fi
 log "INFO" "Detected OS: $OS_ID"
 
 # -----------------------------------------------------------------------------
@@ -111,7 +111,7 @@ main() {
     # Custom Scripts (Always install these)
 
 
-    if [[ "$OS_ID" == "arch" ]]; then
+    if [[ "$IS_ARCH" == "true" ]]; then
         log "INFO" "Installing bootstrap packages for Arch Linux..."
 
         show_progress "Updating system and installing prerequisites"
@@ -119,10 +119,10 @@ main() {
         run_command pacman -Sy --needed --noconfirm git base-devel ca-certificates
         finish_progress
         
-        install_yay
-        install_tools_yay
+        install_aur_helper_if_needed
+        install_tools_aur
         
-    elif [[ "$OS_ID" == "ubuntu" ]] || [[ "$OS_ID" == "debian" ]]; then
+    elif [[ "$IS_DEBIAN" == "true" ]]; then
         # On Ubuntu, we start with minimal system setup, then use binaries for tools
         install_apt_always
         install_tools_binaries

@@ -8,12 +8,7 @@ source "$(dirname "$0")/common.sh"
 
 trap 'cleanup ${LINENO} $?' EXIT
 
-# OS Detection
-OS_ID="unknown"
-if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    OS_ID=${ID:-unknown}
-fi
+# OS Detection is inherited from common.sh
 
 # Detect if running as root
 if [ "$EUID" -eq 0 ]; then
@@ -36,18 +31,18 @@ else
     HAS_SUDO="y"
 fi
 
-if [[ $OS_ID = "arch" ]]; then
+if [[ "$IS_ARCH" == "true" ]]; then
     if [[ $HAS_SUDO = y ]]; then
-        show_progress "Installing extra tools via yay"
-        yay -S --needed --noconfirm hdf5 perl-image-exiftool ffmpeg imagemagick ghostscript playerctl
+        show_progress "Installing extra tools via $AUR_HELPER"
+        "$AUR_HELPER" -S --needed --noconfirm hdf5 perl-image-exiftool ffmpeg imagemagick ghostscript playerctl
     
         # Wayland specific: Niri + DMS
         WAYLAND_PACKAGES=(
             xwayland-satellite xdg-desktop-portal-gnome xdg-desktop-portal-gtk
-            ghostty dms-shell-bin matugen cava qt6-multimedia-ffmpeg
-            kanshi wlr-randr niri iio-niri
+            ghostty dms-shell matugen-bin cava qt6-multimedia-ffmpeg
+            wlr-randr niri iio-niri
         )
-        yay -S --needed --noconfirm "${WAYLAND_PACKAGES[@]}"
+        "$AUR_HELPER" -S --needed --noconfirm "${WAYLAND_PACKAGES[@]}"
         systemctl --user add-wants niri.service dms
         mkdir -p ~/.config/niri/dms
         touch ~/.config/niri/dms/{colors,layout,alttab,binds}.kdl
@@ -80,11 +75,11 @@ if [[ $OS_ID = "arch" ]]; then
             PACKAGES+=(obsidian)
         fi
         if [ ${#PACKAGES[@]} -gt 0 ]; then
-            yay -S --needed --noconfirm "${PACKAGES[@]}"
+            "$AUR_HELPER" -S --needed --noconfirm "${PACKAGES[@]}"
         fi
     fi
 
-elif [[ $OS_ID = "ubuntu" ]] || [[ $OS_ID = "debian" ]]; then
+elif [[ "$IS_DEBIAN" == "true" ]]; then
 
     if [[ $HAS_SUDO = y ]]; then
         # FFMPEG

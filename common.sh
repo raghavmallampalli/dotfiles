@@ -120,6 +120,28 @@ backup_and_delete() {
     log "INFO" "Backed up and removed $file"
 }
 
+# Clean up existing files that would conflict with stow
+pre_stow_cleanup() {
+    local pkg_dir="$1"
+    local target_dir="$2"
+    
+    if [ ! -d "$pkg_dir" ]; then
+        return 0
+    fi
+    
+    # Find all files in the package directory
+    find "$pkg_dir" -type f | while read -r src_file; do
+        # Compute path relative to pkg_dir
+        local rel_path="${src_file#$pkg_dir/}"
+        local dest_file="$target_dir/$rel_path"
+        
+        if [ -e "$dest_file" ] && [ ! -L "$dest_file" ]; then
+            log "WARN" "Conflict detected: $dest_file already exists and is not a symlink."
+            backup_and_delete "$dest_file"
+        fi
+    done
+}
+
 # Improved dotfile installation
 # Default behavior: Try hard link first, fall back to soft link if hard link fails
 # This handles cross-filesystem scenarios automatically
@@ -187,7 +209,7 @@ backup_configs() {
     done
 
     # Backup XDG configs
-    for dir in nvim tmux zsh yazi; do
+    for dir in nvim tmux zsh yazi niri; do
         if [ -d "$HOME/.config/$dir" ]; then
              cp -r "$HOME/.config/$dir" "$backup_dir/$dir"
         fi
@@ -204,10 +226,20 @@ is_symlink() {
     return 1
 }
 
-install_tools_yay() {
-    log "INFO" "Installing tools via yay..."
+detect_aur_helper() {
+    if command -v paru >/dev/null 2>&1; then
+        AUR_HELPER="paru"
+    elif command -v yay >/dev/null 2>&1; then
+        AUR_HELPER="yay"
+    else
+        AUR_HELPER=""
+    fi
+}
 
-    show_progress "Installing essentials and tools via yay"
+install_tools_aur() {
+    log "INFO" "Installing tools via $AUR_HELPER..."
+
+    show_progress "Installing essentials and tools via $AUR_HELPER"
     
     # Combined package list
     local PACKAGES=(
@@ -216,43 +248,48 @@ install_tools_yay() {
         cmake moreutils inetutils
         zsh tmux vim htop nvtop
         xclip jq stow gum copyq
-        fzf ripgrep bat fd zoxide duf yazi-bin lazygit neovim
+        fzf ripgrep bat fd zoxide duf yazi lazygit neovim
     )
 
-    execute yay -S --needed --noconfirm "${PACKAGES[@]}" 
+    execute "$AUR_HELPER" -S --needed --noconfirm "${PACKAGES[@]}" 
     
     finish_progress
 }
 
-install_yay() {
-    log "INFO" "Starting yay installation..."
-
-    if ! command -v yay >/dev/null 2>&1; then
-        show_progress "Installing yay"
-        # We use /tmp to avoid permission issues if the current directory is inside /root
-        local YAY_BUILD_DIR="/tmp/yay-bin"
-        if [ -d "$YAY_BUILD_DIR" ]; then rm -rf "$YAY_BUILD_DIR"; fi
-        git clone https://aur.archlinux.org/yay-bin.git "$YAY_BUILD_DIR"
-
-        local CURRENT_DIR=$(pwd)
-        cd "$YAY_BUILD_DIR"
-
-        if [ "$EUID" -eq 0 ]; then
-            log "WARN" "Running makepkg as root. Creating temporary builder user..."
-            if ! id -u builder >/dev/null 2>&1; then
-                useradd -m builder
-                echo "builder ALL=(ALL) NOPASSWD: ALL" >>/etc/sudoers
-            fi
-            chown -R builder:builder .
-            su builder -c "makepkg -si --noconfirm"
-        else
-            makepkg -si --noconfirm
-        fi
-
-        cd "$CURRENT_DIR"
-        rm -rf "$YAY_BUILD_DIR"
-        finish_progress
+install_aur_helper_if_needed() {
+    log "INFO" "Checking for existing AUR helper (yay or paru)..."
+    detect_aur_helper
+    if [ -n "$AUR_HELPER" ]; then
+        log "INFO" "Found AUR helper: $AUR_HELPER. Skipping yay installation."
+        return 0
     fi
+
+    log "INFO" "No AUR helper found. Starting yay installation..."
+    show_progress "Installing yay"
+    # We use /tmp to avoid permission issues if the current directory is inside /root
+    local YAY_BUILD_DIR="/tmp/yay-bin"
+    if [ -d "$YAY_BUILD_DIR" ]; then rm -rf "$YAY_BUILD_DIR"; fi
+    git clone https://aur.archlinux.org/yay-bin.git "$YAY_BUILD_DIR"
+
+    local CURRENT_DIR=$(pwd)
+    cd "$YAY_BUILD_DIR"
+
+    if [ "$EUID" -eq 0 ]; then
+        log "WARN" "Running makepkg as root. Creating temporary builder user..."
+        if ! id -u builder >/dev/null 2>&1; then
+            useradd -m builder
+            echo "builder ALL=(ALL) NOPASSWD: ALL" >>/etc/sudoers
+        fi
+        chown -R builder:builder .
+        su builder -c "makepkg -si --noconfirm"
+    else
+        makepkg -si --noconfirm
+    fi
+
+    cd "$CURRENT_DIR"
+    rm -rf "$YAY_BUILD_DIR"
+    AUR_HELPER="yay"
+    finish_progress
 }
 
 install_apt_always() {
@@ -398,3 +435,26 @@ stow_custom_scripts() {
 
     finish_progress
 }
+
+# OS Detection
+OS_ID="unknown"
+IS_ARCH=false
+IS_DEBIAN=false
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    OS_ID=$ID
+    if [ "$OS_ID" = "arch" ] || [ "$OS_ID" = "cachyos" ] || echo "${ID_LIKE:-}" | grep -qw "arch"; then
+        IS_ARCH=true
+    fi
+    if [ "$OS_ID" = "ubuntu" ] || [ "$OS_ID" = "debian" ] || echo "${ID_LIKE:-}" | grep -qw -e "ubuntu" -e "debian"; then
+        IS_DEBIAN=true
+    fi
+fi
+export OS_ID IS_ARCH IS_DEBIAN
+
+# Detect AUR helper
+AUR_HELPER=""
+if [ "$IS_ARCH" = "true" ]; then
+    detect_aur_helper
+fi
+export AUR_HELPER
