@@ -131,6 +131,7 @@ window-rule {
 window-rule {
     match app-id="mpv"
     match app-id="org.gnome.Loupe"
+    match app-id="brave-media-server.taile3ae02.ts.net__-Default"
     open-focused      true
     open-fullscreen   true
     open-on-workspace "media"
@@ -151,6 +152,7 @@ window-rule {
 window-rule {
     match app-id="google-chrome"
     match app-id=r#"^brave$"#
+    match app-id=r#"^brave-browser$"#
     match app-id="firefox"
     
     exclude title=r#"^Meet - \S+$"#
@@ -178,7 +180,7 @@ window-rule {
 
 // Google Meet popout windows
 window-rule {
-    match app-id=r#"^brave$"# title=r#"^Meet - \S+$"#
+    match app-id=r#"^brave(-browser)?$"# title=r#"^Meet - \S+$"#
     open-floating     true
     open-focused      true
     open-on-output "eDP-1"    
