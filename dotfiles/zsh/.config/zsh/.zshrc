@@ -27,7 +27,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(git dotenv conda-zsh-completion zsh-autosuggestions zoxide fzf)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git dotenv conda-zsh-completion zsh-autosuggestions zoxide fzf)
+plugins=(git dotenv conda-zsh-completion zsh-autosuggestions zoxide fzf nvm uv docker)
 
 source $ZSH/oh-my-zsh.sh
 
