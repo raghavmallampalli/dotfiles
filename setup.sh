@@ -183,6 +183,11 @@ if command -v stow >/dev/null 2>&1; then
     # Best to be absolute or relative to script location.
     REPO_ROOT="$(dirname "$(readlink -f "$0")")"
     
+    # Pre-stow cleanup to prevent conflicts
+    for pkg in zsh tmux nvim yazi niri; do
+        pre_stow_cleanup "$REPO_ROOT/dotfiles/$pkg" "$HOME"
+    done
+    
     # Execute stow
     # -d sets the directory to look for packages (relative to current or absolute)
     # -t sets the target directory (Home)
