@@ -178,6 +178,14 @@ window-rule {
     }
 }
 
+// Browser notifications (empty app-id and title)
+window-rule {
+    match app-id=r#"^$"# title=r#"^$"#
+    open-floating           true
+    open-focused            false
+    default-floating-position x=32 y=32 relative-to="top-right"
+}
+
 // Google Meet popout windows
 window-rule {
     match app-id=r#"^brave(-browser)?$"# title=r#"^Meet - \S+$"#
