@@ -163,7 +163,7 @@ window-rule {
     match app-id=r#"^brave$"#
     match app-id=r#"^brave-browser$"#
     match app-id="firefox"
-    exclude title=r#"^Meet - \S+$"#
+    exclude title=r#"^Meet - .+$"#
     
     open-on-workspace "browser"
     open-focused      true
@@ -198,7 +198,7 @@ window-rule {
 }
 
 window-rule {
-    match app-id=r#"^brave(-browser)?$"# title=r#"^Meet - \S+$"#
+    match app-id=r#"^brave(-browser)?$"# title=r#"^Meet - .+$"#
     match title="Picture in picture"
     match title="Picture-in-picture"
 
