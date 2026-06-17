@@ -8,7 +8,7 @@ spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 spawn-at-startup "xwayland-satellite"
 spawn-at-startup "copyq" "--start-server"
 spawn-at-startup "iio-niri" "--monitor" "eDP-1"
-spawn-at-startup "sh" "-c" "sleep 2 && brave --no-startup-window"
+spawn-at-startup "sh" "-c" "sleep 2 && brave --profile-directory=Default --no-startup-window"
 // This line polls until Niri is ready, then kicks the portal to recognize it
 spawn-at-startup "sh" "-c" "while ! busctl --user status org.gnome.Mutter.ScreenCast >/dev/null 2>&1; do sleep 0.2; done; pkill -f xdg-desktop-portal-gnome"
 // Adds system theme support to Brave. "Experimental Web Platform features" needs to be set in brave://flags/
