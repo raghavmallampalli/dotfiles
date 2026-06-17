@@ -36,6 +36,7 @@ workspace "draw" {
 workspace "media" {
     open-on-output "Acer Technologies KA270 G0 14490A6233W01"
 }
+
 window-rule {
     // This empty match applies to all windows
     match {}
@@ -51,10 +52,11 @@ window-rule {
 // Scratch windows
 window-rule {
     match app-id=r#"gemini\.google\.com"#
-    open-on-workspace     "scratch"
-    open-focused          true
-    default-column-width  { proportion 0.8; }
-    opacity           0.90
+
+    open-on-workspace    "scratch"
+    open-focused         true
+    default-column-width { proportion 0.8; }
+    opacity              0.90
     background-effect {
         blur true
     }
@@ -62,19 +64,20 @@ window-rule {
 
  window-rule {
     match app-id="com.mitchellh.ghostty"
+
     default-column-width  { proportion 0.7; }
-    opacity           0.90
-    // open-on-workspace     "scratch"
+    opacity               0.90
 }
 
 // Clipboard
 window-rule {
     match app-id=r#"(?i)copyq"#
-    open-floating           true
-    open-focused            true
-    default-column-width    { proportion 0.5; }
-    default-window-height   { proportion 0.8; }
-    opacity           0.80
+
+    open-floating         true
+    open-focused          true
+    default-column-width  { proportion 0.5; }
+    default-window-height { proportion 0.8; }
+    opacity               0.80
     background-effect {
         blur true;
         xray false;
@@ -84,15 +87,16 @@ window-rule {
 
 window-rule {
     match app-id=r#"[sS]potify"#
+
+    open-on-workspace       "music"
     open-focused            true
     open-maximized          true
     open-maximized-to-edges false
     open-fullscreen         false
-    opacity           0.80
+    opacity                 0.80
     background-effect {
         blur true
     }
-    open-on-workspace       "music"
 }
 
 // Code apps
@@ -100,6 +104,7 @@ window-rule {
     match app-id="cursor"
     match app-id="Code"
     match app-id="antigravity"
+
     open-on-workspace "code"
     open-focused      true
     open-maximized    true
@@ -109,9 +114,10 @@ window-rule {
 
 window-rule {
     match title="OBS"
+
     open-on-output  "eDP-1"
     block-out-from  "screen-capture"
-    opacity 1.0;
+    opacity         1.0;
 }
 
 window-rule {
@@ -119,11 +125,12 @@ window-rule {
     open-focused      true
     open-maximized    true
     open-on-workspace "draw"
-    opacity 1.0;
+    opacity           1.0;
 }
 
 window-rule {
     match app-id="obsidian"
+
     open-maximized    true
 }
 
@@ -132,10 +139,11 @@ window-rule {
     match app-id="mpv"
     match app-id="org.gnome.Loupe"
     match app-id="brave-media-server.taile3ae02.ts.net__-Default"
+    
+    open-on-workspace "media"
     open-focused      true
     open-fullscreen   true
-    open-on-workspace "media"
-    opacity 1.0;
+    opacity           1.0;
 }
 
 // Chat apps
@@ -143,8 +151,9 @@ window-rule {
     match app-id=r#".*-web\.whatsapp\.com__-.*"#
     match app-id="steam"
     match app-id="discord"
-    open-focused         true
+
     open-on-workspace    "media"
+    open-focused         true
     default-column-width { proportion 0.75; }
 }
 
@@ -154,12 +163,12 @@ window-rule {
     match app-id=r#"^brave$"#
     match app-id=r#"^brave-browser$"#
     match app-id="firefox"
-    
     exclude title=r#"^Meet - \S+$"#
+    
+    open-on-workspace "browser"
     open-focused      true
     open-maximized    true
-    open-on-workspace "browser"
-    opacity 1.0;
+    opacity           1.0;
 }
 
 // Floating windows
@@ -168,10 +177,11 @@ window-rule {
     match title=r#"^Bitwarden$"#
     // Initial title for Brave pop-up windows
     match title=r#"_crx_.*?"#
-    open-floating           true
-    default-column-width    { proportion 0.3; }
-    default-window-height   { proportion 0.8; }
-    opacity                 0.70
+
+    open-floating         true
+    default-column-width  { proportion 0.3; }
+    default-window-height { proportion 0.8; }
+    opacity               0.70
     background-effect {
         blur true
         xray false
@@ -181,22 +191,17 @@ window-rule {
 // Browser notifications (empty app-id and title)
 window-rule {
     match app-id=r#"^$"# title=r#"^$"#
-    open-floating           true
-    open-focused            false
+
+    open-floating             true
+    open-focused              false
     default-floating-position x=32 y=32 relative-to="top-right"
 }
 
-// Google Meet popout windows
 window-rule {
     match app-id=r#"^brave(-browser)?$"# title=r#"^Meet - \S+$"#
-    open-floating     true
-    open-focused      true
-    open-on-output "eDP-1"    
-    opacity 1.0
-}
-
-window-rule {
     match title="Picture in picture"
+    match title="Picture-in-picture"
+
     open-on-output "eDP-1"
     open-floating     true
     default-window-height   { proportion 0.76; }
@@ -210,6 +215,7 @@ window-rule {
     open-focused   true
     block-out-from "screen-capture"
 }
+
 // Layer rules
 layer-rule {
     match namespace="^notifications$"
