@@ -1,24 +1,16 @@
-// This config is in the KDL format: https://kdl.dev
-// Check the wiki for a full description of the configuration:
-// https://yalter.github.io/niri/Configuration:-Introduction
-
-// Autostart
-spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "DISPLAY" "XDG_CURRENT_DESKTOP=niri"
-spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
+// STARTUP
+// Sync environment across D-Bus and systemd user services immediately
+spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_RUNTIME_DIR" "XDG_CURRENT_DESKTOP=niri"
 spawn-at-startup "xwayland-satellite"
-spawn-at-startup "copyq" "--start-server"
-spawn-at-startup "iio-niri" "--monitor" "eDP-1"
-spawn-at-startup "sh" "-c" "sleep 2 && brave --profile-directory=Default --no-startup-window"
-// This line polls until Niri is ready, then kicks the portal to recognize it
 spawn-at-startup "sh" "-c" "while ! busctl --user status org.gnome.Mutter.ScreenCast >/dev/null 2>&1; do sleep 0.2; done; pkill -f xdg-desktop-portal-gnome"
-// Adds system theme support to Brave. "Experimental Web Platform features" needs to be set in brave://flags/
-spawn-at-startup "~/.local/scripts/toggle-theme"
+spawn-at-startup "iio-niri" "listen" "--monitor" "eDP-1"
 
-// Miscellaneous
-prefer-no-csd
-clipboard {
-    disable-primary // Turns off the middle click register
-}
+// Clipboard manager
+spawn-at-startup "copyq" "--start-server"
+
+// Background background application initialization
+spawn-at-startup "sh" "-c" "sleep 2 && brave --profile-directory=Default --no-startup-window"
+spawn-at-startup "~/.local/scripts/toggle-theme"
 
 environment {
     QT_QPA_PLATFORMTHEME "qt6ct"
@@ -26,7 +18,19 @@ environment {
     XDG_CURRENT_DESKTOP "GNOME"
 }
 
-// Input device configuration.
+// MISCELLANEOUS
+prefer-no-csd
+clipboard {
+    disable-primary // Turns off the middle click register
+}
+
+screenshot-path "~/Pictures/Screenshots/Screenshot_%Y-%m-%d_%H-%M-%S.png"
+
+animations {
+    // slowdown 3.0
+}
+
+// INPUTS
 input {
     keyboard {
         xkb {
@@ -65,22 +69,7 @@ input {
     focus-follows-mouse max-scroll-amount="10%"
 }
 
-layout {
-    preset-column-widths {
-        proportion 0.5
-        proportion 0.7
-    }
-    default-column-width { proportion 0.5; }
-}
-
-// Screenshot path
-screenshot-path "~/Pictures/Screenshots/Screenshot_%Y-%m-%d_%H-%M-%S.png"
-
-// Animations
-animations {
-    // slowdown 3.0
-}
-
+// INCLUDES
 include "dms/alttab.kdl"
 include "dms/binds.kdl"
 include "dms/colors.kdl"
@@ -90,3 +79,11 @@ include "dms/outputs.kdl"
 include "dms/rules.kdl"
 include "dms/wpblur.kdl"
 
+// LAYOUT OVERRIDES
+layout {
+    preset-column-widths {
+        proportion 0.5
+        proportion 0.7
+    }
+    default-column-width { proportion 0.5; }
+}

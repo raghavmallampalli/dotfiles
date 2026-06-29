@@ -1,0 +1,64 @@
+#!/usr/bin/env python3
+"""
+Monitor the Lenovo Yoga hinge switch and inhibit/uninhibit the touchpad
+accordingly. Runs as root (system service) since writing to sysfs requires it.
+"""
+import glob
+import sys
+from pathlib import Path
+from evdev import InputDevice, ecodes, list_devices
+
+
+def find_by_name(fragment: str) -> str | None:
+    for path in list_devices():
+        try:
+            dev = InputDevice(path)
+            if fragment in dev.name:
+                return path
+        except Exception:
+            continue
+    return None
+
+
+def find_inhibit_path(fragment: str) -> Path | None:
+    for name_path in glob.glob("/sys/class/input/event*/device/name"):
+        try:
+            if fragment in Path(name_path).read_text():
+                return Path(name_path).parent / "inhibited"
+        except Exception:
+            continue
+    return None
+
+
+def set_inhibit(inhibit_path: Path, value: int) -> None:
+    inhibit_path.write_text(str(value))
+
+
+def main() -> None:
+    switch_path = find_by_name("Lenovo Yoga Tablet Mode Control")
+    inhibit_path = find_inhibit_path("ELAN06FA")
+
+    if not switch_path:
+        sys.exit("Could not find Lenovo Yoga Tablet Mode Control switch")
+    if not inhibit_path:
+        sys.exit("Could not find ELAN touchpad inhibit path")
+
+    dev = InputDevice(switch_path)
+    print(f"Monitoring {dev.name} → controlling {inhibit_path}", flush=True)
+
+    # Sync initial state: if already in tablet mode, inhibit the touchpad
+    sw_state = dev.active_keys(verbose=False)
+    if ecodes.SW_TABLET_MODE in (dev.active_keys() or []):
+        set_inhibit(inhibit_path, 1)
+    else:
+        set_inhibit(inhibit_path, 0)
+
+    for event in dev.read_loop():
+        if event.type == ecodes.EV_SW and event.code == ecodes.SW_TABLET_MODE:
+            set_inhibit(inhibit_path, event.value)
+            state = "tablet" if event.value else "laptop"
+            print(f"Tablet mode: {state} → touchpad inhibited={event.value}", flush=True)
+
+
+if __name__ == "__main__":
+    main()

@@ -155,5 +155,8 @@ binds {
     Ctrl+Alt+V { spawn "copyq" "show"; }
 
     // Spotify
-    Mod+S { spawn "spotify"; }
+    Mod+S { spawn "spotify-launcher"; }
+
+    // STT
+    Mod+Alt+H {spawn "whisrs" "toggle"; }
 }
