@@ -184,14 +184,14 @@ if command -v stow >/dev/null 2>&1; then
     REPO_ROOT="$(dirname "$(readlink -f "$0")")"
     
     # Pre-stow cleanup to prevent conflicts
-    for pkg in zsh tmux nvim yazi niri; do
+    for pkg in zsh tmux nvim yazi niri starship; do
         pre_stow_cleanup "$REPO_ROOT/dotfiles/$pkg" "$HOME"
     done
     
     # Execute stow
     # -d sets the directory to look for packages (relative to current or absolute)
     # -t sets the target directory (Home)
-    stow -d "$REPO_ROOT/dotfiles" -t "$HOME" zsh tmux nvim yazi niri
+    stow -d "$REPO_ROOT/dotfiles" -t "$HOME" zsh tmux nvim yazi niri starship
     
     finish_progress
 else
@@ -249,18 +249,9 @@ if [ -x "$(command -v zsh)"  ]; then
     fi
     if [ -f "/usr/bin/zsh" ]; then
         show_progress "Installing ZSH plugins"
-        if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" ]; then
-            git clone --quiet --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" > /dev/null
-        fi
-        if [ ! -d "${ZSH_CUSTOM:=$HOME/.oh-my-zsh/custom}/plugins/conda-zsh-completion" ]; then
-            git clone --quiet https://github.com/conda-incubator/conda-zsh-completion.git "${ZSH_CUSTOM:=$HOME/.oh-my-zsh/custom}/plugins/conda-zsh-completion" > /dev/null
-        fi
         if [ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions" ]; then
             git clone --quiet https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions" > /dev/null
         fi
-        sed -i "s|ZSH_THEME=.*|ZSH_THEME=\"powerlevel10k/powerlevel10k\"|" "$HOME/.zshrc"
-        sed -i "s|plugins=.*|plugins=(git dotenv conda-zsh-completion zsh-autosuggestions zoxide fzf)|" "$HOME/.zshrc"
-        sed -i "s|source \$ZSH/oh-my-zsh.sh.*|source \$ZSH/oh-my-zsh.sh\; autoload -U compinit \&\& compinit|" "$HOME/.zshrc"
         finish_progress
     fi
 

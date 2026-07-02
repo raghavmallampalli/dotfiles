@@ -44,7 +44,6 @@ cleanup() {
     log "INFO" "Cleaning up temporary files..."
     [ -f temp ] && rm -f temp
     [ -f /tmp/*.deb ] && rm -f /tmp/*.deb
-    [ -f /tmp/miniconda.sh ] && rm -f /tmp/miniconda.sh
     log "INFO" "Done."
 
     # Only log error if there was one
@@ -248,7 +247,7 @@ install_tools_aur() {
         cmake moreutils inetutils
         zsh tmux vim htop nvtop
         xclip jq stow gum copyq
-        fzf ripgrep bat fd zoxide duf yazi lazygit neovim
+        fzf ripgrep bat fd zoxide duf yazi lazygit neovim starship
     )
 
     execute "$AUR_HELPER" -S --needed --noconfirm "${PACKAGES[@]}" 
@@ -396,6 +395,13 @@ install_tools_binaries() {
     chmod +x "$HOME/.local/bin/yazi"
     chmod +x "$HOME/.local/bin/ya"
     finish_progress
+
+    # Starship
+    if ! command -v starship >/dev/null 2>&1; then
+        show_progress "Installing Starship"
+        curl -sS https://starship.rs/install.sh | sh -s -- --bin-dir "$HOME/.local/bin" --yes
+        finish_progress
+    fi
 }
 
 stow_custom_scripts() {
