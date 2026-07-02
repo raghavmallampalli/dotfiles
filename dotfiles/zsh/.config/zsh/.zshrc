@@ -6,6 +6,17 @@ mkdir -p "${ZSH_COMPDUMP:h}"
 HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history" 
 mkdir -p "${HISTFILE:h}"
 
+# Choose Starship configuration based on TTY and Nerd Font availability
+if [[ "$FORCE_NERD_FONT" == "1" || "$USE_NERD_FONTS" == "1" ]]; then
+  export STARSHIP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml"
+elif [[ "$(tty)" == /dev/tty[0-9]* || "$TERM" == "linux" ]]; then
+  export STARSHIP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/starship-no-nerd.toml"
+elif command -v fc-list >/dev/null 2>&1 && ! fc-list : family | grep -iq "Nerd Font"; then
+  export STARSHIP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/starship-no-nerd.toml"
+else
+  export STARSHIP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml"
+fi
+
 if [ -f $ZDOTDIR/.aliases ]; then
   source $ZDOTDIR/.aliases
 fi
@@ -16,18 +27,10 @@ fi
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time Oh My Zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="powerlevel10k/powerlevel10k"
+ZSH_THEME=""
 
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(git dotenv conda-zsh-completion zsh-autosuggestions zoxide fzf)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git dotenv conda-zsh-completion zsh-autosuggestions zoxide fzf nvm uv docker)
+plugins=(git dotenv zsh-autosuggestions zoxide fzf nvm uv docker starship)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -49,19 +52,6 @@ if [[ $TMUX_AUTO_ATTACH = true ]]; then
       fi
     fi
   fi
-fi
-######################### POWERLEVEL10K INSTANT PROMPT ###########################
-
-# Customising prompt: powerlevel10k
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ${XDG_CONFIG_HOME:-$HOME/.config}/p10k.zsh ]] || source ${XDG_CONFIG_HOME:-$HOME/.config}/p10k.zsh
-
-# DO NOT MOVE THIS BLOCK ABOVE THE ATTACH TO TMUX SESSION BLOCK
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
 ##################################################################################
@@ -92,12 +82,6 @@ bindkey 'jk' vi-cmd-mode
 bindkey 'kj' vi-cmd-mode
 autoload edit-command-line; zle -N edit-command-line
 bindkey -M vicmd V edit-command-line
-
-# Customising prompt: powerlevel10k
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-# [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-# Correcting logic for p10k location
-[[ ! -f $ZDOTDIR/.p10k.zsh ]] || source $ZDOTDIR/.p10k.zsh
 
 # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
