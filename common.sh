@@ -248,6 +248,7 @@ install_tools_aur() {
         zsh tmux vim htop nvtop
         xclip jq stow gum copyq
         fzf ripgrep bat fd zoxide duf yazi lazygit neovim starship
+        python-pyqt6 wvkbd
     )
 
     execute "$AUR_HELPER" -S --needed --noconfirm "${PACKAGES[@]}" 
@@ -313,7 +314,7 @@ install_apt_always() {
     run_command apt-get install xclip jq autossh fonts-powerline aria2 rsync moreutils ca-certificates openssh-client inetutils-ping -y
     run_command apt-get install htop nvtop -y
     run_command apt-get install zsh vim tmux -y
-    run_command apt-get install libevent-dev ncurses-dev bison -y
+    run_command apt-get install libevent-dev ncurses-dev bison python3-pyqt6 wvkbd -y
     finish_progress
 
     if is_wsl; then
