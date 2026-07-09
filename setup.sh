@@ -215,7 +215,7 @@ if [ -x "$(command -v zsh)"  ]; then
     fi
     
     log "INFO" "Setting up Oh-My-Zsh"
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
     log "INFO" "Installed Oh-My-Zsh."
     
     # Change default shell to zsh

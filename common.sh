@@ -77,6 +77,13 @@ execute() {
 backup_and_delete() {
     # Strip any trailing slashes so symlink checks don't incorrectly follow them
     file="${1%/}"
+    
+    # HARD CHECK: NEVER DELETE THESE DIRECTORIES
+    if [ "$file" = "$HOME" ] || [ "$file" = "$HOME/.config" ] || [ "$file" = "$HOME/.local" ] || [ "$file" = "$HOME/.local/share" ]; then
+        log "ERROR" "FATAL: Attempted to backup and delete a critical system directory: $file"
+        exit 1
+    fi
+
     backup_path="$BACKUP_DIR/$(basename "$file")"
 
     # check if the file exists
@@ -107,6 +114,7 @@ backup_and_delete() {
             log "ERROR" "Failed to delete directory $file"
             return 4
         }
+
     elif [ "$(stat -c %h "$file")" -gt 1 ]; then
         log "INFO" "$file is a hard link"
         cp -a "$file" "$backup_path" || {
@@ -132,22 +140,44 @@ backup_and_delete() {
 
 # Clean up existing files that would conflict with stow
 pre_stow_cleanup() {
-    local pkg_dir="$1"
-    local target_dir="$2"
+    local src_dir="$1"
+    local dest_dir="$2"
     
-    if [ ! -d "$pkg_dir" ]; then
+    if [ ! -d "$src_dir" ]; then
         return 0
     fi
     
-    # Find all files in the package directory
-    find "$pkg_dir" -type f | while read -r src_file; do
-        # Compute path relative to pkg_dir
-        local rel_path="${src_file#$pkg_dir/}"
-        local dest_file="$target_dir/$rel_path"
+    # Iterate over items in the current source directory
+    for src_item in "$src_dir"/* "$src_dir"/.[!.]* "$src_dir"/..?*; do
+        [ -e "$src_item" ] || continue
         
-        if [ -e "$dest_file" ] && [ ! -L "$dest_file" ]; then
-            log "WARN" "Conflict detected: $dest_file already exists and is not a symlink."
-            backup_and_delete "$dest_file"
+        local item_name="$(basename "$src_item")"
+        local dest_item="$dest_dir/$item_name"
+        
+        # Ignore the stow-fold flag itself
+        if [ "$item_name" = ".stow-fold" ]; then
+            continue
+        fi
+
+        # If it's a file (or symlink to a file), it's a payload file
+        if [ -f "$src_item" ] || [ -L "$src_item" ]; then
+            if [ -e "$dest_item" ] || [ -L "$dest_item" ]; then
+                log "WARN" "Conflict detected for $dest_item. Removing."
+                backup_and_delete "$dest_item"
+            fi
+        
+        # If it's a directory, determine if it's structural or payload
+        elif [ -d "$src_item" ]; then
+            if [ -f "$src_item/.stow-fold" ]; then
+                # PAYLOAD directory: stow will symlink the whole thing.
+                if [ -e "$dest_item" ] || [ -L "$dest_item" ]; then
+                    log "WARN" "Conflict detected for payload directory $dest_item. Removing."
+                    backup_and_delete "$dest_item"
+                fi
+            else
+                # STRUCTURAL directory: stow will recurse, so we must recurse as well.
+                pre_stow_cleanup "$src_item" "$dest_item"
+            fi
         fi
     done
 }
