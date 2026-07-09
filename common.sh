@@ -75,10 +75,11 @@ execute() {
 
 # Backup the file to backup directory and delete it
 backup_and_delete() {
-    file="$1"
+    # Strip any trailing slashes so symlink checks don't incorrectly follow them
+    file="${1%/}"
     backup_path="$BACKUP_DIR/$(basename "$file")"
 
-    # check if the file exists and is a regular file
+    # check if the file exists
     if [ ! -e "$file" ]; then
         log "INFO" "$file does not exist"
         return 0
@@ -86,19 +87,29 @@ backup_and_delete() {
 
     if is_symlink "$file"; then
         log "INFO" "$file is a symbolic link"
-        if [ -f "$(readlink "$file")" ]; then
-            cp -L "$file" "$backup_path" || {
+        if [ -f "$(readlink "$file")" ] || [ -d "$(readlink "$file")" ]; then
+            cp -rL "$file" "$backup_path" || {
                 log "ERROR" "Failed to backup symlink target $file"
                 return 3
             }
         fi
-        rm "$file" || {
+        unlink "$file" || {
             log "ERROR" "Failed to remove symlink $file"
+            return 4
+        }
+    elif [ -d "$file" ]; then
+        log "INFO" "$file is a directory"
+        cp -a "$file" "$backup_path" || {
+            log "ERROR" "Failed to backup directory $file"
+            return 3
+        }
+        rm -rf "$file" || {
+            log "ERROR" "Failed to delete directory $file"
             return 4
         }
     elif [ "$(stat -c %h "$file")" -gt 1 ]; then
         log "INFO" "$file is a hard link"
-        cp -L "$file" "$backup_path" || {
+        cp -a "$file" "$backup_path" || {
             log "ERROR" "Failed to backup hard link $file"
             return 3
         }
@@ -107,7 +118,7 @@ backup_and_delete() {
             return 4
         }
     else
-        cp -L "$file" "$backup_path" || {
+        cp -a "$file" "$backup_path" || {
             log "ERROR" "Failed to backup $file"
             return 3
         }
