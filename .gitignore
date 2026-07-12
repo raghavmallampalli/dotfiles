@@ -3,3 +3,4 @@
 config_files/zshrc.local
 *.log
 dotfiles/zsh/.config/zsh/.zcompdump
+dotfiles/zsh/.config/zsh/.env_vars.local

@@ -66,3 +66,7 @@ within the directory of the repository.
 # Scripts
 Functionality that I tend to reuse. They will be avaiable on PATH after a standard installation.
 eg. video encoding
+
+## Local Overrides
+You can create a `.env_vars.local` file in `~/.config/zsh/` (or `dotfiles/zsh/.config/zsh/.env_vars.local` in the repository) to override environment variables specific to your local machine. This file is ignored by git.
+For example, you can set `export TMUX_AUTO_ATTACH=true` to automatically attach to a tmux session when opening a terminal.
