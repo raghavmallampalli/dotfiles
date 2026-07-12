@@ -67,7 +67,8 @@ window-rule {
 
 window-rule {
     match app-id=r#"[sS]potify"#
-
+    match app-id=r#".*-music\.youtube\.com__-.*"#
+    
     open-on-workspace       "music"
     open-focused            true
     open-maximized          true
