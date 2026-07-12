@@ -1,162 +1,98 @@
 binds {
-
-    // DMS
-    Mod+Space hotkey-overlay-title="Application Launcher" {
-        spawn "dms" "ipc" "call" "spotlight" "toggle";
-    }
-    Mod+M hotkey-overlay-title="Task Manager" {
-        spawn "dms" "ipc" "call" "processlist" "focusOrToggle";
-    }
-    Mod+Comma hotkey-overlay-title="Settings" {
-        spawn "dms" "ipc" "call" "settings" "focusOrToggle";
-    }
-    Mod+N hotkey-overlay-title="Notification Center" {
-        spawn "dms" "ipc" "call" "notifications" "toggle";
-    }
-    Mod+Shift+N hotkey-overlay-title="Notepad" {
-        spawn "dms" "ipc" "call" "notepad" "toggle";
-    }
-    Mod+Y hotkey-overlay-title="Browse Wallpapers" {
-        spawn "dms" "ipc" "call" "dankdash" "wallpaper";
-    }
-    Mod+Shift+Slash hotkey-overlay-title="Keybinds" {
-        spawn "dms" "ipc" "call" "keybinds" "toggle" "niri";
-    }
-    
-    // Applications
-    Mod+Return { spawn "ghostty"; }
-    Mod+Shift+C { spawn "cursor"; }
-    Mod+Shift+A { spawn "antigravity"; }
-    Mod+E { spawn "nautilus"; }
-    Mod+B { spawn "brave" "--profile-directory=Default" "--new-window"; }
-    Mod+Shift+B { spawn "brave" "--profile-directory=Profile 1" "--new-window"; }
-
-    // System
-    Mod+Alt+L       { spawn "dms" "ipc" "call" "lock" "lock"; }
-    Mod+Shift+E     { quit; }
+    Alt+F4 { spawn "dms" "ipc" "call" "powermenu" "toggle"; }
+    Alt+space hotkey-overlay-title="Default Launcher: Toggle" { spawn "dms" "ipc" "call" "spotlight" "toggle"; }
     Ctrl+Alt+Delete { spawn "dms" "ipc" "call" "processlist" "focusOrToggle"; }
-    Mod+Shift+P     { power-off-monitors; }
-    XF86PowerOff    allow-when-locked=true { spawn "systemctl" "sleep"; }
-    Alt+F4          { spawn "dms" "ipc" "call" "powermenu" "toggle"; }
-    Mod+Tab         { toggle-overview; }
-
-    // Audio / Media
-    XF86AudioRaiseVolume allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "increment" "3"; }
+    Mod+Alt+L { spawn "dms" "ipc" "call" "lock" "lock"; }
+    Mod+Comma hotkey-overlay-title="Settings" { spawn "dms" "ipc" "call" "settings" "focusOrToggle"; }
+    Mod+M hotkey-overlay-title="Task Manager" { spawn "dms" "ipc" "call" "processlist" "focusOrToggle"; }
+    Mod+N hotkey-overlay-title="Notification Center" { spawn "dms" "ipc" "call" "notifications" "toggle"; }
+    Mod+Shift+N hotkey-overlay-title="Notepad" { spawn "dms" "ipc" "call" "notepad" "toggle"; }
+    Mod+Shift+Slash hotkey-overlay-title="Keybinds" { spawn "dms" "ipc" "call" "keybinds" "toggle" "niri"; }
+    Mod+Space hotkey-overlay-title="Application Launcher" { spawn "dms" "ipc" "call" "spotlight" "toggle"; }
+    Mod+Y hotkey-overlay-title="Browse Wallpapers" { spawn "dms" "ipc" "call" "dankdash" "wallpaper"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "decrement" "3"; }
-    XF86AudioMute        allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "mute"; }
-    XF86AudioMicMute     allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "micmute"; }
-    
-    XF86AudioPlay        allow-when-locked=true { spawn "playerctl" "play-pause"; }
-    XF86AudioStop        allow-when-locked=true { spawn "playerctl" "stop"; }
-    XF86AudioPrev        allow-when-locked=true { spawn "playerctl" "previous"; }
-    XF86AudioNext        allow-when-locked=true { spawn "playerctl" "next"; }
-
-    Ctrl+Alt+O           allow-when-locked=true { spawn "playerctl" "play-pause"; }
-    Ctrl+Alt+P           allow-when-locked=true { spawn "playerctl" "next"; }
-    Ctrl+Alt+I           allow-when-locked=true { spawn "playerctl" "previous"; }
-    
-    // Brightness
-    XF86MonBrightnessUp   allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "increment" "5" ""; }
+    XF86AudioMicMute allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "micmute"; }
+    XF86AudioMute allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "mute"; }
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "dms" "ipc" "call" "audio" "increment" "3"; }
     XF86MonBrightnessDown allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "decrement" "5" ""; }
-
-    // Window Management
-    Mod+W     { close-window; }
-    Mod+F     { maximize-column; }
-    Mod+Alt+F { maximize-window-to-edges; }
-    F11       { fullscreen-window; }
-    Mod+V     { toggle-window-floating; }
-    Mod+T     { toggle-window-floating; }
-
-    // MOVING WINDOWS AND FOCUS HINTS
-    // Shift: move window
-    // Alt:   move workspace
-    // Ctrl:  monitor
-    // Vim-like motions
-
-    // Focus Navigation
-    Mod+H     { focus-column-left; }
-    Mod+J     { focus-window-down; }
-    Mod+K     { focus-window-up; }
-    Mod+L     { focus-column-right; }
-
-    // Move Window/Column
-    Mod+Shift+H     { move-column-left; }
-    Mod+Shift+J     { move-window-down; }
-    Mod+Shift+K     { move-window-up; }
-    Mod+Shift+L     { move-column-right; }
-
-    // Monitor Navigation
-    Mod+Ctrl+H     { focus-monitor-left; }
-    Mod+Ctrl+J     { focus-monitor-down; }
-    Mod+Ctrl+K     { focus-monitor-up; }
-    Mod+Ctrl+L     { focus-monitor-right; }
-
-    // Move column to Monitor
-    Mod+Shift+Ctrl+H     { move-column-to-monitor-left; }
-    Mod+Shift+Ctrl+J     { move-column-to-monitor-down; }
-    Mod+Shift+Ctrl+K     { move-column-to-monitor-up; }
-    Mod+Shift+Ctrl+L     { move-column-to-monitor-right; }
-
-    // Focus Workspaces
-    Mod+D         { focus-workspace-down; }
-    Mod+U         { focus-workspace-up; }
-
-    // Move columns between workspaces
-    Mod+Shift+D         { move-column-to-workspace-down; }
-    Mod+Shift+U         { move-column-to-workspace-up; }
-
-    // Move workspace (swap them within a monitor)
-    Mod+Alt+D         { move-workspace-down; }
-    Mod+Alt+U         { move-workspace-up; }
-    
-    // Move workspace between monitors
-    Mod+Ctrl+Alt+J         { move-workspace-to-monitor-down; }
-    Mod+Ctrl+Alt+K         { move-workspace-to-monitor-up; }
-    Mod+Ctrl+Alt+H         { move-workspace-to-monitor-left; }
-    Mod+Ctrl+Alt+L         { move-workspace-to-monitor-right; }
-
-    // Mouse Wheel
-    Mod+WheelScrollDown      cooldown-ms=150 { focus-workspace-down; }
-    Mod+WheelScrollUp        cooldown-ms=150 { focus-workspace-up; }
-    Mod+Shift+WheelScrollDown cooldown-ms=150 { move-column-to-workspace-down; }
-    Mod+Shift+WheelScrollUp   cooldown-ms=150 { move-column-to-workspace-up; }
-
-    // Numbered Workspaces
+    XF86MonBrightnessUp allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "increment" "5" ""; }
     Mod+1 { focus-workspace "code"; }
     Mod+2 { focus-workspace "browser"; }
     Mod+3 { focus-workspace "scratch"; }
     Mod+4 { focus-workspace "music"; }
     Mod+5 { focus-workspace "draw"; }
     Mod+6 { focus-workspace "media"; }
-
+    Mod+Alt+D { move-workspace-down; }
+    Mod+Alt+U { move-workspace-up; }
+    Mod+Ctrl+Alt+H { move-workspace-to-monitor-left; }
+    Mod+Ctrl+Alt+J { move-workspace-to-monitor-down; }
+    Mod+Ctrl+Alt+K { move-workspace-to-monitor-up; }
+    Mod+Ctrl+Alt+L { move-workspace-to-monitor-right; }
+    Mod+D { focus-workspace-down; }
     Mod+Shift+1 { move-column-to-workspace "code"; }
     Mod+Shift+2 { move-column-to-workspace "browser"; }
     Mod+Shift+3 { move-column-to-workspace "scratch"; }
     Mod+Shift+4 { move-column-to-workspace "music"; }
     Mod+Shift+5 { move-column-to-workspace "draw"; }
     Mod+Shift+6 { move-column-to-workspace "media"; }
-    // Layout Adjustment
-    Mod+R            { switch-preset-column-width; }
-    Mod+BracketLeft  { consume-or-expel-window-left; }
+    Mod+Shift+D { move-column-to-workspace-down; }
+    Mod+Shift+U { move-column-to-workspace-up; }
+    Mod+Shift+WheelScrollDown cooldown-ms=150 { move-column-to-workspace-down; }
+    Mod+Shift+WheelScrollUp cooldown-ms=150 { move-column-to-workspace-up; }
+    Mod+U { focus-workspace-up; }
+    Mod+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
+    Mod+WheelScrollUp cooldown-ms=150 { focus-workspace-up; }
+    Alt+Print { screenshot-window; }
+    F11 { fullscreen-window; }
+    Mod+Alt+F { maximize-window-to-edges; }
+    Mod+B { spawn "brave" "--profile-directory=Default" "--new-window"; }
+    Mod+BracketLeft { consume-or-expel-window-left; }
     Mod+BracketRight { consume-or-expel-window-right; }
-    Mod+Shift+W      { toggle-column-tabbed-display; }
-    Mod+C            { center-column; }
-
-    Mod+Minus { set-column-width "-10%"; }
+    Mod+C { center-column; }
+    Mod+Ctrl+H { focus-monitor-left; }
+    Mod+Ctrl+J { focus-monitor-down; }
+    Mod+Ctrl+K { focus-monitor-up; }
+    Mod+Ctrl+L { focus-monitor-right; }
     Mod+Equal { set-column-width "+10%"; }
-
-    // Screenshots
-    Mod+Shift+S { screenshot;}
-    Print       { screenshot; }
-    Ctrl+Print  { screenshot-screen; }
-    Alt+Print   { screenshot-window; }
-
-    // CopyQ
+    Mod+F { maximize-column; }
+    Mod+H { focus-column-left; }
+    Mod+J { focus-window-down; }
+    Mod+K { focus-window-up; }
+    Mod+L { focus-column-right; }
+    Mod+Minus { set-column-width "-10%"; }
+    Mod+R { switch-preset-column-width; }
+    Mod+Shift+B { spawn "brave" "--profile-directory=Profile 1" "--new-window"; }
+    Mod+Shift+Ctrl+H { move-column-to-monitor-left; }
+    Mod+Shift+Ctrl+J { move-column-to-monitor-down; }
+    Mod+Shift+Ctrl+K { move-column-to-monitor-up; }
+    Mod+Shift+Ctrl+L { move-column-to-monitor-right; }
+    Mod+Shift+H { move-column-left; }
+    Mod+Shift+J { move-window-down; }
+    Mod+Shift+K { move-window-up; }
+    Mod+Shift+L { move-column-right; }
+    Mod+Shift+W { toggle-column-tabbed-display; }
+    Mod+T { toggle-window-floating; }
+    Mod+V { toggle-window-floating; }
+    Mod+W { close-window; }
+    Mod+Shift+P { power-off-monitors; }
+    Ctrl+Print { screenshot-screen; }
+    Mod+Shift+S { screenshot; }
+    Print { screenshot; }
+    Mod+Shift+E { quit; }
+    Ctrl+Alt+I allow-when-locked=true { spawn "playerctl" "previous"; }
+    Ctrl+Alt+O allow-when-locked=true { spawn "playerctl" "play-pause"; }
+    Ctrl+Alt+P allow-when-locked=true { spawn "playerctl" "next"; }
     Ctrl+Alt+V { spawn "copyq" "show"; }
-
-    // Spotify
+    Mod+Alt+H { spawn "whisrs" "toggle"; }
+    Mod+E { spawn "nautilus"; }
+    Mod+Return { spawn "ghostty"; }
     Mod+S { spawn "spotify-launcher"; }
-
-    // STT
-    Mod+Alt+H {spawn "whisrs" "toggle"; }
+    Mod+Shift+A { spawn "antigravity"; }
+    Mod+Shift+C { spawn "cursor"; }
+    XF86AudioNext allow-when-locked=true { spawn "playerctl" "next"; }
+    XF86AudioPlay allow-when-locked=true { spawn "playerctl" "play-pause"; }
+    XF86AudioPrev allow-when-locked=true { spawn "playerctl" "previous"; }
+    XF86AudioStop allow-when-locked=true { spawn "playerctl" "stop"; }
+    XF86PowerOff allow-when-locked=true { spawn "systemctl" "sleep"; }
+    Mod+Tab { toggle-overview; }
 }
