@@ -1,5 +1,11 @@
 #!/bin/zsh
 
+# XDG Compliance for Zsh files
+export ZSH_COMPDUMP="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump"
+mkdir -p "${ZSH_COMPDUMP:h}"
+export HISTFILE="${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history"
+mkdir -p "${HISTFILE:h}"
+
 # Choose Starship configuration based on TTY and Nerd Font availability
 if [[ "$FORCE_NERD_FONT" == "1" || "$USE_NERD_FONTS" == "1" ]]; then
   export STARSHIP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml"

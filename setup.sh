@@ -291,3 +291,19 @@ uv run --with numpy \
 --with plotly \
 --with catppuccin \
 ipython profile create
+
+# Configure catppuccin theme for ipython (IPython 9.0+)
+IPYTHON_CONFIG="$HOME/.ipython/profile_default/ipython_config.py"
+cat << 'EOF' >> "$IPYTHON_CONFIG"
+
+from IPython.utils.PyColorize import linux_theme, theme_table
+from copy import deepcopy
+
+catppuccin_theme = "catppuccin-mocha"
+theme = deepcopy(linux_theme)
+theme.base = catppuccin_theme
+theme_table[catppuccin_theme] = theme
+
+c.TerminalInteractiveShell.true_color = True
+c.TerminalInteractiveShell.colors = catppuccin_theme
+EOF

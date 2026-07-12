@@ -2,5 +2,6 @@
 .history/
 config_files/zshrc.local
 *.log
-dotfiles/zsh/.config/zsh/.zcompdump
+dotfiles/zsh/.config/zsh/.zcompdump*
 dotfiles/zsh/.config/zsh/.env_vars.local
+dotfiles/zsh/.config/zsh/.zsh_history
