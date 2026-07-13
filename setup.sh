@@ -257,12 +257,49 @@ if [ -x "$(command -v zsh)"  ]; then
 
 fi
 
-if [ -d "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tpm" ]; then
-    log "INFO" "TPM already installed, skipping installation."
-else
-    if [ -x "$(command -v tmux)" ]; then
-        mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins"
-        git clone https://github.com/tmux-plugins/tpm "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins/tpm"
+# --- tmux plugin manager (TPM) + plugins -------------------------------------
+# Plugins live under ~/.config/tmux/plugins, which is git-ignored in the tmux
+# package, so a fresh checkout has neither TPM nor any plugins. Bootstrap both
+# here, after stow has linked ~/.config/tmux.
+if [ -x "$(command -v tmux)" ]; then
+    TMUX_CONF="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/tmux.conf"
+    TMUX_PLUGINS_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/plugins"
+    TPM_DIR="$TMUX_PLUGINS_DIR/tpm"
+
+    # Check for the actual tpm executable, not just the directory. A partial or
+    # empty checkout (e.g. a broken git husk left behind by an interrupted
+    # setup) would otherwise be treated as "installed" and silently skipped,
+    # leaving TPM unloaded and prefix+I unbound.
+    if [ ! -x "$TPM_DIR/tpm" ]; then
+        log "INFO" "Installing TPM (tmux plugin manager)..."
+        rm -rf "$TPM_DIR"
+        mkdir -p "$TMUX_PLUGINS_DIR"
+        git clone --quiet https://github.com/tmux-plugins/tpm "$TPM_DIR"
+    else
+        log "INFO" "TPM already installed."
+    fi
+
+    # Install every plugin listed in tmux.conf non-interactively so the setup is
+    # complete out of the box, without the user having to press prefix+I on the
+    # first launch. TPM reads the plugin list from a running server that has
+    # sourced the config, so drive a throwaway detached server on its own socket.
+    if [ -x "$TPM_DIR/tpm" ] && [ -f "$TMUX_CONF" ]; then
+        log "INFO" "Installing tmux plugins..."
+        _tpm_sock="tpm-setup-$$"
+        TERM="${TERM:-xterm-256color}" tmux -L "$_tpm_sock" new-session -d -x 200 -y 50 2>/dev/null || true
+        tmux -L "$_tpm_sock" source-file "$TMUX_CONF" 2>/dev/null || true
+        tmux -L "$_tpm_sock" run-shell "$TPM_DIR/bindings/install_plugins" 2>/dev/null || true
+        tmux -L "$_tpm_sock" kill-server 2>/dev/null || true
+
+        installed=$(find "$TMUX_PLUGINS_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)
+        log "INFO" "tmux plugins present: $installed"
+
+        # If a tmux server is already running, reload the config so the freshly
+        # installed plugins take effect immediately instead of only on next launch.
+        if tmux has-session 2>/dev/null; then
+            tmux source-file "$TMUX_CONF" 2>/dev/null || true
+            log "INFO" "Reloaded config into the running tmux session."
+        fi
     fi
 fi
 
@@ -280,7 +317,7 @@ fi
 log "INFO" "Setup completed. Restart your shell."
 
 if [[ $COPY_TMUX_CONFIG = y ]]; then
-    log "WARN" "Press Ctrl+A I (capital I) on first run of tmux to install plugins."
+    log "INFO" "tmux plugins installed automatically. To manage them later: prefix+I (install), prefix+U (update), prefix+alt+u (uninstall unused)."
 fi
 
 ######## 'SYSTEM' PYTHON #############
