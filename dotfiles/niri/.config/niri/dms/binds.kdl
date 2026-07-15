@@ -89,6 +89,7 @@ binds {
     Mod+S { spawn "spotify-launcher"; }
     Mod+Shift+A { spawn "antigravity"; }
     Mod+Shift+C { spawn "cursor"; }
+    Mod+Shift+Y { spawn "launch-webapp" "https://music.youtube.com/"; }
     XF86AudioNext allow-when-locked=true { spawn "playerctl" "next"; }
     XF86AudioPlay allow-when-locked=true { spawn "playerctl" "play-pause"; }
     XF86AudioPrev allow-when-locked=true { spawn "playerctl" "previous"; }
