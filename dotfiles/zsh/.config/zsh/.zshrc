@@ -34,6 +34,10 @@ plugins=(git dotenv zsh-autosuggestions zoxide fzf nvm uv docker starship)
 
 source $ZSH/oh-my-zsh.sh
 
+# Enable autossh and ssa auto-completion using ssh completion
+compdef autossh=ssh
+compdef ssa=ssh
+
 # If set to true, tmux will auto-attach to a session if not already in one
 ########################### ATTACH TO TMUX SESSION ###########################
 if [[ $TMUX_AUTO_ATTACH = true ]]; then

@@ -61,3 +61,9 @@ alias explorer.exe='/mnt/c/Windows/explorer.exe'
 jb() {
     bundle exec jekyll build && rsync -avz --delete "$1" "$2"
 }
+
+# autossh function with IPv4, 10s polling frequency, and keepalives for fast/reliable reconnections
+ssa() {
+    AUTOSSH_POLL=10 autossh -M 0 -4 -o ServerAliveInterval=10 -o ServerAliveCountMax=3 "$@"
+}
+

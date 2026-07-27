@@ -283,7 +283,7 @@ install_tools_aur() {
     
     # Combined package list
     local PACKAGES=(
-        github-cli wget openssh aria2 curl rsync
+        github-cli wget openssh autossh aria2 curl rsync
         zip unzip p7zip
         cmake moreutils inetutils
         zsh tmux vim htop nvtop
