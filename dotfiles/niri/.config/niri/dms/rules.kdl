@@ -1,14 +1,14 @@
 workspace "code" {
-    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
+    open-on-output "Acer Technologies KA270 G0 14490A6733W01"
 }
 workspace "media" {
     open-on-output "Acer Technologies KA270 G0 14490A6233W01"
 }
+workspace "browser" {
+    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
+}
 workspace "scratch" {
     open-on-output "eDP-1"
-}
-workspace "browser" {
-    open-on-output "PNP(BNQ) BenQ GW2480 98P0346401Q"
 }
 workspace "music" {
     open-on-output "eDP-1"
@@ -84,6 +84,7 @@ window-rule {
 window-rule {
     match app-id="cursor"
     match app-id="Code"
+    match app-id="code"
     match app-id="antigravity"
 
     open-on-workspace "code"
@@ -103,6 +104,7 @@ window-rule {
 
 window-rule {
     match title="Krita"
+    match title="tldraw offline"
     open-focused      true
     open-maximized    true
     open-on-workspace "draw"
