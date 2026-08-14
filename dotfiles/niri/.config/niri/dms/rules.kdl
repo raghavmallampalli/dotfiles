@@ -105,8 +105,9 @@ window-rule {
 window-rule {
     match title="Krita"
     match title="tldraw offline"
+    match app-id="brave-www.tldraw.com__-Default"
     open-focused      true
-    open-maximized    true
+    open-fullscreen   true
     open-on-workspace "draw"
     opacity           1.0;
 }
