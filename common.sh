@@ -358,11 +358,6 @@ install_apt_always() {
     run_command apt-get install libevent-dev ncurses-dev bison python3-pyqt6 wvkbd -y
     finish_progress
 
-    if is_wsl; then
-        show_progress "Installing WSLU"
-        run_command apt-get install wslu -y
-        finish_progress
-    fi
     
     # neovim: no other stable version exists via apt usually, using snap or bob is better but keeping snap here as per original
     run_command snap install nvim --classic
