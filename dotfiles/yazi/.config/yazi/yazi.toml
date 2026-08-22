@@ -1,25 +1,25 @@
 [plugin]  
 prepend_previewers = [  
-  { name = "*.md", run = "rich-preview" }, # for markdown (.md) files
-  { name = "*.rst", run = "rich-preview"}, # for restructured text (.rst) files
-  { name = "*.ipynb", run = "rich-preview"}, # for jupyter notebooks (.ipynb)
-  { name = "*.json", run = "rich-preview"}, # for json (.json) files
-  { name = "*.csv", run = "duckdb" },  
-  { name = "*.tsv", run = "duckdb" },  
-  { name = "*.json", run = "duckdb" },  
-  { name = "*.parquet", run = "duckdb" },  
-  { name = "*.txt", run = "duckdb" },  
-  { name = "*.xlsx", run = "duckdb" },  
-  { name = "*.db", run = "duckdb" },
-  { name = "*.duckdb", run = "duckdb" }
+  { url = "*.md", run = "rich-preview" }, # for markdown (.md) files
+  { url = "*.rst", run = "rich-preview"}, # for restructured text (.rst) files
+  { url = "*.ipynb", run = "rich-preview"}, # for jupyter notebooks (.ipynb)
+  { url = "*.json", run = "rich-preview"}, # for json (.json) files
+  { url = "*.csv", run = "duckdb" },  
+  { url = "*.tsv", run = "duckdb" },  
+  { url = "*.json", run = "duckdb" },  
+  { url = "*.parquet", run = "duckdb" },  
+  { url = "*.txt", run = "duckdb" },  
+  { url = "*.xlsx", run = "duckdb" },  
+  { url = "*.db", run = "duckdb" },
+  { url = "*.duckdb", run = "duckdb" }
 ]
 
 
 prepend_preloaders = [  
-  { name = "*.csv", run = "duckdb", multi = false },  
-  { name = "*.tsv", run = "duckdb", multi = false },  
-  { name = "*.json", run = "duckdb", multi = false },  
-  { name = "*.parquet", run = "duckdb", multi = false },
-  { name = "*.txt", run = "duckdb", multi = false },  
-  { name = "*.xlsx", run = "duckdb", multi = false }
+  { url = "*.csv", run = "duckdb", multi = false },  
+  { url = "*.tsv", run = "duckdb", multi = false },  
+  { url = "*.json", run = "duckdb", multi = false },  
+  { url = "*.parquet", run = "duckdb", multi = false },
+  { url = "*.txt", run = "duckdb", multi = false },  
+  { url = "*.xlsx", run = "duckdb", multi = false }
 ]
