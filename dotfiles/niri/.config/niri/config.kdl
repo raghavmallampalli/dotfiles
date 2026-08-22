@@ -6,7 +6,7 @@ spawn-at-startup "sh" "-c" "while ! busctl --user status org.gnome.Mutter.Screen
 spawn-at-startup "iio-niri" "listen" "--monitor" "eDP-1"
 
 // Background background application initialization
-spawn-at-startup "sh" "-c" "sleep 2 && brave --profile-directory=Default --no-startup-window"
+spawn-at-startup "sh" "-c" "sleep 2 && brave --profile-directory=Default"
 spawn-at-startup "~/.local/scripts/toggle-theme"
 spawn-at-startup "wvkbd-mobintl" "--hidden" "-L" "300" "-R" "25" "--bg" "1c1b1f" "--fg" "1c1b1f" "--fg-sp" "2b2930" "--text" "e6e1e5" "--text-sp" "e6e1e5" "--press" "d0bcff" "--press-sp" "d0bcff" "--alpha" "100" "--non-exclusive"
 spawn-at-startup "~/.local/scripts/osk-tray.py"
@@ -15,7 +15,6 @@ spawn-at-startup "~/.local/scripts/osk-tray.py"
 // Clipboard manager
 spawn-at-startup "copyq" "--start-server"
 
-spawn-at-startup "launch-webapp" "https://music.youtube.com/"
 spawn-at-startup "ghostty"
 
 environment {
