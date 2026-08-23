@@ -14,6 +14,7 @@ SET_LOCAL_TIME=""
 GH_LOGIN=""
 SET_ZSH_DEFAULT=""
 COPY_TMUX_CONFIG=""
+SUDO_ACCESS=""
 
 # Function to show help
 show_help() {
@@ -23,6 +24,10 @@ show_help() {
     echo "  -g, --github-login <y/n>       Would you like to login to GitHub?"
     echo "  -z, --zsh-default <y/n>        Set zsh as default shell?"
     echo "  -c, --tmux-config <y/n>        Copy tmux configuration?"
+    echo "  --sudo-access <yes/no>         Do you have sudo access? Only used as a"
+    echo "                                 fallback for setting zsh as your default"
+    echo "                                 shell (for yourself only) if plain 'chsh'"
+    echo "                                 isn't permitted."
     echo "  -h, --help                      Show this help message"
     echo ""
     echo "If any option is not provided, the script will prompt interactively."
@@ -48,6 +53,10 @@ while getopts ":-:" opt; do
                     ;;
                 tmux-config)
                     COPY_TMUX_CONFIG="${!OPTIND}"
+                    OPTIND=$((OPTIND + 1))
+                    ;;
+                sudo-access)
+                    SUDO_ACCESS="${!OPTIND}"
                     OPTIND=$((OPTIND + 1))
                     ;;
                 help)
@@ -81,6 +90,17 @@ while getopts ":-:" opt; do
     esac
 done
 
+# Normalize --sudo-access to "yes"/"no" (or leave empty to prompt/decide later)
+case "$SUDO_ACCESS" in
+[yY]*) SUDO_ACCESS="yes" ;;
+[nN]*) SUDO_ACCESS="no" ;;
+"") ;;
+*)
+    echo "Invalid value for --sudo-access: $SUDO_ACCESS (expected yes/no)"
+    show_help
+    ;;
+esac
+
 # Check if any CLI arguments were provided
 CLI_ARGS_PROVIDED=false
 if [ $# -gt 0 ]; then
@@ -105,6 +125,19 @@ else
     ROOT_MODE=false
 fi
 export ROOT_MODE
+
+# Resolve sudo access (only used as a fallback if plain, unprivileged 'chsh' isn't
+# permitted when setting zsh as the default shell; root never needs this)
+if [ "$ROOT_MODE" = true ]; then
+    SUDO_ACCESS="yes"
+elif [ -z "$SUDO_ACCESS" ]; then
+    read -p "Do you have sudo access? [Y/n] " sudo_reply
+    case "${sudo_reply:-y}" in
+    [nN]*) SUDO_ACCESS="no" ;;
+    *) SUDO_ACCESS="yes" ;;
+    esac
+fi
+export SUDO_ACCESS
 
 # Initialize
 mkdir -p "$BACKUP_DIR"
@@ -221,17 +254,35 @@ if [ -x "$(command -v zsh)"  ]; then
     # Change default shell to zsh
     if [ "$SHELL" != "$(which zsh)" ] && [[ $SET_ZSH_DEFAULT = y ]]; then
         log "INFO" "Changing default shell to zsh"
-        if [ "$ROOT_MODE" != "true" ]; then
-            run_command chsh -s "$(which zsh)" "$(whoami)"
-            log "INFO" "Shell changed to zsh. Changes will take effect after logout."
+        shell_changed=false
+
+        if [ "$ROOT_MODE" = "true" ]; then
+            # Root changing its own shell needs no sudo and no username argument.
+            if chsh -s "$(which zsh)"; then
+                shell_changed=true
+                log "INFO" "Shell changed to zsh. Changes will take effect after logout."
+            fi
         else
-            log "WARN" "Adding zsh auto-start to bashrc for root users."
-            # Add zsh auto-start to bashrc for root users
+            # chsh is normally self-service (setuid) and doesn't need sudo for your
+            # own account, so try it directly before ever reaching for sudo. If we do
+            # need sudo, always target the current user explicitly by name - this
+            # only ever changes your own shell, never anyone else's.
+            if chsh -s "$(which zsh)" 2>/dev/null; then
+                shell_changed=true
+                log "INFO" "Shell changed to zsh (no sudo needed). Changes will take effect after logout."
+            elif [ "$SUDO_ACCESS" = "yes" ] && run_command chsh -s "$(which zsh)" "$(whoami)"; then
+                shell_changed=true
+                log "INFO" "Shell changed to zsh via sudo. Changes will take effect after logout."
+            fi
+        fi
+
+        if [ "$shell_changed" != true ]; then
+            log "WARN" "Could not change login shell via chsh. Falling back to auto-starting zsh from .bashrc."
             if [ -f "$HOME/.bashrc" ]; then
                 # Check if the configuration is already present
                 if ! grep -q "ZSH_STARTED" "$HOME/.bashrc"; then
                     echo "" >> "$HOME/.bashrc"
-                    echo "# Auto-start zsh for root users (safer than chsh)" >> "$HOME/.bashrc"
+                    echo "# Auto-start zsh (chsh unavailable or not permitted)" >> "$HOME/.bashrc"
                     echo 'if [ -t 1 ] && [ "$SHELL" != "$(which zsh)" ] && [ -z "$ZSH_STARTED" ]; then' >> "$HOME/.bashrc"
                     echo '    export ZSH_STARTED=1' >> "$HOME/.bashrc"
                     echo '    exec zsh' >> "$HOME/.bashrc"
@@ -241,11 +292,9 @@ if [ -x "$(command -v zsh)"  ]; then
                     log "INFO" "Zsh auto-start configuration already present in $HOME/.bashrc"
                 fi
             else
-                log "WARN" "No .bashrc found for root user"
+                log "WARN" "No .bashrc found; cannot auto-start zsh either. Run 'exec zsh' manually or add it to your shell's rc file."
             fi
         fi
-
-
     fi
     if [ -f "/usr/bin/zsh" ]; then
         show_progress "Installing ZSH plugins"
