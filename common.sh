@@ -342,12 +342,8 @@ install_apt_always() {
     run_command apt-get install git wget curl zip unzip 7zip stow -y
     finish_progress
 
-    show_progress "Setting up GitHub CLI keyring"
-    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | run_command dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-    run_command chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | run_command tee /etc/apt/sources.list.d/github-cli.list >/dev/null
-    finish_progress
-    run_command apt-get install gh -y
+    # gh is installed via install_tools_binaries (portable release tarball) instead of
+    # apt's keyring dance, so it's identical across the sudo and no-sudo Debian arms.
 
     show_progress "Installing development and base tools"
     # Superset of tools
@@ -358,9 +354,8 @@ install_apt_always() {
     run_command apt-get install libevent-dev ncurses-dev bison python3-pyqt6 wvkbd -y
     finish_progress
 
-    
-    # neovim: no other stable version exists via apt usually, using snap or bob is better but keeping snap here as per original
-    run_command snap install nvim --classic
+    # neovim is installed via install_tools_binaries (portable release tarball) instead
+    # of snap, so it doesn't depend on snapd being present and is identical across arms.
 }
 
 install_tools_binaries() {
@@ -373,7 +368,43 @@ install_tools_binaries() {
             execute git clone --quiet --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
         fi
         execute "$HOME/.fzf/install" --all
+        ln -sf "$HOME/.fzf/bin/fzf" "$HOME/.local/bin/fzf"
         wget https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh -qO "$HOME/.fzf-git.sh"
+        finish_progress
+    fi
+
+    # Stow - no portable upstream binary, but on Debian/Ubuntu it's pure Perl (no
+    # compiled deps), so we can pull the .deb without root and run it via PERL5LIB
+    if ! command -v stow >/dev/null 2>&1 && command -v apt-get >/dev/null 2>&1; then
+        show_progress "Installing GNU Stow (extracting .deb, no root needed)"
+        if (cd /tmp && apt-get download stow) >>"$LOG_FILE" 2>&1; then
+            local stow_deb
+            stow_deb=$(find /tmp -maxdepth 1 -name "stow_*.deb" | head -n 1)
+            mkdir -p "$HOME/.local/opt/stow"
+            dpkg-deb -x "$stow_deb" "$HOME/.local/opt/stow"
+            rm -f "$stow_deb"
+            cat >"$HOME/.local/bin/stow" <<'STOWEOF'
+#!/bin/sh
+export PERL5LIB="$HOME/.local/opt/stow/usr/share/perl5${PERL5LIB:+:$PERL5LIB}"
+exec perl "$HOME/.local/opt/stow/usr/bin/stow" "$@"
+STOWEOF
+            chmod +x "$HOME/.local/bin/stow"
+            finish_progress
+        else
+            echo " Failed"
+            log "WARN" "Could not fetch stow via 'apt-get download' (needs a populated apt cache, but not root). Install GNU Stow manually if needed."
+        fi
+    fi
+
+    # Neovim - official portable release tarball, no snap/apt needed
+    if ! command -v nvim >/dev/null 2>&1; then
+        show_progress "Installing Neovim"
+        url=$(wget "https://api.github.com/repos/neovim/neovim/releases/latest" -qO- | grep browser_download_url | grep -i "linux-x86_64.tar.gz" | head -n 1 | cut -d \" -f 4)
+        mkdir -p "$HOME/.local/opt"
+        wget "$url" -qO- | tar -xz -C "$HOME/.local/opt/"
+        local temp_nvim_dir
+        temp_nvim_dir=$(find "$HOME/.local/opt" -maxdepth 1 -type d -name "nvim-linux-*" | head -n 1)
+        ln -sf "$temp_nvim_dir/bin/nvim" "$HOME/.local/bin/nvim"
         finish_progress
     fi
 
@@ -423,7 +454,7 @@ install_tools_binaries() {
     # GUM - Inlined here
     if ! command -v gum >/dev/null 2>&1; then
         show_progress "Installing Gum"
-        url=$(wget "https://api.github.com/repos/charmbracelet/gum/releases/latest" -qO- | grep browser_download_url | grep "linux_x86_64" | grep ".tar.gz" | head -n 1 | cut -d \" -f 4)
+        url=$(wget "https://api.github.com/repos/charmbracelet/gum/releases/latest" -qO- | grep browser_download_url | grep -i "linux_x86_64" | grep ".tar.gz" | head -n 1 | cut -d \" -f 4)
         wget "$url" -qO- | tar -xz -C /tmp/
         # Use find to handle the versioned directory name
         local temp_gum_dir=$(find /tmp/ -maxdepth 1 -type d -name "gum_*" | head -n 1)
@@ -482,6 +513,28 @@ install_tools_binaries() {
         fi
         finish_progress
     fi
+
+    # GH (GitHub CLI) - self-contained release tarball, no package manager needed
+    if ! command -v gh >/dev/null 2>&1; then
+        show_progress "Installing GitHub CLI"
+        url=$(wget "https://api.github.com/repos/cli/cli/releases/latest" -qO- | grep browser_download_url | grep "linux_amd64" | grep ".tar.gz" | head -n 1 | cut -d \" -f 4)
+        wget "$url" -qO- | tar -xz -C /tmp/
+        local temp_gh_dir=$(find /tmp/ -maxdepth 1 -type d -name "gh_*" | head -n 1)
+        mv "$temp_gh_dir/bin/gh" "$HOME/.local/bin/"
+        chmod +x "$HOME/.local/bin/gh"
+        rm -rf "$temp_gh_dir"
+        finish_progress
+    fi
+
+    # Lazygit - flat tarball, binary at archive root
+    if ! command -v lazygit >/dev/null 2>&1; then
+        show_progress "Installing Lazygit"
+        url=$(wget "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" -qO- | grep browser_download_url | grep -i "linux_x86_64" | grep ".tar.gz" | head -n 1 | cut -d \" -f 4)
+        wget "$url" -qO- | tar -xz -C /tmp/ lazygit
+        mv /tmp/lazygit "$HOME/.local/bin/"
+        chmod +x "$HOME/.local/bin/lazygit"
+        finish_progress
+    fi
 }
 
 stow_custom_scripts() {
@@ -520,6 +573,74 @@ stow_custom_scripts() {
     log "INFO" "Created symlink: $TARGET_DIR -> $SCRIPTS_DIR"
 
     finish_progress
+}
+
+# Master list of tools all three install paths (Arch/AUR, Debian+apt, Debian no-sudo
+# binaries-only) are expected to provide. Format per entry: "Label:cmd1,cmd2,..." -
+# satisfied if any listed command is found on PATH. Run once, right before stowing,
+# so any arm that fails to reach the same end state as the others is surfaced.
+verify_master_tools() {
+    log "INFO" "Verifying expected tools are on PATH..."
+
+    local MASTER_TOOLS=(
+        "git:git"
+        "wget:wget"
+        "curl:curl"
+        "GitHub CLI:gh"
+        "zip:zip"
+        "unzip:unzip"
+        "GNU Stow:stow"
+        "jq:jq"
+        "aria2:aria2c"
+        "rsync:rsync"
+        "OpenSSH client:ssh"
+        "ping:ping"
+        "htop:htop"
+        "nvtop:nvtop"
+        "zsh:zsh"
+        "vim:vim"
+        "tmux:tmux"
+        "C++ compiler:g++"
+        "cmake:cmake"
+        "pkg-config:pkg-config"
+        "automake:automake"
+        "fzf:fzf"
+        "ripgrep:rg"
+        "bat:bat"
+        "fd:fd"
+        "zoxide:zoxide"
+        "duf:duf"
+        "gum:gum"
+        "yazi:yazi"
+        "starship:starship"
+        "neovim:nvim"
+        "lazygit:lazygit"
+    )
+
+    local missing=0
+    local entry label alts alt found
+    for entry in "${MASTER_TOOLS[@]}"; do
+        label="${entry%%:*}"
+        alts="${entry#*:}"
+        found=false
+        IFS=',' read -ra alt_list <<<"$alts"
+        for alt in "${alt_list[@]}"; do
+            if command -v "$alt" >/dev/null 2>&1; then
+                found=true
+                break
+            fi
+        done
+        if [ "$found" = false ]; then
+            missing=$((missing + 1))
+            log "WARN" "$label not found on PATH (expected: ${alts//,/ or })."
+        fi
+    done
+
+    if [ "$missing" -eq 0 ]; then
+        log "INFO" "All expected tools are present on PATH."
+    else
+        log "WARN" "$missing expected tool(s) missing on PATH. If you ran with --sudo-access no, this is expected for anything that only ships via apt/pacman with no portable binary (e.g. tmux, zsh, wvkbd, build toolchain)."
+    fi
 }
 
 # OS Detection

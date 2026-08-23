@@ -20,11 +20,10 @@ ENV BACKUP_DIR=/tmp
 RUN chmod +x /root/dotfiles/install.sh /root/dotfiles/setup.sh /root/dotfiles/common.sh
 
 # Run the install.sh script
-# We pass --sudo-access y and --binaries-install n (default)
+# We're root in the container so --sudo-access is moot, but pass it for non-interactive builds.
 # The script itself will handle OS detection.
 RUN ./install.sh \
-    --sudo-access y \
-    --binaries-install n
+    --sudo-access yes
 
 # Run the setup.sh script
 RUN ./setup.sh \
