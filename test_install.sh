@@ -29,6 +29,9 @@ run_test() {
         echo 'Checking fzf...' && fzf --version && 
         echo 'Checking bat...' && bat --version && 
         echo 'Checking zoxide...' && zoxide --version &&
+        echo 'Checking yazi...' && yazi --version &&
+        echo 'Checking duckdb...' && duckdb --version &&
+        echo 'Checking rich...' && rich --version &&
         echo 'Checking .zshrc...' && ls -la ~/.zshrc
     " >> "$LOG_FILE" 2>&1; then
         echo "Verification tests passed for $base_image." | tee -a "$LOG_FILE"

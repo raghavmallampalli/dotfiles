@@ -289,7 +289,7 @@ install_tools_aur() {
         zsh tmux vim htop nvtop
         xclip jq stow gum copyq
         fzf ripgrep bat fd zoxide duf yazi lazygit neovim starship
-        python-pyqt6 wvkbd
+        python-pyqt6 wvkbd duckdb rich-cli
     )
 
     execute "$AUR_HELPER" -S --needed --noconfirm "${PACKAGES[@]}" 
@@ -378,37 +378,47 @@ install_tools_binaries() {
     fi
 
     # Zoxide
-    show_progress "Installing Zoxide"
-    curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
-    finish_progress
+    if ! command -v zoxide >/dev/null 2>&1; then
+        show_progress "Installing Zoxide"
+        curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+        finish_progress
+    fi
 
     # DUF
-    show_progress "Installing DUF"
-    url=$(wget "https://api.github.com/repos/muesli/duf/releases/latest" -qO- | grep browser_download_url | grep "linux_x86_64" | grep ".tar.gz" | head -n 1 | cut -d \" -f 4)
-    wget "$url" -qO- | tar -xz -C /tmp/
-    mv /tmp/duf "$HOME/.local/bin/"
-    finish_progress
+    if ! command -v duf >/dev/null 2>&1; then
+        show_progress "Installing DUF"
+        url=$(wget "https://api.github.com/repos/muesli/duf/releases/latest" -qO- | grep browser_download_url | grep "linux_x86_64" | grep ".tar.gz" | head -n 1 | cut -d \" -f 4)
+        wget "$url" -qO- | tar -xz -C /tmp/
+        mv /tmp/duf "$HOME/.local/bin/"
+        finish_progress
+    fi
 
     # BAT
-    show_progress "Installing BAT"
-    url=$(wget "https://api.github.com/repos/sharkdp/bat/releases/latest" -qO- | grep browser_download_url | grep "gnu" | grep "x86_64" | grep "linux" | head -n 1 | cut -d \" -f 4)
-    wget "$url" -qO- | tar -xz -C /tmp/
-    mv /tmp/bat*/bat "$HOME/.local/bin/"
-    finish_progress
+    if ! command -v bat >/dev/null 2>&1; then
+        show_progress "Installing BAT"
+        url=$(wget "https://api.github.com/repos/sharkdp/bat/releases/latest" -qO- | grep browser_download_url | grep "gnu" | grep "x86_64" | grep "linux" | head -n 1 | cut -d \" -f 4)
+        wget "$url" -qO- | tar -xz -C /tmp/
+        mv /tmp/bat*/bat "$HOME/.local/bin/"
+        finish_progress
+    fi
 
     # FD
-    show_progress "Installing FD"
-    url=$(wget "https://api.github.com/repos/sharkdp/fd/releases/latest" -qO- | grep browser_download_url | grep "gnu" | grep "x86_64" | grep "linux" | head -n 1 | cut -d \" -f 4)
-    wget "$url" -qO- | tar -xz -C /tmp
-    mv /tmp/fd*/fd "$HOME/.local/bin/"
-    finish_progress
+    if ! command -v fd >/dev/null 2>&1; then
+        show_progress "Installing FD"
+        url=$(wget "https://api.github.com/repos/sharkdp/fd/releases/latest" -qO- | grep browser_download_url | grep "gnu" | grep "x86_64" | grep "linux" | head -n 1 | cut -d \" -f 4)
+        wget "$url" -qO- | tar -xz -C /tmp
+        mv /tmp/fd*/fd "$HOME/.local/bin/"
+        finish_progress
+    fi
 
     # RIPGREP
-    show_progress "Installing Ripgrep"
-    url=$(wget "https://api.github.com/repos/BurntSushi/ripgrep/releases/latest" -qO- | grep browser_download_url | grep "x86_64" | grep "linux" | head -n 1 | cut -d \" -f 4)
-    wget "$url" -qO- | tar -xz -C /tmp/
-    mv /tmp/ripgrep*/rg "$HOME/.local/bin/"
-    finish_progress
+    if ! command -v rg >/dev/null 2>&1; then
+        show_progress "Installing Ripgrep"
+        url=$(wget "https://api.github.com/repos/BurntSushi/ripgrep/releases/latest" -qO- | grep browser_download_url | grep "x86_64" | grep "linux" | head -n 1 | cut -d \" -f 4)
+        wget "$url" -qO- | tar -xz -C /tmp/
+        mv /tmp/ripgrep*/rg "$HOME/.local/bin/"
+        finish_progress
+    fi
     
     # GUM - Inlined here
     if ! command -v gum >/dev/null 2>&1; then
@@ -424,19 +434,52 @@ install_tools_binaries() {
     fi
 
     # Yazi - via helper
-    show_progress "Installing Yazi"
-    wget -q https://github.com/sxyazi/yazi/releases/latest/download/yazi-x86_64-unknown-linux-musl.zip -O /tmp/yazi.zip
-    unzip -oq /tmp/yazi.zip -d /tmp
-    mv /tmp/yazi-x86_64-unknown-linux-musl/yazi "$HOME/.local/bin/"
-    mv /tmp/yazi-x86_64-unknown-linux-musl/ya "$HOME/.local/bin/"
-    chmod +x "$HOME/.local/bin/yazi"
-    chmod +x "$HOME/.local/bin/ya"
-    finish_progress
+    if ! command -v yazi >/dev/null 2>&1; then
+        show_progress "Installing Yazi"
+        wget -q https://github.com/sxyazi/yazi/releases/latest/download/yazi-x86_64-unknown-linux-musl.zip -O /tmp/yazi.zip
+        unzip -oq /tmp/yazi.zip -d /tmp
+        mv /tmp/yazi-x86_64-unknown-linux-musl/yazi "$HOME/.local/bin/"
+        mv /tmp/yazi-x86_64-unknown-linux-musl/ya "$HOME/.local/bin/"
+        chmod +x "$HOME/.local/bin/yazi"
+        chmod +x "$HOME/.local/bin/ya"
+        finish_progress
+    fi
 
     # Starship
     if ! command -v starship >/dev/null 2>&1; then
         show_progress "Installing Starship"
         curl -sS https://starship.rs/install.sh | sh -s -- --bin-dir "$HOME/.local/bin" --yes
+        finish_progress
+    fi
+
+    # UV
+    if ! command -v uv >/dev/null 2>&1; then
+        show_progress "Installing UV"
+        curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="$HOME/.local/bin" sh
+        finish_progress
+    fi
+
+    # DuckDB
+    if ! command -v duckdb >/dev/null 2>&1; then
+        show_progress "Installing DuckDB"
+        curl -sSfL https://install.duckdb.org | sh
+        finish_progress
+    fi
+
+    # Rich CLI (rich-preview)
+    if ! command -v rich >/dev/null 2>&1; then
+        show_progress "Installing Rich CLI"
+        if command -v uv >/dev/null 2>&1; then
+            uv tool install rich-cli --force
+        elif [ -x "$HOME/.local/bin/uv" ]; then
+            "$HOME/.local/bin/uv" tool install rich-cli --force
+        elif command -v pipx >/dev/null 2>&1; then
+            pipx install rich-cli
+        elif command -v pip3 >/dev/null 2>&1; then
+            pip3 install --user rich-cli
+        elif command -v pip >/dev/null 2>&1; then
+            pip install --user rich-cli
+        fi
         finish_progress
     fi
 }
