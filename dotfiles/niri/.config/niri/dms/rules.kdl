@@ -29,11 +29,13 @@ window-rule {
     }
 }
 
-// Scratch windows
+// research windows
 window-rule {
     match app-id=r#"gemini\.google\.com"#
+    match app-id=r#"notebook\.google\.com"#
+    match app-id="Zotero"
 
-    open-on-workspace    "scratch"
+    open-on-workspace    "research"
     open-focused         true
     default-column-width { proportion 0.8; }
     opacity              0.90
@@ -148,7 +150,6 @@ window-rule {
     match app-id=r#"^brave$"#
     match app-id=r#"^brave-browser$"#
     match app-id="firefox"
-    match app-id="Zotero"
     exclude title=r#"^Meet - .+$"#
     
     open-on-workspace "browser"

@@ -40,7 +40,7 @@ if [[ "$IS_ARCH" == "true" ]]; then
         WAYLAND_PACKAGES=(
             xwayland-satellite xdg-desktop-portal-gnome xdg-desktop-portal-gtk
             ghostty dms-shell matugen-bin cava qt6-multimedia-ffmpeg
-            wlr-randr niri iio-niri
+            wlr-randr niri iio-niri wl-mirror
         )
         "$AUR_HELPER" -S --needed --noconfirm "${WAYLAND_PACKAGES[@]}"
         systemctl --user add-wants niri.service dms

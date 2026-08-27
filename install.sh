@@ -136,9 +136,6 @@ log "INFO" "Detected OS: $OS_ID"
 main() {
     log "INFO" "Starting main execution..."
     
-    # Custom Scripts (Always install these)
-
-
     if [[ "$IS_ARCH" == "true" ]]; then
         log "INFO" "Installing bootstrap packages for Arch Linux..."
 
@@ -167,7 +164,6 @@ main() {
     # Verify the union of tools all three install paths are expected to provide
     verify_master_tools
 
-    # Custom Scripts (Always install these after stow is installed)
     stow_custom_scripts
 
     log "INFO" "Installation completed."

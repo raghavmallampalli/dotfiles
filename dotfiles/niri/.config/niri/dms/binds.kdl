@@ -59,6 +59,7 @@ binds {
     Mod+J { focus-window-down; }
     Mod+K { focus-window-up; }
     Mod+L { focus-column-right; }
+    Mod+P repeat=false { spawn-sh "wl-mirror $(niri msg --json focused-output | jq -r .name)"; }
     Mod+Minus { set-column-width "-10%"; }
     Mod+R { switch-preset-column-width; }
     Mod+Shift+B { spawn "brave" "--profile-directory=Profile 1" "--new-window"; }
@@ -86,7 +87,7 @@ binds {
     Mod+Alt+H { spawn "whisrs" "toggle"; }
     Mod+E { spawn "nautilus"; }
     Mod+Return { spawn "ghostty"; }
-    Mod+S { spawn "spotify-launcher"; }
+    // Mod+S { spawn "spotify-launcher"; }
     Mod+Shift+A { spawn "antigravity"; }
     Mod+Shift+C { spawn "cursor"; }
     Mod+Shift+Y { spawn "launch-webapp" "https://music.youtube.com/"; }

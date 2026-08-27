@@ -538,6 +538,7 @@ STOWEOF
 }
 
 stow_custom_scripts() {
+    # Custom Scripts (Always install these after stow is installed)
     show_progress "Symlinking scripts directory to ~/.local/scripts"
 
     local TARGET_DIR="$HOME/.local/scripts"
