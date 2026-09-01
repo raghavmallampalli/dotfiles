@@ -1,20 +1,20 @@
 workspace "code" {
     open-on-output "Acer Technologies KA270 G0 14490A6733W01"
 }
-workspace "media" {
-    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
-}
 workspace "browser" {
     open-on-output "Acer Technologies KA270 G0 14490A6233W01"
 }
-workspace "scratch" {
-    open-on-output "eDP-1"
+workspace "research" {
+    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
 }
 workspace "music" {
     open-on-output "eDP-1"
 }
 workspace "draw" {
     open-on-output "eDP-1"
+}
+workspace "media" {
+    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
 }
 
 window-rule {

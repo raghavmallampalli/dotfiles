@@ -18,7 +18,7 @@ binds {
     XF86MonBrightnessUp allow-when-locked=true { spawn "dms" "ipc" "call" "brightness" "increment" "5" ""; }
     Mod+1 { focus-workspace "code"; }
     Mod+2 { focus-workspace "browser"; }
-    Mod+3 { focus-workspace "scratch"; }
+    Mod+3 { focus-workspace "research"; }
     Mod+4 { focus-workspace "music"; }
     Mod+5 { focus-workspace "draw"; }
     Mod+6 { focus-workspace "media"; }
@@ -31,7 +31,7 @@ binds {
     Mod+D { focus-workspace-down; }
     Mod+Shift+1 { move-column-to-workspace "code"; }
     Mod+Shift+2 { move-column-to-workspace "browser"; }
-    Mod+Shift+3 { move-column-to-workspace "scratch"; }
+    Mod+Shift+3 { move-column-to-workspace "research"; }
     Mod+Shift+4 { move-column-to-workspace "music"; }
     Mod+Shift+5 { move-column-to-workspace "draw"; }
     Mod+Shift+6 { move-column-to-workspace "media"; }
@@ -87,10 +87,10 @@ binds {
     Mod+Alt+H { spawn "whisrs" "toggle"; }
     Mod+E { spawn "nautilus"; }
     Mod+Return { spawn "ghostty"; }
-    // Mod+S { spawn "spotify-launcher"; }
     Mod+Shift+A { spawn "antigravity"; }
-    Mod+Shift+C { spawn "cursor"; }
+    Mod+Shift+C { spawn "code"; }
     Mod+Shift+Y { spawn "launch-webapp" "https://music.youtube.com/"; }
+    Mod+Shift+G { spawn "launch-webapp" "https://gemini.google.com/"; }
     XF86AudioNext allow-when-locked=true { spawn "playerctl" "next"; }
     XF86AudioPlay allow-when-locked=true { spawn "playerctl" "play-pause"; }
     XF86AudioPrev allow-when-locked=true { spawn "playerctl" "previous"; }
