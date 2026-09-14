@@ -49,6 +49,7 @@ alias py=" uvx \
     --with scikit-learn \
     --with ipython \
     --with plotly \
+    --with dash \
     --with catppuccin \
     ipython"
 

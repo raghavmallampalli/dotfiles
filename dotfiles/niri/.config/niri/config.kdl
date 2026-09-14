@@ -10,6 +10,7 @@ spawn-at-startup "~/.local/scripts/toggle-theme"
 spawn-at-startup "wvkbd-mobintl" "--hidden" "-L" "300" "-R" "25" "--bg" "1c1b1f" "--fg" "1c1b1f" "--fg-sp" "2b2930" "--text" "e6e1e5" "--text-sp" "e6e1e5" "--press" "d0bcff" "--press-sp" "d0bcff" "--alpha" "100" "--non-exclusive"
 spawn-at-startup "~/.local/scripts/osk-tray.py"
 spawn-at-startup "copyq" "--start-server" // Clipboard manager
+spawn-at-startup "gnome-keyring-daemon" "--start" "--components=secrets,pkcs11,ssh"
 
 // STARTUP APPS
 spawn-at-startup "ghostty"
