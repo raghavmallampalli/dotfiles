@@ -63,6 +63,10 @@ We use [GNU Stow](https://www.gnu.org/software/stow/) to manage dotfiles.
   ```
 within the directory of the repository.
 
+## TODO
+
+- Add a custom DankMaterialShell top-right bar tile backed by a script or Bash command. DMS supports custom bar widgets through QML plugins in `~/.config/DankMaterialShell/plugins/`; implement this after the relevant configuration is backed up and managed through Stow.
+
 # Scripts
 Functionality that I tend to reuse. They will be avaiable on PATH after a standard installation.
 eg. video encoding
