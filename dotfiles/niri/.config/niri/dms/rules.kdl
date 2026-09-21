@@ -205,8 +205,8 @@ window-rule {
 }
 
 // Layer rules
-layer-rule {
-    match namespace="^notifications$"
-    match namespace=r#"dms:.*"#
-    block-out-from "screen-capture"
-}
+// layer-rule {
+    // match namespace="^notifications$"
+    // match namespace=r#"dms:.*"#
+    // block-out-from "screen-capture"
+// }
