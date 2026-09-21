@@ -77,7 +77,7 @@ binds {
     Mod+W { close-window; }
     Mod+Shift+P { power-off-monitors; }
     Ctrl+Print { screenshot-screen; }
-    Mod+Shift+S { spawn "dms" "ipc" "call" "quickCapture" "screenshot" "region" "edit"; }
+    Mod+Shift+S { spawn "dms" "screenshot"; }
     Print { screenshot; }
     Mod+Shift+E { quit; }
     Ctrl+Alt+I allow-when-locked=true { spawn "playerctl" "previous"; }
