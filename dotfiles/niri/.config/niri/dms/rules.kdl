@@ -204,9 +204,11 @@ window-rule {
     block-out-from "screen-capture"
 }
 
-// Layer rules
-// layer-rule {
-    // match namespace="^notifications$"
-    // match namespace=r#"dms:.*"#
-    // block-out-from "screen-capture"
-// }
+// Keep DMS chrome out of screencasts while allowing DMS screenshots.
+// DMS's screenshot selector uses the separate `dms-screenshot` namespace;
+// leave it unblocked so the selector can capture normally.
+layer-rule {
+    match namespace="^notifications$"
+    match namespace=r#"^dms:.*$"#
+    block-out-from "screencast"
+}
