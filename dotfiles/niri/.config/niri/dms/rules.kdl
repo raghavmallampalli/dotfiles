@@ -87,6 +87,7 @@ window-rule {
     match app-id="cursor"
     match app-id="Code"
     match app-id="code"
+    match app-id="Chatgpt"
     match app-id="com.anthropic.Claude"
     match app-id="antigravity"
 
