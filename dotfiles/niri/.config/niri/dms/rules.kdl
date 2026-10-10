@@ -153,6 +153,7 @@ window-rule {
     match app-id=r#"^brave-browser$"#
     match app-id="firefox"
     exclude title=r#"^Meet - .+$"#
+    exclude title=r#"^.+ Personal Meeting Room$"#
     
     open-on-workspace "browser"
     open-focused      true
@@ -188,13 +189,16 @@ window-rule {
 
 window-rule {
     match app-id=r#"^brave(-browser)?$"# title=r#"^Meet - .+$"#
+    // Zoom web PiP uses the personal meeting room name as its title.
+    match app-id=r#"^brave(-browser)?$"# title=r#"^.+ Personal Meeting Room$"#
     match title="Picture in picture"
     match title="Picture-in-picture"
 
     open-on-output "eDP-1"
     open-floating     true
-    default-window-height   { proportion 0.76; }
-    default-column-width    { proportion 0.8; }
+    default-window-height   { proportion 0.3; }
+    default-column-width    { proportion 0.3; }
+    default-floating-position x=0 y=0 relative-to="bottom-right"
 }
 
 // Needs to be the last rule - should override default properties

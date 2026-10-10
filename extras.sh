@@ -43,7 +43,10 @@ if [[ "$IS_ARCH" == "true" ]]; then
             wlr-randr niri iio-niri wl-mirror
         )
         "$AUR_HELPER" -S --needed --noconfirm "${WAYLAND_PACKAGES[@]}"
-        systemctl --user add-wants niri.service dms
+        # DMS ships with WantedBy=graphical-session.target, which also starts it
+        # in KDE. Remove existing enablement before attaching it only to Niri.
+        systemctl --user disable dms.service
+        systemctl --user add-wants niri.service dms.service
         mkdir -p ~/.config/niri/dms
         touch ~/.config/niri/dms/{colors,layout,alttab,binds}.kdl
         finish_progress
