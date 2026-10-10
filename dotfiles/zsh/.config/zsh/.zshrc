@@ -34,11 +34,11 @@ plugins=(git dotenv zsh-autosuggestions zoxide fzf nvm uv docker starship)
 
 source $ZSH/oh-my-zsh.sh
 
-# Catppuccin Mocha-inspired colors for GNU ls. Set the palette explicitly so
-# inherited distro LS_COLORS rules (including their bright yellow file types)
-# do not take precedence. 256-color approximations of the Mocha palette:
-# blue 111, teal 116, green 150, mauve 183, red 210, peach 216, yellow 223.
-export LS_COLORS='di=38;5;111:ow=38;5;111;48;5;235:tw=38;5;111;48;5;235:ln=38;5;116:mi=38;5;210:or=38;5;210:so=38;5;218:pi=38;5;223:ex=38;5;150:bd=38;5;223:cd=38;5;223:su=38;5;210:sg=38;5;223:ca=38;5;210:*.png=38;5;216:*.jpg=38;5;216:*.jpeg=38;5;216:*.gif=38;5;216:*.webp=38;5;216:*.bmp=38;5;216:*.tif=38;5;216:*.tiff=38;5;216:*.svg=38;5;216:*.heic=38;5;216:*.pdf=38;5;183:*.doc=38;5;216:*.docx=38;5;216:*.odt=38;5;216:*.rtf=38;5;216:*.txt=38;5;116:*.md=38;5;116:*.csv=38;5;116:*.tsv=38;5;116:*.json=38;5;116:*.yaml=38;5;116:*.yml=38;5;116:*.toml=38;5;116:*.zip=38;5;183:*.gz=38;5;183:*.bz2=38;5;183:*.xz=38;5;183:*.7z=38;5;183:*.rar=38;5;183:*.tar=38;5;183:*.mp3=38;5;218:*.flac=38;5;218:*.wav=38;5;218:*.ogg=38;5;218:*.mp4=38;5;218:*.mkv=38;5;218:*.mov=38;5;218:*.webm=38;5;218'
+# Generate the full file-type palette from Vivid's Catppuccin Mocha theme.
+# Vivid provides the extension database and translates the theme into LS_COLORS.
+if command -v vivid >/dev/null 2>&1; then
+  LS_COLORS="$(vivid generate catppuccin-mocha)" && export LS_COLORS
+fi
 
 # Enable autossh and ssa auto-completion using ssh completion
 compdef autossh=ssh

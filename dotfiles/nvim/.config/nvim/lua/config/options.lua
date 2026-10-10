@@ -18,4 +18,5 @@ opt.shiftwidth = 4
 opt.expandtab = true
 opt.smarttab = true
 opt.termguicolors = true
+opt.background = "dark"
 opt.whichwrap:append("<,>,h,l,[,]")

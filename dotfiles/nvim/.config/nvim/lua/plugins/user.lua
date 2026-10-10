@@ -4,33 +4,13 @@ return {
     "catppuccin/nvim",
     name = "catppuccin",
     opts = {
-      flavour = "mocha", -- Use "latte" for light and "mocha" for dark, auto for auto-switching
-      background = {
-        light = "latte",
-        dark = "mocha",
-      },
+      flavour = "mocha",
       transparent_background = false,
     },
   },
 
-  -- Auto-switch dark/light mode
-  {
-    "f-person/auto-dark-mode.nvim",
-    opts = {
-      update_interval = 1000,
-      set_dark_mode = function()
-        vim.api.nvim_set_option("background", "dark")
-        vim.cmd("colorscheme catppuccin")
-      end,
-      set_light_mode = function()
-        vim.api.nvim_set_option("background", "light")
-        vim.cmd("colorscheme catppuccin")
-      end,
-    },
-  },
-
   -- Logic to ensure Catppuccin loads
-  { "LazyVim/LazyVim", opts = { colorscheme = "catppuccin" } },
+  { "LazyVim/LazyVim", opts = { colorscheme = "catppuccin-mocha" } },
 
   -- Essential logic from your old setup not in LazyVim core
   {

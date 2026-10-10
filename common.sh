@@ -288,7 +288,7 @@ install_tools_aur() {
         cmake moreutils inetutils
         zsh tmux vim htop nvtop
         xclip jq stow gum copyq
-        fzf ripgrep bat fd zoxide duf yazi lazygit neovim starship
+        fzf ripgrep bat fd zoxide duf yazi lazygit neovim starship vivid
         python-pyqt6 wvkbd duckdb rich-cli
     )
 
@@ -439,6 +439,20 @@ STOWEOF
         url=$(wget "https://api.github.com/repos/sharkdp/fd/releases/latest" -qO- | grep browser_download_url | grep "gnu" | grep "x86_64" | grep "linux" | head -n 1 | cut -d \" -f 4)
         wget "$url" -qO- | tar -xz -C /tmp
         mv /tmp/fd*/fd "$HOME/.local/bin/"
+        finish_progress
+    fi
+
+    # VIVID (generates LS_COLORS from a named theme)
+    if ! command -v vivid >/dev/null 2>&1; then
+        show_progress "Installing Vivid"
+        url=$(wget "https://api.github.com/repos/sharkdp/vivid/releases/latest" -qO- | grep browser_download_url | grep -E 'vivid-v.*-x86_64-unknown-linux-gnu.tar.gz' | head -n 1 | cut -d \" -f 4)
+        local vivid_tmp="/tmp/vivid-install-$$"
+        mkdir -p "$vivid_tmp"
+        wget "$url" -qO- | tar -xz -C "$vivid_tmp"
+        local vivid_bin
+        vivid_bin=$(find "$vivid_tmp" -type f -name vivid -print -quit)
+        mv "$vivid_bin" "$HOME/.local/bin/vivid"
+        rm -rf "$vivid_tmp"
         finish_progress
     fi
 
@@ -609,6 +623,7 @@ verify_master_tools() {
         "ripgrep:rg"
         "bat:bat"
         "fd:fd"
+        "vivid:vivid"
         "zoxide:zoxide"
         "duf:duf"
         "gum:gum"
