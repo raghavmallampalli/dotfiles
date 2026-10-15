@@ -1,9 +1,12 @@
 # dotfiles
-These are the scripts I use to set up my Linux environment. They install tools for Web development and ML and work with:
-- Ubuntu / Debian (apt)
-- Fedora (dnf)
-- Arch Linux (pacman)
-- Any of the above without sudo (CLI tools only)
+These are the scripts I use to set up my Linux environment: CLI and dev tools for web development and ML, my dotfiles, and my desktop.
+
+| | Ubuntu / Debian | Fedora | Arch | No sudo (e.g. compute clusters) |
+|---|---|---|---|---|
+| CLI tools + dotfiles (`install_cli.sh`, `setup.sh`) | ✅ | ✅ | ✅ | ✅ |
+| Desktop (`install_desktop.sh`) | — | ✅ | — | — |
+
+I only maintain one desktop at a time, currently Fedora with niri + DankMaterialShell.
 
 These scripts are largely inspired by https://github.com/rsnk96/Ubuntu-Setup-Scripts. Some of the code is taken directly from there. 
 For a list of useful commands and tips, check out [help](Help.md)
@@ -35,6 +38,7 @@ docker run -it --name dotfiles-test dotfiles-test-ubuntu
 # or
 docker run -it --name dotfiles-test dotfiles-test-arch
 ```
+The images cover the CLI scripts only; `install_desktop.sh` needs a real Fedora machine.
 
 ### Automated Verification
 You can also run the automated test script which builds the images and runs the installation scripts for Ubuntu, Fedora and Arch:
@@ -44,19 +48,27 @@ You can also run the automated test script which builds the images and runs the 
 Check `install_test.log` for the output.
 
 ## Setup scripts
-Run them in this order:
 
-1. `install_cli.sh`: shell, CLI, monitoring and dev tools. Everything it can comes from [mise](https://mise.jdx.dev) (Python CLIs through uv), installed into `$HOME`, so it works without sudo on servers. With sudo it also installs the few tools mise can't provide (zsh, ssh, ...) via apt, dnf or pacman, and it ends with a report of anything missing. The tool list is `dotfiles/mise/.config/mise/config.toml`.
-2. `setup.sh`: links the dotfiles (chezmoi), sets up zsh, oh-my-zsh, tmux plugins, SSH key and GitHub login.
-3. `install_desktop.sh` (Fedora only, run first on a new desktop install): niri + DankMaterialShell, apps, services, snapper snapshots around dnf, hibernation.
+- `install_cli.sh`: shell, CLI, monitoring and dev tools. Everything it can comes from [mise](https://mise.jdx.dev) (Python CLIs through uv), installed into `$HOME`, so it works without sudo. With sudo it also installs the few tools mise can't provide (zsh, ssh, ...) via apt, dnf or pacman. It ends with a report of anything missing. The tool list is `dotfiles/mise/.config/mise/config.toml`.
+- `setup.sh`: links the dotfiles (chezmoi), sets up zsh, oh-my-zsh, tmux plugins, SSH key and GitHub login. Without zsh, it loads mise from `.bashrc` instead.
+- `install_desktop.sh` (**Fedora only**): niri + DankMaterialShell, apps, services, snapper snapshots around dnf, hibernation. Run it first on a new desktop.
 
+**New server or cluster** (no sudo):
 ```bash
-./install_desktop.sh   # desktops only
-./install_cli.sh
+./install_cli.sh --sudo-access no
+./setup.sh --sudo-access no
+```
+If downloads hit GitHub rate limits, set `GITHUB_TOKEN` first.
+
+**New Fedora desktop:**
+```bash
+./install_desktop.sh
+./install_cli.sh --sudo-access yes
 ./setup.sh
+./install_desktop.sh   # second run builds iio-niri, which needs cargo from install_cli.sh
 ```
 
-Update all CLI tools later with `mise up`.
+Update all CLI tools later with `mise up` (desktops also run it weekly on a timer).
 
 > IMPORTANT: `bash` shell is replaced by a `zsh+Oh-My-Zsh` configuration.
 
@@ -70,7 +82,7 @@ Update all CLI tools later with `mise up`.
 - Add a custom DankMaterialShell top-right bar tile backed by a script or Bash command. DMS supports custom bar widgets through QML plugins in `~/.config/DankMaterialShell/plugins/`; implement this after the relevant configuration is backed up and managed through chezmoi.
 
 # Scripts
-Functionality that I tend to reuse. They will be avaiable on PATH after a standard installation.
+Functionality that I tend to reuse. They're available on PATH after a standard installation.
 eg. video encoding
 
 ## Local Overrides
