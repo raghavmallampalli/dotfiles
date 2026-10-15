@@ -84,12 +84,13 @@ window-rule {
     }
 }
 
-// Code apps
+// Code apps (app-id matches are regexes, so anchor them: a bare "code" also matched
+// web apps like brave-claude.ai__code-Default)
 window-rule {
-    match app-id="cursor"
-    match app-id="Code"
-    match app-id="code"
-    match app-id="antigravity"
+    match app-id="^cursor$"
+    match app-id="^(Code|code)$"
+    match app-id=r#"^com\.microsoft\.VSCode$"#
+    match app-id="^antigravity$"
 
     open-on-workspace "code"
     open-focused      true

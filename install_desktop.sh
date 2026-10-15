@@ -53,7 +53,7 @@ DESKTOP_PACKAGES=(
     bluez NetworkManager NetworkManager-wifi NetworkManager-openconnect
     power-profiles-daemon intel-lpmd fwupd
     mesa-dri-drivers mesa-vulkan-drivers vulkan-tools libva-utils intel-media-driver igt-gpu-tools
-    gvfs gvfs-mtp udiskie ffmpegthumbnailer fuse-libs
+    gvfs gvfs-mtp udiskie ffmpegthumbnailer fuse fuse-libs
     snapper btrfs-progs btrfs-assistant libdnf5-plugin-actions cronie
     cups hplip sane-backends
     google-noto-sans-fonts google-noto-serif-fonts google-noto-sans-cjk-fonts
@@ -227,7 +227,8 @@ install_zotero() {
     curl -fsSL -o "$DOWNLOAD_DIR/zotero.tar" "https://www.zotero.org/download/client/dl?channel=release&platform=linux-x86_64"
     tar -xf "$DOWNLOAD_DIR/zotero.tar" -C "$HOME/.local/opt"
     (cd "$dir" && ./set_launcher_icon)
-    ln -sf "$dir/zotero.desktop" "$HOME/.local/share/applications/zotero.desktop"
+    # Zotero's own launcher finds the program via %k, which DMS's launcher doesn't fill in
+    sed "s|^Exec=.*|Exec=$dir/zotero -url %U|" "$dir/zotero.desktop" >"$HOME/.local/share/applications/zotero.desktop"
     finish_progress
 }
 

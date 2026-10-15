@@ -1,5 +1,14 @@
 alias maxvol="pactl set-sink-volume @DEFAULT_SINK@ 150%"
-alias update="sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y"
+# Update system packages (skipped without sudo, e.g. on clusters), then mise and its tools
+update() {
+  if sudo -v 2>/dev/null; then
+    if command -v dnf >/dev/null; then sudo dnf upgrade --refresh -y
+    elif command -v apt >/dev/null; then sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y
+    elif command -v pacman >/dev/null; then sudo pacman -Syu
+    fi
+  fi
+  mise self-update -y; mise up
+}
 alias download="wget --random-wait -r -p --no-parent -e robots=off -U mozilla"
 alias server="ip -4 a | grep inet; python3 -m http.server"
 alias la='n'
