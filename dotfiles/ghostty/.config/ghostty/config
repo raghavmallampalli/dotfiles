@@ -1,0 +1,67 @@
+# Ghostty config. Every option and its docs: `ghostty +show-config --default --docs`
+# Reload in place with ctrl+shift+, (default binding).
+
+# Theme
+theme = Catppuccin Mocha
+
+# Font
+font-family = FiraCode Nerd Font
+font-size = 12
+
+# Window
+# niri draws no decorations and already applies 0.90 opacity to Ghostty
+# (see niri/dms/rules.kdl), so keep Ghostty itself opaque.
+window-decoration = none
+gtk-titlebar = false
+window-padding-x = 12
+window-padding-y = 12
+window-padding-balance = true
+background-opacity = 1.0
+# The size overlay pops up on every niri column resize
+resize-overlay = never
+
+# Cursor (the shell integration's prompt bar cursor is disabled below)
+cursor-style = block
+cursor-style-blink = true
+
+# Scrollback is in bytes, not lines. tmux keeps its own history, so this
+# mostly matters outside tmux.
+scrollback-limit = 25000000
+
+# Mouse and clipboard
+mouse-hide-while-typing = true
+copy-on-select = false
+confirm-close-surface = false
+clipboard-read = allow
+clipboard-write = allow
+clipboard-paste-protection = false
+# Hide the "copied to clipboard" and "config reloaded" toasts
+app-notifications = no-clipboard-copy,no-config-reload
+
+# Shell integration
+# ssh-env and ssh-terminfo wrap ssh: Ghostty's terminfo is installed on the
+# remote host on first connect (cached afterwards), falling back to
+# TERM=xterm-256color, so top, tmux, etc. work on fresh servers.
+# sudo keeps the terminfo under sudo.
+shell-integration = detect
+shell-integration-features = no-cursor,sudo,title,ssh-env,ssh-terminfo
+
+# Keybinds
+# Ctrl+V pastes. This shadows nvim's visual block (use <C-q> there instead)
+# and zsh's quoted-insert. Ctrl+Shift+V works as well.
+keybind = ctrl+v=paste_from_clipboard
+keybind = ctrl+shift+n=new_window
+keybind = ctrl+plus=increase_font_size:1
+keybind = ctrl+minus=decrease_font_size:1
+keybind = ctrl+zero=reset_font_size
+# Delete the word before or after the cursor
+keybind = ctrl+backspace=text:\x17
+keybind = ctrl+delete=text:\x1bd
+# Newline without submitting (multi-line prompts in CLI tools)
+keybind = shift+enter=text:\n
+
+# Splits (tmux does most of this)
+unfocused-split-opacity = 0.7
+
+# Keep one Ghostty process so new windows open instantly
+gtk-single-instance = true

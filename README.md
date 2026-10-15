@@ -79,7 +79,6 @@ Update all CLI tools later with `mise up` (desktops also run it weekly on a time
 
 ## TODO
 
-- Bring the Ghostty config (`~/.config/ghostty/config`) into the repo and link it with chezmoi. Before that, set it up properly: Catppuccin Mocha theme (Ghostty ships Catppuccin themes) and useful convenience settings. It already uses `font-family = FiraCode Nerd Font` from `fonts/`.
 - Add a custom DankMaterialShell top-right bar tile backed by a script or Bash command. DMS supports custom bar widgets through QML plugins in `~/.config/DankMaterialShell/plugins/`; implement this after the relevant configuration is backed up and managed through chezmoi.
 
 # Scripts
