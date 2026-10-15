@@ -1,0 +1,16 @@
+// Drop-down terminal, toggled by ~/.local/scripts/dropterm.
+// It hides on the "scratch" workspace and floats centered on screen.
+
+workspace "scratch"
+
+window-rule {
+    match app-id=r#"^com\.mitchellh\.ghostty\.dropterm$"#
+
+    open-floating true
+    default-column-width { proportion 0.7; }
+    default-window-height { proportion 0.7; }
+}
+
+binds {
+    Mod+Grave hotkey-overlay-title="Drop-down Terminal" { spawn "~/.local/scripts/dropterm"; }
+}

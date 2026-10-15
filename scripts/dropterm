@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Drop-down terminal for niri. Bound in ~/.config/niri/dropterm.kdl.
+#
+# Hidden: the window sits on the "scratch" workspace.
+# Toggle: summons it as a floating window on the focused workspace, or hides it
+# again if it is already focused. Launches it the first time.
+set -euo pipefail
+
+# A separate class makes this its own Ghostty instance, apart from the main one
+APP_ID=com.mitchellh.ghostty.dropterm
+SCRATCH=scratch
+
+win=$(niri msg -j windows | jq -c --arg id "$APP_ID" 'first(.[] | select(.app_id == $id)) // empty')
+
+if [[ -z $win ]]; then
+  exec ghostty --class="$APP_ID"
+fi
+
+win_id=$(jq -r '.id' <<<"$win")
+
+if [[ $(jq -r '.is_focused' <<<"$win") == true ]]; then
+  niri msg action move-window-to-workspace --window-id "$win_id" --focus false "$SCRATCH"
+  exit 0
+fi
+
+workspaces=$(niri msg -j workspaces)
+focused=$(jq -c 'first(.[] | select(.is_focused))' <<<"$workspaces")
+win_output=$(jq -r --argjson ws "$(jq -r '.workspace_id' <<<"$win")" \
+  'first(.[] | select(.id == $ws)) | .output' <<<"$workspaces")
+target_output=$(jq -r '.output' <<<"$focused")
+
+if [[ $win_output != "$target_output" ]]; then
+  # Lands on that output's active workspace, which is the focused one
+  niri msg action move-window-to-monitor --id "$win_id" "$target_output"
+else
+  niri msg action move-window-to-workspace --window-id "$win_id" --focus false "$(jq -r '.idx' <<<"$focused")"
+fi
+niri msg action focus-window --id "$win_id"
+niri msg action center-window --id "$win_id"

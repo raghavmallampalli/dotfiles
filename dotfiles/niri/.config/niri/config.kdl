@@ -82,6 +82,7 @@ include "dms/layout.kdl"
 include "dms/outputs.kdl"
 include "dms/rules.kdl"
 include "dms/wpblur.kdl"
+include "dropterm.kdl"
 
 // LAYOUT OVERRIDES
 layout {

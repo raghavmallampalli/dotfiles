@@ -1,0 +1,10 @@
+[Desktop Entry]
+# Gives the drop-down terminal (scripts/dropterm) Ghostty's icon in the DMS
+# taskbar, which matches windows to desktop entries by app id.
+Type=Application
+Name=Ghostty Drop-down
+Icon=com.mitchellh.ghostty
+Exec=ghostty --class=com.mitchellh.ghostty.dropterm
+StartupWMClass=com.mitchellh.ghostty.dropterm
+Terminal=false
+NoDisplay=true
