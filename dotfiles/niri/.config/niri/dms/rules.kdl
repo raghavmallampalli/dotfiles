@@ -1,11 +1,11 @@
 workspace "code" {
-    open-on-output "Acer Technologies KA270 G0 14490A6733W01"
+    open-on-output "Acer Technologies KB272 G0 6629005315W01"
 }
 workspace "browser" {
-    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
+    open-on-output "Acer Technologies KB272 G0 6629005315W01"
 }
 workspace "research" {
-    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
+    open-on-output "Acer Technologies KB272 G0 6629005315W01"
 }
 workspace "music" {
     open-on-output "eDP-1"
@@ -14,7 +14,7 @@ workspace "draw" {
     open-on-output "eDP-1"
 }
 workspace "media" {
-    open-on-output "Acer Technologies KA270 G0 14490A6233W01"
+    open-on-output "Acer Technologies KB272 G0 6629005315W01"
 }
 
 window-rule {
