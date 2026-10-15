@@ -45,6 +45,12 @@ window-rule {
         blur true
     }
 }
+window-rule {
+    match app-id="Zotero"
+    match app-id="com.anthropic.Claude"
+
+    open-maximized true
+}
 
  window-rule {
     match app-id="com.mitchellh.ghostty"
