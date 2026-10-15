@@ -1,7 +1,9 @@
 # dotfiles
 These are the scripts I use to set up my Linux environment. They install tools for Web development and ML and work with:
-- Ubuntu 18.04, 20.04, 22.04, 24.04
-- Arch Linux
+- Ubuntu / Debian (apt)
+- Fedora (dnf)
+- Arch Linux (pacman)
+- Any of the above without sudo (CLI tools only)
 
 These scripts are largely inspired by https://github.com/rsnk96/Ubuntu-Setup-Scripts. Some of the code is taken directly from there. 
 For a list of useful commands and tips, check out [help](Help.md)
@@ -9,7 +11,7 @@ For a list of useful commands and tips, check out [help](Help.md)
 I like to see icons on my terminal. Make sure to install and use a NerdFont for your terminal emulator if you want the icons to show up. I use [FircaCode](https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip)
 
 ## Testing on Docker
-If you want to test this setup on Docker, a `Dockerfile` is provided. It supports both Ubuntu and Arch Linux base images.
+If you want to test this setup on Docker, a `Dockerfile` is provided. It supports Ubuntu, Fedora and Arch Linux base images.
 
 ### Build the Docker image:
 For Ubuntu (default):
@@ -22,6 +24,11 @@ For Arch Linux:
 docker build --build-arg BASE_IMAGE=archlinux:latest -t dotfiles-test-arch .
 ```
 
+For Fedora:
+```bash
+docker build --build-arg BASE_IMAGE=fedora:latest -t dotfiles-test-fedora .
+```
+
 ### Run the container:
 ```bash
 docker run -it --name dotfiles-test dotfiles-test-ubuntu
@@ -30,42 +37,39 @@ docker run -it --name dotfiles-test dotfiles-test-arch
 ```
 
 ### Automated Verification
-You can also run the automated test script which builds the images and runs the installation scripts for both Ubuntu and Arch:
+You can also run the automated test script which builds the images and runs the installation scripts for Ubuntu, Fedora and Arch:
 ```bash
 ./test_install.sh
 ```
 Check `install_test.log` for the output.
 
 ## Setup scripts
-Run them in this order. Every subsequent step needs all previous to have been run.
+Run them in this order:
 
-1. `install.sh`: Installs packages and tools.
-2. `setup.sh`: Configures dotfiles and shell.
-3. These two are independent, run them in any order:
-    - `dev.sh`: Programming languages and environments.
-    - `extras.sh`: General tools. Includes my preferred desktop environment set-up on Arch.
+1. `install_cli.sh`: shell, CLI, monitoring and dev tools. Everything it can comes from [mise](https://mise.jdx.dev) (Python CLIs through uv), installed into `$HOME`, so it works without sudo on servers. With sudo it also installs the few tools mise can't provide (zsh, ssh, ...) via apt, dnf or pacman, and it ends with a report of anything missing. The tool list is `dotfiles/mise/.config/mise/config.toml`.
+2. `setup.sh`: links the dotfiles (chezmoi), sets up zsh, oh-my-zsh, tmux plugins, SSH key and GitHub login.
+3. `install_desktop.sh` (Fedora only, run first on a new desktop install): niri + DankMaterialShell, apps, services, snapper snapshots around dnf, hibernation.
 
-> IMPORTANT: `extras.sh` is only kept up to date for Ubuntu, which is my primary OS.
-Run them in order:
 ```bash
-./install.sh
+./install_desktop.sh   # desktops only
+./install_cli.sh
 ./setup.sh
 ```
 
+New Fedora machine from scratch: see [FEDORA_INSTALL_GUIDE.md](FEDORA_INSTALL_GUIDE.md).
+
+Update all CLI tools later with `mise up`.
+
 > IMPORTANT: `bash` shell is replaced by a `zsh+Oh-My-Zsh` configuration.
 
-### Dotfiles Management (Stow)
-We use [GNU Stow](https://www.gnu.org/software/stow/) to manage dotfiles.
-- **Install**: `setup.sh` runs `stow` to link configurations to your home directory.
-- **Move Repo**: If you move this repository, the symlinks will break. To fix them, run:
-  ```bash
-  stow -R -d dotfiles -t $HOME zsh tmux nvim yazi neovim ...
-  ```
-within the directory of the repository.
+### Dotfiles management (chezmoi)
+[chezmoi](https://www.chezmoi.io) uses this repo as its source (`.chezmoiroot` points it at `home/`). Each entry in `home/` is a symlink from `$HOME` into `dotfiles/`, so it behaves like stow: editing a config in `$HOME` edits the repo, and new files in a linked directory (e.g. `~/.config/niri`) land in the repo too.
+- **Add a config**: put it under `dotfiles/<app>/`, add a matching `symlink_` entry in `home/`, then run `chezmoi apply`.
+- **Move the repo**: update `sourceDir` in `~/.config/chezmoi/chezmoi.toml`, then run `chezmoi apply --force`.
 
 ## TODO
 
-- Add a custom DankMaterialShell top-right bar tile backed by a script or Bash command. DMS supports custom bar widgets through QML plugins in `~/.config/DankMaterialShell/plugins/`; implement this after the relevant configuration is backed up and managed through Stow.
+- Add a custom DankMaterialShell top-right bar tile backed by a script or Bash command. DMS supports custom bar widgets through QML plugins in `~/.config/DankMaterialShell/plugins/`; implement this after the relevant configuration is backed up and managed through chezmoi.
 
 # Scripts
 Functionality that I tend to reuse. They will be avaiable on PATH after a standard installation.

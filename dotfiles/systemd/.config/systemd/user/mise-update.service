@@ -1,0 +1,11 @@
+[Unit]
+Description=Update mise and the tools it manages
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+Environment=MISE_YES=1
+# "-": keep going if mise came from a package manager and can't update itself
+ExecStart=-%h/.local/bin/mise self-update -y
+ExecStart=%h/.local/bin/mise up

@@ -30,7 +30,12 @@ export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME=""
 
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git dotenv zsh-autosuggestions zoxide fzf nvm uv docker starship)
+plugins=(git dotenv zsh-autosuggestions zoxide fzf uv docker starship)
+
+# mise puts its tools on PATH; must run before oh-my-zsh so the plugins above find them
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate zsh)"
+fi
 
 source $ZSH/oh-my-zsh.sh
 
