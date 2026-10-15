@@ -14,7 +14,7 @@ spawn-at-startup "gnome-keyring-daemon" "--start" "--components=secrets,pkcs11,s
 
 // STARTUP APPS
 spawn-at-startup "ghostty"
-spawn-at-startup "sh" "-c" "sleep 5 && brave --profile-directory=Default"
+spawn-at-startup "sh" "-c" "sleep 5 && brave-browser --profile-directory=Default"
 
 environment {
     QT_QPA_PLATFORMTHEME "qt6ct"

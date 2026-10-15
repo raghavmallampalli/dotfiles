@@ -1,0 +1,7 @@
+# Snapper pre/post snapshots around every dnf transaction (libdnf5 actions plugin)
+# Remember the command that started the transaction, for the snapshot description
+pre_transaction::::/usr/bin/sh -c echo\ "tmp.cmd=$(ps\ -o\ command\ --no-headers\ -p\ '${pid}')"
+# Pre snapshot; store its number in tmp.snapper_pre_number
+pre_transaction::::/usr/bin/sh -c echo\ "tmp.snapper_pre_number=$(snapper\ create\ -t\ pre\ -c\ number\ -p\ -d\ '${tmp.cmd}')"
+# Post snapshot paired with the pre one, then clear the variables
+post_transaction::::/usr/bin/sh -c [\ -n\ "${tmp.snapper_pre_number}"\ ]\ &&\ snapper\ create\ -t\ post\ --pre-number\ "${tmp.snapper_pre_number}"\ -c\ number\ -d\ "${tmp.cmd}"\ ;\ echo\ tmp.snapper_pre_number\ ;\ echo\ tmp.cmd

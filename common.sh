@@ -1,25 +1,29 @@
-#!/bin/sh
+#!/bin/bash
 
-# Constants and configuration
+# Shared helpers for the setup scripts: logging, running commands, backups and OS detection.
+# No install logic lives here.
+
 BACKUP_DIR="${BACKUP_DIR:-/tmp}"
 LOG_FILE="/tmp/installation.log"
 export PATH="$HOME/.local/bin:$PATH"
 
-# Logging function
+# ------------------------------------------------------------------------------
+# Logging
+# ------------------------------------------------------------------------------
+
 log() {
     level="$1"
     shift
     echo ""
     if [ "$level" = "WARN" ]; then
-        echo "[$(date +'%Y-%m-%d %H:%M:%S')] [\033[33m$level\033[0m] $*" | tee -a "$LOG_FILE"
+        echo -e "[$(date +'%Y-%m-%d %H:%M:%S')] [\033[33m$level\033[0m] $*" | tee -a "$LOG_FILE"
     elif [ "$level" = "ERROR" ]; then
-        echo "[$(date +'%Y-%m-%d %H:%M:%S')] [\033[31m$level\033[0m] $*" | tee -a "$LOG_FILE"
+        echo -e "[$(date +'%Y-%m-%d %H:%M:%S')] [\033[31m$level\033[0m] $*" | tee -a "$LOG_FILE"
     else
-        echo "[$(date +'%Y-%m-%d %H:%M:%S')] [$level] $*" | tee -a "$LOG_FILE"
+        echo -e "[$(date +'%Y-%m-%d %H:%M:%S')] [$level] $*" | tee -a "$LOG_FILE"
     fi
 }
 
-# Progress indication
 show_progress() {
     echo -n "$1..."
 }
@@ -34,36 +38,22 @@ finish_progress() {
     return $exit_status
 }
 
-# Cleanup function
+# Used as the EXIT trap: trap 'cleanup ${LINENO} $?' EXIT
 cleanup() {
     exit_code=$?
     line_no=$1
     error_code=$2
-
-    # Always do cleanup
-    log "INFO" "Cleaning up temporary files..."
-    [ -f temp ] && rm -f temp
-    [ -f /tmp/*.deb ] && rm -f /tmp/*.deb
-    log "INFO" "Done."
-
-    # Only log error if there was one
     if [ $exit_code -ne 0 ]; then
         log "ERROR" "Error on line $line_no. Exit code: $error_code"
     fi
-
     exit $exit_code
 }
 
-# Function to run commands based on root/non-root mode
-run_command() {
-    if [ "$ROOT_MODE" = "true" ]; then
-        execute "$@"
-    else
-        execute sudo "$@"
-    fi
-}
+# ------------------------------------------------------------------------------
+# Running commands
+# ------------------------------------------------------------------------------
 
-# Improved execute function
+# Run a command, logging it and its output; returns 1 on failure
 execute() {
     log "CMD" "$*"
     if ! OUTPUT=$("$@" 2>&1 | tee -a "$LOG_FILE"); then
@@ -73,56 +63,40 @@ execute() {
     fi
 }
 
-# Backup the file to backup directory and delete it
+# Same as execute, with sudo unless we're already root (ROOT_MODE=true)
+run_command() {
+    if [ "$ROOT_MODE" = "true" ]; then
+        execute "$@"
+    else
+        execute sudo "$@"
+    fi
+}
+
+# ------------------------------------------------------------------------------
+# Files
+# ------------------------------------------------------------------------------
+
+# Move a file, directory or link into $BACKUP_DIR, then remove it
 backup_and_delete() {
     # Strip any trailing slashes so symlink checks don't incorrectly follow them
     file="${1%/}"
-    
+
     # HARD CHECK: NEVER DELETE THESE DIRECTORIES
     if [ "$file" = "$HOME" ] || [ "$file" = "$HOME/.config" ] || [ "$file" = "$HOME/.local" ] || [ "$file" = "$HOME/.local/share" ]; then
         log "ERROR" "FATAL: Attempted to backup and delete a critical system directory: $file"
         exit 1
     fi
 
-    backup_path="$BACKUP_DIR/$(basename "$file")"
-
-    # check if the file exists
-    if [ ! -e "$file" ]; then
-        log "INFO" "$file does not exist"
+    if [ ! -e "$file" ] && [ ! -L "$file" ]; then
         return 0
     fi
 
-    if is_symlink "$file"; then
-        log "INFO" "$file is a symbolic link"
-        if [ -f "$(readlink "$file")" ] || [ -d "$(readlink "$file")" ]; then
-            cp -rL "$file" "$backup_path" || {
-                log "ERROR" "Failed to backup symlink target $file"
-                return 3
-            }
-        fi
+    mkdir -p "$BACKUP_DIR"
+    backup_path="$BACKUP_DIR/$(basename "$file")"
+
+    if [ -L "$file" ]; then
         unlink "$file" || {
             log "ERROR" "Failed to remove symlink $file"
-            return 4
-        }
-    elif [ -d "$file" ]; then
-        log "INFO" "$file is a directory"
-        cp -a "$file" "$backup_path" || {
-            log "ERROR" "Failed to backup directory $file"
-            return 3
-        }
-        rm -rf "$file" || {
-            log "ERROR" "Failed to delete directory $file"
-            return 4
-        }
-
-    elif [ "$(stat -c %h "$file")" -gt 1 ]; then
-        log "INFO" "$file is a hard link"
-        cp -a "$file" "$backup_path" || {
-            log "ERROR" "Failed to backup hard link $file"
-            return 3
-        }
-        unlink "$file" || {
-            log "ERROR" "Failed to unlink hard link $file"
             return 4
         }
     else
@@ -130,539 +104,27 @@ backup_and_delete() {
             log "ERROR" "Failed to backup $file"
             return 3
         }
-        rm "$file" || {
+        rm -rf "$file" || {
             log "ERROR" "Failed to delete $file"
             return 4
         }
+        log "INFO" "Backed up $file to $backup_path"
     fi
-    log "INFO" "Backed up and removed $file"
 }
 
-# Clean up existing files that would conflict with stow
-pre_stow_cleanup() {
-    local src_dir="$1"
-    local dest_dir="$2"
-    
-    if [ ! -d "$src_dir" ]; then
-        return 0
-    fi
-    
-    # Iterate over items in the current source directory
-    for src_item in "$src_dir"/* "$src_dir"/.[!.]* "$src_dir"/..?*; do
-        [ -e "$src_item" ] || continue
-        
-        local item_name="$(basename "$src_item")"
-        local dest_item="$dest_dir/$item_name"
-        
-        # Ignore the stow-fold flag itself
-        if [ "$item_name" = ".stow-fold" ]; then
-            continue
-        fi
+# ------------------------------------------------------------------------------
+# Environment detection
+# ------------------------------------------------------------------------------
 
-        # If it's a file (or symlink to a file), it's a payload file
-        if [ -f "$src_item" ] || [ -L "$src_item" ]; then
-            if [ -e "$dest_item" ] || [ -L "$dest_item" ]; then
-                log "WARN" "Conflict detected for $dest_item. Removing."
-                backup_and_delete "$dest_item"
-            fi
-        
-        # If it's a directory, determine if it's structural or payload
-        elif [ -d "$src_item" ]; then
-            if [ -f "$src_item/.stow-fold" ]; then
-                # PAYLOAD directory: stow will symlink the whole thing.
-                if [ -e "$dest_item" ] || [ -L "$dest_item" ]; then
-                    log "WARN" "Conflict detected for payload directory $dest_item. Removing."
-                    backup_and_delete "$dest_item"
-                fi
-            else
-                # STRUCTURAL directory: stow will recurse, so we must recurse as well.
-                pre_stow_cleanup "$src_item" "$dest_item"
-            fi
-        fi
-    done
-}
-
-# Improved dotfile installation
-# Default behavior: Try hard link first, fall back to soft link if hard link fails
-# This handles cross-filesystem scenarios automatically
-install_dotfile() {
-    src="$1"
-    dest="$2"
-    link="${3:-false}"
-    if [ "$link" = "true" ]; then
-        link=true
-    else
-        link=false
-    fi
-
-    show_progress "Installing $(basename "$src")"
-    if [ ! -f "$src" ]; then
-        log "ERROR" "Source file $src does not exist"
-        finish_progress
-        return 1
-    fi
-
-    backup_and_delete "$dest"
-
-    if [ "$link" = "true" ]; then
-        # Convert relative source path to absolute path for symlink
-        if [[ "$src" != /* ]]; then
-            src="$(realpath "$src")"
-        fi
-        ln -s "$src" "$dest"
-        log "INFO" "Created soft link for $(basename "$src")"
-    else
-        # Try hard link first, fall back to soft link if it fails
-        if ln "$src" "$dest" 2>/dev/null; then
-            log "INFO" "Created hard link for $(basename "$src")"
-        else
-            # Hard link failed, fall back to soft link
-            log "INFO" "Hard link failed, falling back to soft link for $(basename "$src")"
-            # Convert relative source path to absolute path for symlink
-            if [[ "$src" != /* ]]; then
-                src="$(realpath "$src")"
-            fi
-            ln -s "$src" "$dest"
-        fi
-    fi
-    finish_progress
-}
-
-# WSL detection
 is_wsl() {
-    if [ -f /proc/sys/fs/binfmt_misc/WSLInterop ] || \
-       grep -qi microsoft /proc/version 2>/dev/null; then
-        return 0
-    fi
-    return 1
+    [ -f /proc/sys/fs/binfmt_misc/WSLInterop ] || grep -qi microsoft /proc/version 2>/dev/null
 }
 
-# Configuration backup
-backup_configs() {
-    backup_dir="$BACKUP_DIR/config_backup_$(date +%Y%m%d_%H%M%S)"
-    show_progress "Backing up configurations"
-    mkdir -p "$backup_dir"
-    for file in .zshrc .bashrc .vimrc .tmux.conf .zshenv; do
-        if [ -f "$HOME/$file" ]; then
-            cp "$HOME/$file" "$backup_dir/"
-        fi
-    done
-
-    # Backup XDG configs
-    for dir in nvim tmux zsh yazi niri; do
-        if [ -d "$HOME/.config/$dir" ]; then
-             cp -r "$HOME/.config/$dir" "$backup_dir/$dir"
-        fi
-    done
-    log "INFO" "Configurations backed up to $backup_dir"
-    finish_progress
-}
-
-is_symlink() {
-    file="$1"
-    if [ -L "$file" ]; then
-        return 0
-    fi
-    return 1
-}
-
-detect_aur_helper() {
-    if command -v paru >/dev/null 2>&1; then
-        AUR_HELPER="paru"
-    elif command -v yay >/dev/null 2>&1; then
-        AUR_HELPER="yay"
-    else
-        AUR_HELPER=""
-    fi
-}
-
-install_tools_aur() {
-    log "INFO" "Installing tools via $AUR_HELPER..."
-
-    show_progress "Installing essentials and tools via $AUR_HELPER"
-    
-    # Combined package list
-    local PACKAGES=(
-        github-cli wget openssh autossh aria2 curl rsync
-        zip unzip p7zip
-        cmake moreutils inetutils
-        zsh tmux vim htop nvtop
-        xclip jq stow gum copyq
-        fzf ripgrep bat fd zoxide duf yazi lazygit neovim starship vivid
-        python-pyqt6 wvkbd duckdb rich-cli
-    )
-
-    execute "$AUR_HELPER" -S --needed --noconfirm "${PACKAGES[@]}" 
-    
-    finish_progress
-}
-
-install_aur_helper_if_needed() {
-    log "INFO" "Checking for existing AUR helper (yay or paru)..."
-    detect_aur_helper
-    if [ -n "$AUR_HELPER" ]; then
-        log "INFO" "Found AUR helper: $AUR_HELPER. Skipping yay installation."
-        return 0
-    fi
-
-    log "INFO" "No AUR helper found. Starting yay installation..."
-    show_progress "Installing yay"
-    # We use /tmp to avoid permission issues if the current directory is inside /root
-    local YAY_BUILD_DIR="/tmp/yay-bin"
-    if [ -d "$YAY_BUILD_DIR" ]; then rm -rf "$YAY_BUILD_DIR"; fi
-    git clone https://aur.archlinux.org/yay-bin.git "$YAY_BUILD_DIR"
-
-    local CURRENT_DIR=$(pwd)
-    cd "$YAY_BUILD_DIR"
-
-    if [ "$EUID" -eq 0 ]; then
-        log "WARN" "Running makepkg as root. Creating temporary builder user..."
-        if ! id -u builder >/dev/null 2>&1; then
-            useradd -m builder
-            echo "builder ALL=(ALL) NOPASSWD: ALL" >>/etc/sudoers
-        fi
-        chown -R builder:builder .
-        su builder -c "makepkg -si --noconfirm"
-    else
-        makepkg -si --noconfirm
-    fi
-
-    cd "$CURRENT_DIR"
-    rm -rf "$YAY_BUILD_DIR"
-    AUR_HELPER="yay"
-    finish_progress
-}
-
-install_apt_always() {
-    log "INFO" "Installing always-essential packages for Debian/Ubuntu..."
-
-    show_progress "Updating system packages"
-    run_command apt update -y
-    # run_command apt upgrade -y # causes frequent failures in server setups
-    run_command apt-get install git wget curl zip unzip 7zip stow -y
-    finish_progress
-
-    # gh is installed via install_tools_binaries (portable release tarball) instead of
-    # apt's keyring dance, so it's identical across the sudo and no-sudo Debian arms.
-
-    show_progress "Installing development and base tools"
-    # Superset of tools
-    run_command apt-get install build-essential g++ cmake cmake-curses-gui pkg-config checkinstall automake -y
-    run_command apt-get install xclip jq autossh fonts-powerline aria2 rsync moreutils ca-certificates openssh-client inetutils-ping -y
-    run_command apt-get install htop nvtop -y
-    run_command apt-get install zsh vim tmux -y
-    run_command apt-get install libevent-dev ncurses-dev bison python3-pyqt6 wvkbd -y
-    finish_progress
-
-    # neovim is installed via install_tools_binaries (portable release tarball) instead
-    # of snap, so it doesn't depend on snapd being present and is identical across arms.
-}
-
-install_tools_binaries() {
-    log "INFO" "Installing tools via Binaries (Manual)..."
-
-    # FZF
-    if ! command -v fzf >/dev/null 2>&1; then
-        show_progress "Installing FZF"
-        if [ ! -d "$HOME/.fzf" ]; then
-            execute git clone --quiet --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
-        fi
-        execute "$HOME/.fzf/install" --all
-        ln -sf "$HOME/.fzf/bin/fzf" "$HOME/.local/bin/fzf"
-        wget https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh -qO "$HOME/.fzf-git.sh"
-        finish_progress
-    fi
-
-    # Stow - no portable upstream binary, but on Debian/Ubuntu it's pure Perl (no
-    # compiled deps), so we can pull the .deb without root and run it via PERL5LIB
-    if ! command -v stow >/dev/null 2>&1 && command -v apt-get >/dev/null 2>&1; then
-        show_progress "Installing GNU Stow (extracting .deb, no root needed)"
-        if (cd /tmp && apt-get download stow) >>"$LOG_FILE" 2>&1; then
-            local stow_deb
-            stow_deb=$(find /tmp -maxdepth 1 -name "stow_*.deb" | head -n 1)
-            mkdir -p "$HOME/.local/opt/stow"
-            dpkg-deb -x "$stow_deb" "$HOME/.local/opt/stow"
-            rm -f "$stow_deb"
-            cat >"$HOME/.local/bin/stow" <<'STOWEOF'
-#!/bin/sh
-export PERL5LIB="$HOME/.local/opt/stow/usr/share/perl5${PERL5LIB:+:$PERL5LIB}"
-exec perl "$HOME/.local/opt/stow/usr/bin/stow" "$@"
-STOWEOF
-            chmod +x "$HOME/.local/bin/stow"
-            finish_progress
-        else
-            echo " Failed"
-            log "WARN" "Could not fetch stow via 'apt-get download' (needs a populated apt cache, but not root). Install GNU Stow manually if needed."
-        fi
-    fi
-
-    # Neovim - official portable release tarball, no snap/apt needed
-    if ! command -v nvim >/dev/null 2>&1; then
-        show_progress "Installing Neovim"
-        url=$(wget "https://api.github.com/repos/neovim/neovim/releases/latest" -qO- | grep browser_download_url | grep -i "linux-x86_64.tar.gz" | head -n 1 | cut -d \" -f 4)
-        mkdir -p "$HOME/.local/opt"
-        wget "$url" -qO- | tar -xz -C "$HOME/.local/opt/"
-        local temp_nvim_dir
-        temp_nvim_dir=$(find "$HOME/.local/opt" -maxdepth 1 -type d -name "nvim-linux-*" | head -n 1)
-        ln -sf "$temp_nvim_dir/bin/nvim" "$HOME/.local/bin/nvim"
-        finish_progress
-    fi
-
-    # Zoxide
-    if ! command -v zoxide >/dev/null 2>&1; then
-        show_progress "Installing Zoxide"
-        curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
-        finish_progress
-    fi
-
-    # DUF
-    if ! command -v duf >/dev/null 2>&1; then
-        show_progress "Installing DUF"
-        url=$(wget "https://api.github.com/repos/muesli/duf/releases/latest" -qO- | grep browser_download_url | grep "linux_x86_64" | grep ".tar.gz" | head -n 1 | cut -d \" -f 4)
-        wget "$url" -qO- | tar -xz -C /tmp/
-        mv /tmp/duf "$HOME/.local/bin/"
-        finish_progress
-    fi
-
-    # BAT
-    if ! command -v bat >/dev/null 2>&1; then
-        show_progress "Installing BAT"
-        url=$(wget "https://api.github.com/repos/sharkdp/bat/releases/latest" -qO- | grep browser_download_url | grep "gnu" | grep "x86_64" | grep "linux" | head -n 1 | cut -d \" -f 4)
-        wget "$url" -qO- | tar -xz -C /tmp/
-        mv /tmp/bat*/bat "$HOME/.local/bin/"
-        finish_progress
-    fi
-
-    # FD
-    if ! command -v fd >/dev/null 2>&1; then
-        show_progress "Installing FD"
-        url=$(wget "https://api.github.com/repos/sharkdp/fd/releases/latest" -qO- | grep browser_download_url | grep "gnu" | grep "x86_64" | grep "linux" | head -n 1 | cut -d \" -f 4)
-        wget "$url" -qO- | tar -xz -C /tmp
-        mv /tmp/fd*/fd "$HOME/.local/bin/"
-        finish_progress
-    fi
-
-    # VIVID (generates LS_COLORS from a named theme)
-    if ! command -v vivid >/dev/null 2>&1; then
-        show_progress "Installing Vivid"
-        url=$(wget "https://api.github.com/repos/sharkdp/vivid/releases/latest" -qO- | grep browser_download_url | grep -E 'vivid-v.*-x86_64-unknown-linux-gnu.tar.gz' | head -n 1 | cut -d \" -f 4)
-        local vivid_tmp="/tmp/vivid-install-$$"
-        mkdir -p "$vivid_tmp"
-        wget "$url" -qO- | tar -xz -C "$vivid_tmp"
-        local vivid_bin
-        vivid_bin=$(find "$vivid_tmp" -type f -name vivid -print -quit)
-        mv "$vivid_bin" "$HOME/.local/bin/vivid"
-        rm -rf "$vivid_tmp"
-        finish_progress
-    fi
-
-    # RIPGREP
-    if ! command -v rg >/dev/null 2>&1; then
-        show_progress "Installing Ripgrep"
-        url=$(wget "https://api.github.com/repos/BurntSushi/ripgrep/releases/latest" -qO- | grep browser_download_url | grep "x86_64" | grep "linux" | head -n 1 | cut -d \" -f 4)
-        wget "$url" -qO- | tar -xz -C /tmp/
-        mv /tmp/ripgrep*/rg "$HOME/.local/bin/"
-        finish_progress
-    fi
-    
-    # GUM - Inlined here
-    if ! command -v gum >/dev/null 2>&1; then
-        show_progress "Installing Gum"
-        url=$(wget "https://api.github.com/repos/charmbracelet/gum/releases/latest" -qO- | grep browser_download_url | grep -i "linux_x86_64" | grep ".tar.gz" | head -n 1 | cut -d \" -f 4)
-        wget "$url" -qO- | tar -xz -C /tmp/
-        # Use find to handle the versioned directory name
-        local temp_gum_dir=$(find /tmp/ -maxdepth 1 -type d -name "gum_*" | head -n 1)
-        mv "$temp_gum_dir/gum" "$HOME/.local/bin/"
-        chmod +x "$HOME/.local/bin/gum"
-        rm -rf "$temp_gum_dir"
-        finish_progress
-    fi
-
-    # Yazi - via helper
-    if ! command -v yazi >/dev/null 2>&1; then
-        show_progress "Installing Yazi"
-        wget -q https://github.com/sxyazi/yazi/releases/latest/download/yazi-x86_64-unknown-linux-musl.zip -O /tmp/yazi.zip
-        unzip -oq /tmp/yazi.zip -d /tmp
-        mv /tmp/yazi-x86_64-unknown-linux-musl/yazi "$HOME/.local/bin/"
-        mv /tmp/yazi-x86_64-unknown-linux-musl/ya "$HOME/.local/bin/"
-        chmod +x "$HOME/.local/bin/yazi"
-        chmod +x "$HOME/.local/bin/ya"
-        finish_progress
-    fi
-
-    # Starship
-    if ! command -v starship >/dev/null 2>&1; then
-        show_progress "Installing Starship"
-        curl -sS https://starship.rs/install.sh | sh -s -- --bin-dir "$HOME/.local/bin" --yes
-        finish_progress
-    fi
-
-    # UV
-    if ! command -v uv >/dev/null 2>&1; then
-        show_progress "Installing UV"
-        curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="$HOME/.local/bin" sh
-        finish_progress
-    fi
-
-    # DuckDB
-    if ! command -v duckdb >/dev/null 2>&1; then
-        show_progress "Installing DuckDB"
-        curl -sSfL https://install.duckdb.org | sh
-        finish_progress
-    fi
-
-    # Rich CLI (rich-preview)
-    if ! command -v rich >/dev/null 2>&1; then
-        show_progress "Installing Rich CLI"
-        if command -v uv >/dev/null 2>&1; then
-            uv tool install rich-cli --force
-        elif [ -x "$HOME/.local/bin/uv" ]; then
-            "$HOME/.local/bin/uv" tool install rich-cli --force
-        elif command -v pipx >/dev/null 2>&1; then
-            pipx install rich-cli
-        elif command -v pip3 >/dev/null 2>&1; then
-            pip3 install --user rich-cli
-        elif command -v pip >/dev/null 2>&1; then
-            pip install --user rich-cli
-        fi
-        finish_progress
-    fi
-
-    # GH (GitHub CLI) - self-contained release tarball, no package manager needed
-    if ! command -v gh >/dev/null 2>&1; then
-        show_progress "Installing GitHub CLI"
-        url=$(wget "https://api.github.com/repos/cli/cli/releases/latest" -qO- | grep browser_download_url | grep "linux_amd64" | grep ".tar.gz" | head -n 1 | cut -d \" -f 4)
-        wget "$url" -qO- | tar -xz -C /tmp/
-        local temp_gh_dir=$(find /tmp/ -maxdepth 1 -type d -name "gh_*" | head -n 1)
-        mv "$temp_gh_dir/bin/gh" "$HOME/.local/bin/"
-        chmod +x "$HOME/.local/bin/gh"
-        rm -rf "$temp_gh_dir"
-        finish_progress
-    fi
-
-    # Lazygit - flat tarball, binary at archive root
-    if ! command -v lazygit >/dev/null 2>&1; then
-        show_progress "Installing Lazygit"
-        url=$(wget "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" -qO- | grep browser_download_url | grep -i "linux_x86_64" | grep ".tar.gz" | head -n 1 | cut -d \" -f 4)
-        wget "$url" -qO- | tar -xz -C /tmp/ lazygit
-        mv /tmp/lazygit "$HOME/.local/bin/"
-        chmod +x "$HOME/.local/bin/lazygit"
-        finish_progress
-    fi
-}
-
-stow_custom_scripts() {
-    # Custom Scripts (Always install these after stow is installed)
-    show_progress "Symlinking scripts directory to ~/.local/scripts"
-
-    local TARGET_DIR="$HOME/.local/scripts"
-    local SCRIPTS_DIR
-    SCRIPTS_DIR="$(realpath "$(dirname "$0")/scripts")"
-
-    # If TARGET_DIR is already a symlink pointing to the right place, nothing to do
-    if [ -L "$TARGET_DIR" ] && [ "$(readlink -f "$TARGET_DIR")" = "$SCRIPTS_DIR" ]; then
-        log "INFO" "$TARGET_DIR already points to $SCRIPTS_DIR"
-        finish_progress
-        return 0
-    fi
-
-    # If it's a real directory, copy any files not already in the repo, then remove it
-    if [ -d "$TARGET_DIR" ] && [ ! -L "$TARGET_DIR" ]; then
-        log "INFO" "Copying any untracked scripts from $TARGET_DIR into repo..."
-        for f in "$TARGET_DIR"/*; do
-            [ -e "$f" ] || continue
-            base="$(basename "$f")"
-            if [ ! -e "$SCRIPTS_DIR/$base" ]; then
-                log "INFO" "Copying missing script: $base"
-                cp -p "$f" "$SCRIPTS_DIR/$base"
-            fi
-        done
-        log "INFO" "Removing $TARGET_DIR so it can be replaced with a symlink"
-        rm -rf "$TARGET_DIR"
-    elif [ -L "$TARGET_DIR" ]; then
-        # Stale or wrong symlink
-        rm "$TARGET_DIR"
-    fi
-
-    ln -s "$SCRIPTS_DIR" "$TARGET_DIR"
-    log "INFO" "Created symlink: $TARGET_DIR -> $SCRIPTS_DIR"
-
-    finish_progress
-}
-
-# Master list of tools all three install paths (Arch/AUR, Debian+apt, Debian no-sudo
-# binaries-only) are expected to provide. Format per entry: "Label:cmd1,cmd2,..." -
-# satisfied if any listed command is found on PATH. Run once, right before stowing,
-# so any arm that fails to reach the same end state as the others is surfaced.
-verify_master_tools() {
-    log "INFO" "Verifying expected tools are on PATH..."
-
-    local MASTER_TOOLS=(
-        "git:git"
-        "wget:wget"
-        "curl:curl"
-        "GitHub CLI:gh"
-        "zip:zip"
-        "unzip:unzip"
-        "GNU Stow:stow"
-        "jq:jq"
-        "aria2:aria2c"
-        "rsync:rsync"
-        "OpenSSH client:ssh"
-        "ping:ping"
-        "htop:htop"
-        "nvtop:nvtop"
-        "zsh:zsh"
-        "vim:vim"
-        "tmux:tmux"
-        "C++ compiler:g++"
-        "cmake:cmake"
-        "pkg-config:pkg-config"
-        "automake:automake"
-        "fzf:fzf"
-        "ripgrep:rg"
-        "bat:bat"
-        "fd:fd"
-        "vivid:vivid"
-        "zoxide:zoxide"
-        "duf:duf"
-        "gum:gum"
-        "yazi:yazi"
-        "starship:starship"
-        "neovim:nvim"
-        "lazygit:lazygit"
-    )
-
-    local missing=0
-    local entry label alts alt found
-    for entry in "${MASTER_TOOLS[@]}"; do
-        label="${entry%%:*}"
-        alts="${entry#*:}"
-        found=false
-        IFS=',' read -ra alt_list <<<"$alts"
-        for alt in "${alt_list[@]}"; do
-            if command -v "$alt" >/dev/null 2>&1; then
-                found=true
-                break
-            fi
-        done
-        if [ "$found" = false ]; then
-            missing=$((missing + 1))
-            log "WARN" "$label not found on PATH (expected: ${alts//,/ or })."
-        fi
-    done
-
-    if [ "$missing" -eq 0 ]; then
-        log "INFO" "All expected tools are present on PATH."
-    else
-        log "WARN" "$missing expected tool(s) missing on PATH. If you ran with --sudo-access no, this is expected for anything that only ships via apt/pacman with no portable binary (e.g. tmux, zsh, wvkbd, build toolchain)."
-    fi
-}
-
-# OS Detection
 OS_ID="unknown"
 IS_ARCH=false
 IS_DEBIAN=false
+IS_FEDORA=false
+IS_ATOMIC=false
 if [ -f /etc/os-release ]; then
     . /etc/os-release
     OS_ID=$ID
@@ -672,12 +134,12 @@ if [ -f /etc/os-release ]; then
     if [ "$OS_ID" = "ubuntu" ] || [ "$OS_ID" = "debian" ] || echo "${ID_LIKE:-}" | grep -qw -e "ubuntu" -e "debian"; then
         IS_DEBIAN=true
     fi
+    if [ "$OS_ID" = "fedora" ] || echo "${ID_LIKE:-}" | grep -qw -e "fedora" -e "rhel"; then
+        IS_FEDORA=true
+    fi
 fi
-export OS_ID IS_ARCH IS_DEBIAN
-
-# Detect AUR helper
-AUR_HELPER=""
-if [ "$IS_ARCH" = "true" ]; then
-    detect_aur_helper
+# Image-based (rpm-ostree / bootc) systems can't dnf install; packages are layered instead
+if [ -e /run/ostree-booted ]; then
+    IS_ATOMIC=true
 fi
-export AUR_HELPER
+export OS_ID IS_ARCH IS_DEBIAN IS_FEDORA IS_ATOMIC

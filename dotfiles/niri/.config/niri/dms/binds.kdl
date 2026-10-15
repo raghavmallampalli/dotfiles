@@ -45,7 +45,7 @@ binds {
     Alt+Print { screenshot-window; }
     F11 { fullscreen-window; }
     Mod+Alt+F { maximize-window-to-edges; }
-    Mod+B { spawn "brave" "--profile-directory=Default" "--new-window"; }
+    Mod+B { spawn "brave-browser" "--profile-directory=Default" "--new-window"; }
     Mod+BracketLeft { consume-or-expel-window-left; }
     Mod+BracketRight { consume-or-expel-window-right; }
     Mod+C { center-column; }
@@ -62,7 +62,7 @@ binds {
     Mod+P repeat=false { spawn-sh "wl-mirror $(niri msg --json focused-output | jq -r .name)"; }
     Mod+Minus { set-column-width "-10%"; }
     Mod+R { switch-preset-column-width; }
-    Mod+Shift+B { spawn "brave" "--profile-directory=Profile 1" "--new-window"; }
+    Mod+Shift+B { spawn "brave-browser" "--profile-directory=Profile 1" "--new-window"; }
     Mod+Shift+Ctrl+H { move-column-to-monitor-left; }
     Mod+Shift+Ctrl+J { move-column-to-monitor-down; }
     Mod+Shift+Ctrl+K { move-column-to-monitor-up; }

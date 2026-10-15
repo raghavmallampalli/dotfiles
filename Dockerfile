@@ -1,41 +1,33 @@
 # Accept base image as argument (default to ubuntu:24.04)
 ARG BASE_IMAGE=ubuntu:24.04
-FROM ${BASE_IMAGE}
+
+# "base": the repo copied in, nothing installed. test_install.sh runs the scripts in a
+# container from this stage, so a GitHub token can be passed at runtime instead of being
+# baked into the image.
+FROM ${BASE_IMAGE} AS base
 
 # Set environment variables to avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
-
-# Copy the dotfiles project to the container
-COPY . /root/dotfiles/
-
-# Set working directory to root's home
-WORKDIR /root/dotfiles
-
-# Set environment variables for the script
 ENV HOME=/root
 ENV BACKUP_DIR=/tmp
 
-# Make the scripts executable
-RUN chmod +x /root/dotfiles/install.sh /root/dotfiles/setup.sh /root/dotfiles/common.sh
+# Copy the dotfiles project to the container
+COPY . /root/dotfiles/
+WORKDIR /root/dotfiles
+RUN chmod +x /root/dotfiles/install_cli.sh /root/dotfiles/setup.sh
 
-# Run the install.sh script
-# We're root in the container so --sudo-access is moot, but pass it for non-interactive builds.
-# The script itself will handle OS detection.
-RUN ./install.sh \
-    --sudo-access yes
+# "full" (default): everything installed, for poking around with `docker run -it`
+FROM base AS full
 
-# Run the setup.sh script
+# We're root in the container so --sudo-access is moot, but pass it for non-interactive builds
+RUN ./install_cli.sh --sudo-access yes
+
 RUN ./setup.sh \
-    --replace-dotfiles y \
-    --link n \
     --local-time n \
     --github-login n \
     --zsh-default y \
-    --tmux-config y
+    --sudo-access yes
 
-# Set zsh as the default shell for the container
-RUN chsh -s /usr/bin/zsh root
-
-# Set the default command to start zsh
-CMD ["/usr/bin/zsh"]
+# Start zsh by default
+CMD ["zsh"]

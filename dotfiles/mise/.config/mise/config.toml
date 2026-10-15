@@ -1,0 +1,45 @@
+# Global tool list for mise. install_cli.sh installs everything here into $HOME
+# (no sudo); `mise up` keeps it current. Find tools with `mise registry | grep <name>`.
+
+[tools]
+# Shell and CLI
+neovim = "latest"
+fzf = "latest"
+ripgrep = "latest"
+fd = "latest"
+bat = "latest"
+zoxide = "latest"
+duf = "latest"
+vivid = "latest"
+yazi = "latest"
+lazygit = "latest"
+lazydocker = "latest"
+starship = "latest"
+gum = "latest"
+gh = "latest"
+jq = "latest"
+duckdb = "latest"
+tmux = "latest"
+micro = "latest"
+fastfetch = "latest"
+rclone = "latest"
+7zip = "latest"
+chezmoi = "latest"
+
+# Monitoring
+btop = "latest"
+
+# Languages and dev tools
+uv = "latest"
+node = "lts"
+rust = "stable"
+java = "temurin-17"
+cmake = "latest"
+zig = "latest"     # C compiler for nvim-treesitter parsers, so gcc isn't needed
+claude = "latest"
+codex = "latest"
+
+# Python CLIs, installed through uv (mise's pipx backend uses uv when it's available)
+"pipx:rich-cli" = "latest"
+"pipx:nvitop" = "latest"
+"pipx:gpustat" = "latest"

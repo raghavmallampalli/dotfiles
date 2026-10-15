@@ -19,7 +19,6 @@ alias vimdiff='nvim -d'
 alias n='nvim'
 
 # fzf aliases
-alias fzfupdate='cd ~/.fzf && git pull && ./install && cd -'
 alias fzp="fzf-tmux --preview 'bat --style=numbers --color=always {} | head -500'"
 
 # git aliases
