@@ -56,8 +56,6 @@ Run them in this order:
 ./setup.sh
 ```
 
-New Fedora machine from scratch: see [FEDORA_INSTALL_GUIDE.md](FEDORA_INSTALL_GUIDE.md).
-
 Update all CLI tools later with `mise up`.
 
 > IMPORTANT: `bash` shell is replaced by a `zsh+Oh-My-Zsh` configuration.

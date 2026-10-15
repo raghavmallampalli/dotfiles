@@ -4,7 +4,6 @@
 #
 # Run as your own user (it uses sudo), after a Fedora "Minimal Install". Safe to re-run. Then
 # run install_cli.sh and setup.sh. Steps that can't be automated are printed at the end.
-# See FEDORA_INSTALL_GUIDE.md for the full install.
 #
 # Package sources, in order of preference: Fedora repos, vendor repos / the DMS devs' COPRs,
 # community COPRs / RPM Fusion, direct downloads. No Flatpak.
@@ -148,11 +147,6 @@ install_apps() {
     install_iio_niri
     install_rquickshare
     install_zotero
-
-    # The rpm's pre-install script runs `rpm -q` while dnf holds the package database lock and
-    # hangs, so install with rpm directly and skip that script
-    MANUAL_STEPS+=("Cisco Secure Client: download the rpm from https://vpn.utexas.edu, then: sudo rpm -ivh --nopretrans ~/Downloads/cisco-secure-client-vpn-*.rpm && sudo systemctl enable --now vpnagentd")
-    MANUAL_STEPS+=("DaVinci Resolve (optional): download the Linux .run from blackmagicdesign.com and run it with sudo. Check that it works on the Intel Arc GPU.")
 }
 
 # On-screen keyboard (started by the niri config as wvkbd-mobintl). Not packaged for Fedora,
