@@ -51,7 +51,15 @@ compdef ssa=ssh
 
 # If set to true, tmux will auto-attach to a session if not already in one
 ########################### ATTACH TO TMUX SESSION ###########################
-if [[ $TMUX_AUTO_ATTACH = true ]]; then
+# The niri drop-down terminal (scripts/dropterm) is the home of the General
+# session: it always attaches, taking the session over from any other client.
+if [[ -n $DROPTERM && -z $TMUX ]]; then
+  if tmux has-session -t General 2>/dev/null; then
+    tmux -u attach -d -t General
+  else
+    tgex
+  fi
+elif [[ $TMUX_AUTO_ATTACH = true ]]; then
   SESSION_NAME="General"
   # Auto-attach to tmux session if not already in one
   if [[ -z ${TMUX} ]]; then

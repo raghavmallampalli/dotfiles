@@ -1,7 +1,5 @@
 // Drop-down terminal, toggled by ~/.local/scripts/dropterm.
-// It hides on the "scratch" workspace and floats centered on screen.
-
-workspace "scratch"
+// It floats centered on screen; toggling it off closes the window.
 
 window-rule {
     match app-id=r#"^com\.mitchellh\.ghostty\.dropterm$"#

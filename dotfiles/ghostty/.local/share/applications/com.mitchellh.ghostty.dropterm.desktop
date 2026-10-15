@@ -4,7 +4,7 @@
 Type=Application
 Name=Ghostty Drop-down
 Icon=com.mitchellh.ghostty
-Exec=ghostty --class=com.mitchellh.ghostty.dropterm
+Exec=ghostty --class=com.mitchellh.ghostty.dropterm --env=DROPTERM=1
 StartupWMClass=com.mitchellh.ghostty.dropterm
 Terminal=false
 NoDisplay=true

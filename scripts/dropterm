@@ -1,25 +1,25 @@
 #!/usr/bin/env bash
 # Drop-down terminal for niri. Bound in ~/.config/niri/dropterm.kdl.
 #
-# Hidden: the window sits on the "scratch" workspace.
-# Toggle: summons it as a floating window on the focused workspace, or hides it
-# again if it is already focused. Launches it the first time.
+# Toggle: opens it as a centered floating window, brings it to the focused
+# workspace and monitor if it is open elsewhere, or closes it if it is focused.
+# It runs with DROPTERM=1, which makes zsh attach to the tmux session "General"
+# (see .zshrc), so closing it only detaches tmux.
 set -euo pipefail
 
 # A separate class makes this its own Ghostty instance, apart from the main one
 APP_ID=com.mitchellh.ghostty.dropterm
-SCRATCH=scratch
 
 win=$(niri msg -j windows | jq -c --arg id "$APP_ID" 'first(.[] | select(.app_id == $id)) // empty')
 
 if [[ -z $win ]]; then
-  exec ghostty --class="$APP_ID"
+  exec ghostty --class="$APP_ID" --env=DROPTERM=1
 fi
 
 win_id=$(jq -r '.id' <<<"$win")
 
 if [[ $(jq -r '.is_focused' <<<"$win") == true ]]; then
-  niri msg action move-window-to-workspace --window-id "$win_id" --focus false "$SCRATCH"
+  niri msg action close-window --id "$win_id"
   exit 0
 fi
 
