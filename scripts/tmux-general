@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Create the tmux session "General" in the background, if it doesn't exist:
+# two panes side by side, `py` running on the right, focus on the left.
+# Run by niri at startup so the drop-down terminal (dropterm) attaches at once.
+set -euo pipefail
+
+tmux has-session -t General 2>/dev/null && exit 0
+
+# Sized like the drop-down terminal so the pane split matches once attached
+tmux -u new-session -d -s General -x 131 -y 33 \; \
+  split-window -h \; \
+  select-pane -L \; \
+  resize-pane -R 30 \; \
+  select-pane -R \; \
+  send-keys ' py' C-m \; \
+  select-pane -L

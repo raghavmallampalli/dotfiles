@@ -40,13 +40,7 @@ alias gsmh='git rebase -i --autosquash $(git merge-base main HEAD)'
 
 # tmux aliases
 alias ta="tmux -u attach"
-alias tgex="tmux -u new-session -s General \; \
-    split-window -h \; \
-        select-pane -L \; \
-        resize-pane -R 30 \; \
-        select-pane -R \; \
-        send-keys ' py' C-m \; \
-        select-pane -L"
+alias tgex="tmux-general && tmux -u attach -t General"
 
 # Python
 alias uvs="source .venv/bin/activate"
