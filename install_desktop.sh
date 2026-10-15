@@ -292,6 +292,23 @@ setup_hibernation() {
     log "INFO" "Hibernation set up (takes effect after a reboot)."
 }
 
+# Catppuccin Mocha theme for GRUB (graphical menu; GRUB's text console can't show a theme)
+setup_grub_theme() {
+    local theme_dir="/boot/grub2/themes/catppuccin-mocha"
+    if [ ! -f "$theme_dir/theme.txt" ]; then
+        rm -rf "$DOWNLOAD_DIR/catppuccin-grub"
+        mkdir -p "$DOWNLOAD_DIR"
+        git clone --quiet --depth 1 https://github.com/catppuccin/grub "$DOWNLOAD_DIR/catppuccin-grub"
+        run_command mkdir -p /boot/grub2/themes
+        run_command cp -r "$DOWNLOAD_DIR/catppuccin-grub/src/catppuccin-mocha-grub-theme" "$theme_dir"
+    fi
+    if ! grep -q '^GRUB_THEME=' /etc/default/grub; then
+        run_command sed -i 's/^GRUB_TERMINAL_OUTPUT=.*/GRUB_TERMINAL_OUTPUT="gfxterm"/' /etc/default/grub
+        echo "GRUB_THEME=\"$theme_dir/theme.txt\"" | run_command tee -a /etc/default/grub >/dev/null
+        run_command grub2-mkconfig -o /boot/grub2/grub.cfg
+    fi
+}
+
 # Weekly `mise self-update && mise up` (unit files are dotfiles, linked by setup.sh)
 setup_update_timer() {
     if [ -f "$HOME/.config/systemd/user/mise-update.timer" ]; then
@@ -340,6 +357,7 @@ main() {
     setup_services
     setup_snapper
     setup_hibernation
+    setup_grub_theme
     setup_update_timer
     setup_media_drive
     report
