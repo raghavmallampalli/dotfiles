@@ -48,7 +48,8 @@ window-rule {
 window-rule {
     match app-id="Zotero"
     match app-id="com.anthropic.Claude"
-
+    match app-id="Chatgpt"
+    
     open-maximized true
 }
 
@@ -135,6 +136,7 @@ window-rule {
     match app-id="mpv"
     match app-id="org.gnome.Loupe"
     match app-id="brave-media-server.taile3ae02.ts.net__-Default"
+    match app-id="brave-www.youtube.com__-Default"
     
     open-on-workspace "media"
     open-focused      true
