@@ -8,10 +8,10 @@ sync_theme() {
 
     # If the output contains 'u 1', it's dark mode. If it's 'u 0' (or anything else), map it to light mode.
     if [[ "$current_state" == *"u 1"* ]]; then
-        gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+        gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark'
         gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
     else
-        gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita'
+        gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3'
         gsettings set org.gnome.desktop.interface color-scheme 'prefer-light'
     fi
 }
