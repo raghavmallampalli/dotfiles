@@ -1,0 +1,40 @@
+{
+    "id": "agendaCalendarCard",
+    "name": "Agenda Calendar Card",
+    "description": "The dash calendar card with a button to switch between month and agenda views",
+    "version": "1.0.0",
+    "author": "Raghav",
+    "type": "dashCard",
+    "capabilities": [
+        "dash-card"
+    ],
+    "component": "./AgendaCalendarCard.qml",
+    "icon": "calendar_month",
+    "requires_dms": ">=2.0.0",
+    "dash": {
+        "card": {
+            "title": "Calendar",
+            "w": 3,
+            "h": 3,
+            "minW": 3,
+            "minH": 3
+        },
+        "options": [
+            {
+                "key": "weekends",
+                "text": "Highlight weekends",
+                "type": "toggle",
+                "def": false
+            },
+            {
+                "key": "agendaDays",
+                "text": "Agenda days",
+                "type": "number",
+                "def": 14,
+                "min": 1,
+                "max": 60,
+                "unit": "days"
+            }
+        ]
+    }
+}
