@@ -3,7 +3,8 @@ import sys
 import subprocess
 from PyQt6.QtWidgets import QApplication, QSystemTrayIcon, QMenu
 from PyQt6.QtGui import QIcon, QPainter, QColor, QPixmap
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QObject, pyqtSlot
+from PyQt6.QtDBus import QDBusConnection, QDBusInterface, QDBusMessage
 import os
 
 # Monochrome keyboard glyph, tinted below to match the bar. Theme icons such as breeze's
@@ -34,9 +35,29 @@ def tinted_icon(color):
     painter.end()
     return QIcon(pixmap)
 
-def update_icon(*_):
-    dark = app.styleHints().colorScheme() != Qt.ColorScheme.Light
+# Qt's styleHints().colorScheme() is Unknown under qt6ct on niri, so ask the desktop portal
+# directly. color-scheme: 0 = no preference, 1 = prefer dark, 2 = prefer light.
+PORTAL = ("org.freedesktop.portal.Desktop", "/org/freedesktop/portal/desktop",
+          "org.freedesktop.portal.Settings")
+
+def portal_color_scheme():
+    reply = QDBusInterface(*PORTAL, QDBusConnection.sessionBus()).call(
+        "ReadOne", "org.freedesktop.appearance", "color-scheme")
+    args = reply.arguments()
+    return args[0] if args and isinstance(args[0], int) else 0
+
+def update_icon(scheme=None):
+    if scheme is None:
+        scheme = portal_color_scheme()
+    dark = scheme != 2
     tray.setIcon(tinted_icon("#e6e1e5" if dark else "#1c1b1f"))
+
+class PortalWatcher(QObject):
+    @pyqtSlot(QDBusMessage)
+    def setting_changed(self, msg):
+        namespace, key, value = msg.arguments()
+        if namespace == "org.freedesktop.appearance" and key == "color-scheme":
+            update_icon(value)
 
 def toggle_keyboard(reason):
     # React only to standard left click (Trigger)
@@ -48,7 +69,9 @@ app.setQuitOnLastWindowClosed(False) # Keep running when tray is the only thing 
 
 tray = QSystemTrayIcon()
 update_icon()
-app.styleHints().colorSchemeChanged.connect(update_icon)
+watcher = PortalWatcher()
+QDBusConnection.sessionBus().connect(PORTAL[0], PORTAL[1], PORTAL[2], "SettingChanged",
+                                     watcher.setting_changed)
 tray.setVisible(True)
 
 # Create context menu for right-click
