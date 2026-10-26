@@ -1,0 +1,1428 @@
+{
+    "id": "worldClockCard",
+    "name": "World Clock Card",
+    "description": "Dashboard card showing the time in other time zones",
+    "version": "1.0.0",
+    "author": "Raghav",
+    "type": "dashCard",
+    "capabilities": [
+        "dash-card"
+    ],
+    "component": "./WorldClockCard.qml",
+    "icon": "public",
+    "dash": {
+        "card": {
+            "title": "World Clock",
+            "w": 2,
+            "h": 1,
+            "minW": 1,
+            "minH": 1,
+            "maxW": 6,
+            "maxH": 2
+        },
+        "options": [
+            {
+                "key": "zone1",
+                "text": "Zone 1",
+                "type": "choice",
+                "def": "Asia/Kolkata",
+                "choices": [
+                    {
+                        "value": "",
+                        "text": "None"
+                    },
+                    {
+                        "value": "Pacific/Honolulu",
+                        "text": "Honolulu — Hawaii"
+                    },
+                    {
+                        "value": "America/Anchorage",
+                        "text": "Anchorage — Alaska"
+                    },
+                    {
+                        "value": "America/Los_Angeles",
+                        "text": "Los Angeles — US Pacific"
+                    },
+                    {
+                        "value": "America/Vancouver",
+                        "text": "Vancouver — Canada"
+                    },
+                    {
+                        "value": "America/Denver",
+                        "text": "Denver — US Mountain"
+                    },
+                    {
+                        "value": "America/Phoenix",
+                        "text": "Phoenix — Arizona"
+                    },
+                    {
+                        "value": "America/Chicago",
+                        "text": "Chicago — US Central"
+                    },
+                    {
+                        "value": "America/Mexico_City",
+                        "text": "Mexico City — Mexico"
+                    },
+                    {
+                        "value": "America/New_York",
+                        "text": "New York — US Eastern"
+                    },
+                    {
+                        "value": "America/Toronto",
+                        "text": "Toronto — Canada"
+                    },
+                    {
+                        "value": "America/Bogota",
+                        "text": "Bogotá — Colombia"
+                    },
+                    {
+                        "value": "America/Sao_Paulo",
+                        "text": "São Paulo — Brazil"
+                    },
+                    {
+                        "value": "America/Argentina/Buenos_Aires",
+                        "text": "Buenos Aires — Argentina"
+                    },
+                    {
+                        "value": "Atlantic/Reykjavik",
+                        "text": "Reykjavik — Iceland"
+                    },
+                    {
+                        "value": "UTC",
+                        "text": "UTC"
+                    },
+                    {
+                        "value": "Europe/London",
+                        "text": "London — UK"
+                    },
+                    {
+                        "value": "Europe/Dublin",
+                        "text": "Dublin — Ireland"
+                    },
+                    {
+                        "value": "Europe/Lisbon",
+                        "text": "Lisbon — Portugal"
+                    },
+                    {
+                        "value": "Europe/Paris",
+                        "text": "Paris — France"
+                    },
+                    {
+                        "value": "Europe/Berlin",
+                        "text": "Berlin — Germany"
+                    },
+                    {
+                        "value": "Europe/Amsterdam",
+                        "text": "Amsterdam — Netherlands"
+                    },
+                    {
+                        "value": "Europe/Madrid",
+                        "text": "Madrid — Spain"
+                    },
+                    {
+                        "value": "Europe/Rome",
+                        "text": "Rome — Italy"
+                    },
+                    {
+                        "value": "Europe/Stockholm",
+                        "text": "Stockholm — Sweden"
+                    },
+                    {
+                        "value": "Europe/Zurich",
+                        "text": "Zurich — Switzerland"
+                    },
+                    {
+                        "value": "Africa/Lagos",
+                        "text": "Lagos — Nigeria"
+                    },
+                    {
+                        "value": "Africa/Cairo",
+                        "text": "Cairo — Egypt"
+                    },
+                    {
+                        "value": "Africa/Johannesburg",
+                        "text": "Johannesburg — South Africa"
+                    },
+                    {
+                        "value": "Europe/Athens",
+                        "text": "Athens — Greece"
+                    },
+                    {
+                        "value": "Europe/Istanbul",
+                        "text": "Istanbul — Turkey"
+                    },
+                    {
+                        "value": "Asia/Jerusalem",
+                        "text": "Jerusalem — Israel"
+                    },
+                    {
+                        "value": "Africa/Nairobi",
+                        "text": "Nairobi — Kenya"
+                    },
+                    {
+                        "value": "Europe/Moscow",
+                        "text": "Moscow — Russia"
+                    },
+                    {
+                        "value": "Asia/Riyadh",
+                        "text": "Riyadh — Saudi Arabia"
+                    },
+                    {
+                        "value": "Asia/Tehran",
+                        "text": "Tehran — Iran"
+                    },
+                    {
+                        "value": "Asia/Dubai",
+                        "text": "Dubai — UAE"
+                    },
+                    {
+                        "value": "Asia/Karachi",
+                        "text": "Karachi — Pakistan"
+                    },
+                    {
+                        "value": "Asia/Kolkata",
+                        "text": "Kolkata — India"
+                    },
+                    {
+                        "value": "Asia/Kathmandu",
+                        "text": "Kathmandu — Nepal"
+                    },
+                    {
+                        "value": "Asia/Dhaka",
+                        "text": "Dhaka — Bangladesh"
+                    },
+                    {
+                        "value": "Asia/Bangkok",
+                        "text": "Bangkok — Thailand"
+                    },
+                    {
+                        "value": "Asia/Jakarta",
+                        "text": "Jakarta — Indonesia"
+                    },
+                    {
+                        "value": "Asia/Singapore",
+                        "text": "Singapore"
+                    },
+                    {
+                        "value": "Asia/Hong_Kong",
+                        "text": "Hong Kong"
+                    },
+                    {
+                        "value": "Asia/Shanghai",
+                        "text": "Shanghai — China"
+                    },
+                    {
+                        "value": "Asia/Taipei",
+                        "text": "Taipei — Taiwan"
+                    },
+                    {
+                        "value": "Asia/Manila",
+                        "text": "Manila — Philippines"
+                    },
+                    {
+                        "value": "Asia/Seoul",
+                        "text": "Seoul — South Korea"
+                    },
+                    {
+                        "value": "Asia/Tokyo",
+                        "text": "Tokyo — Japan"
+                    },
+                    {
+                        "value": "Australia/Perth",
+                        "text": "Perth — Australia"
+                    },
+                    {
+                        "value": "Australia/Adelaide",
+                        "text": "Adelaide — Australia"
+                    },
+                    {
+                        "value": "Australia/Brisbane",
+                        "text": "Brisbane — Australia"
+                    },
+                    {
+                        "value": "Australia/Sydney",
+                        "text": "Sydney — Australia"
+                    },
+                    {
+                        "value": "Pacific/Auckland",
+                        "text": "Auckland — New Zealand"
+                    }
+                ]
+            },
+            {
+                "key": "zone2",
+                "text": "Zone 2",
+                "type": "choice",
+                "def": "Europe/London",
+                "choices": [
+                    {
+                        "value": "",
+                        "text": "None"
+                    },
+                    {
+                        "value": "Pacific/Honolulu",
+                        "text": "Honolulu — Hawaii"
+                    },
+                    {
+                        "value": "America/Anchorage",
+                        "text": "Anchorage — Alaska"
+                    },
+                    {
+                        "value": "America/Los_Angeles",
+                        "text": "Los Angeles — US Pacific"
+                    },
+                    {
+                        "value": "America/Vancouver",
+                        "text": "Vancouver — Canada"
+                    },
+                    {
+                        "value": "America/Denver",
+                        "text": "Denver — US Mountain"
+                    },
+                    {
+                        "value": "America/Phoenix",
+                        "text": "Phoenix — Arizona"
+                    },
+                    {
+                        "value": "America/Chicago",
+                        "text": "Chicago — US Central"
+                    },
+                    {
+                        "value": "America/Mexico_City",
+                        "text": "Mexico City — Mexico"
+                    },
+                    {
+                        "value": "America/New_York",
+                        "text": "New York — US Eastern"
+                    },
+                    {
+                        "value": "America/Toronto",
+                        "text": "Toronto — Canada"
+                    },
+                    {
+                        "value": "America/Bogota",
+                        "text": "Bogotá — Colombia"
+                    },
+                    {
+                        "value": "America/Sao_Paulo",
+                        "text": "São Paulo — Brazil"
+                    },
+                    {
+                        "value": "America/Argentina/Buenos_Aires",
+                        "text": "Buenos Aires — Argentina"
+                    },
+                    {
+                        "value": "Atlantic/Reykjavik",
+                        "text": "Reykjavik — Iceland"
+                    },
+                    {
+                        "value": "UTC",
+                        "text": "UTC"
+                    },
+                    {
+                        "value": "Europe/London",
+                        "text": "London — UK"
+                    },
+                    {
+                        "value": "Europe/Dublin",
+                        "text": "Dublin — Ireland"
+                    },
+                    {
+                        "value": "Europe/Lisbon",
+                        "text": "Lisbon — Portugal"
+                    },
+                    {
+                        "value": "Europe/Paris",
+                        "text": "Paris — France"
+                    },
+                    {
+                        "value": "Europe/Berlin",
+                        "text": "Berlin — Germany"
+                    },
+                    {
+                        "value": "Europe/Amsterdam",
+                        "text": "Amsterdam — Netherlands"
+                    },
+                    {
+                        "value": "Europe/Madrid",
+                        "text": "Madrid — Spain"
+                    },
+                    {
+                        "value": "Europe/Rome",
+                        "text": "Rome — Italy"
+                    },
+                    {
+                        "value": "Europe/Stockholm",
+                        "text": "Stockholm — Sweden"
+                    },
+                    {
+                        "value": "Europe/Zurich",
+                        "text": "Zurich — Switzerland"
+                    },
+                    {
+                        "value": "Africa/Lagos",
+                        "text": "Lagos — Nigeria"
+                    },
+                    {
+                        "value": "Africa/Cairo",
+                        "text": "Cairo — Egypt"
+                    },
+                    {
+                        "value": "Africa/Johannesburg",
+                        "text": "Johannesburg — South Africa"
+                    },
+                    {
+                        "value": "Europe/Athens",
+                        "text": "Athens — Greece"
+                    },
+                    {
+                        "value": "Europe/Istanbul",
+                        "text": "Istanbul — Turkey"
+                    },
+                    {
+                        "value": "Asia/Jerusalem",
+                        "text": "Jerusalem — Israel"
+                    },
+                    {
+                        "value": "Africa/Nairobi",
+                        "text": "Nairobi — Kenya"
+                    },
+                    {
+                        "value": "Europe/Moscow",
+                        "text": "Moscow — Russia"
+                    },
+                    {
+                        "value": "Asia/Riyadh",
+                        "text": "Riyadh — Saudi Arabia"
+                    },
+                    {
+                        "value": "Asia/Tehran",
+                        "text": "Tehran — Iran"
+                    },
+                    {
+                        "value": "Asia/Dubai",
+                        "text": "Dubai — UAE"
+                    },
+                    {
+                        "value": "Asia/Karachi",
+                        "text": "Karachi — Pakistan"
+                    },
+                    {
+                        "value": "Asia/Kolkata",
+                        "text": "Kolkata — India"
+                    },
+                    {
+                        "value": "Asia/Kathmandu",
+                        "text": "Kathmandu — Nepal"
+                    },
+                    {
+                        "value": "Asia/Dhaka",
+                        "text": "Dhaka — Bangladesh"
+                    },
+                    {
+                        "value": "Asia/Bangkok",
+                        "text": "Bangkok — Thailand"
+                    },
+                    {
+                        "value": "Asia/Jakarta",
+                        "text": "Jakarta — Indonesia"
+                    },
+                    {
+                        "value": "Asia/Singapore",
+                        "text": "Singapore"
+                    },
+                    {
+                        "value": "Asia/Hong_Kong",
+                        "text": "Hong Kong"
+                    },
+                    {
+                        "value": "Asia/Shanghai",
+                        "text": "Shanghai — China"
+                    },
+                    {
+                        "value": "Asia/Taipei",
+                        "text": "Taipei — Taiwan"
+                    },
+                    {
+                        "value": "Asia/Manila",
+                        "text": "Manila — Philippines"
+                    },
+                    {
+                        "value": "Asia/Seoul",
+                        "text": "Seoul — South Korea"
+                    },
+                    {
+                        "value": "Asia/Tokyo",
+                        "text": "Tokyo — Japan"
+                    },
+                    {
+                        "value": "Australia/Perth",
+                        "text": "Perth — Australia"
+                    },
+                    {
+                        "value": "Australia/Adelaide",
+                        "text": "Adelaide — Australia"
+                    },
+                    {
+                        "value": "Australia/Brisbane",
+                        "text": "Brisbane — Australia"
+                    },
+                    {
+                        "value": "Australia/Sydney",
+                        "text": "Sydney — Australia"
+                    },
+                    {
+                        "value": "Pacific/Auckland",
+                        "text": "Auckland — New Zealand"
+                    }
+                ]
+            },
+            {
+                "key": "zone3",
+                "text": "Zone 3",
+                "type": "choice",
+                "def": "America/Los_Angeles",
+                "choices": [
+                    {
+                        "value": "",
+                        "text": "None"
+                    },
+                    {
+                        "value": "Pacific/Honolulu",
+                        "text": "Honolulu — Hawaii"
+                    },
+                    {
+                        "value": "America/Anchorage",
+                        "text": "Anchorage — Alaska"
+                    },
+                    {
+                        "value": "America/Los_Angeles",
+                        "text": "Los Angeles — US Pacific"
+                    },
+                    {
+                        "value": "America/Vancouver",
+                        "text": "Vancouver — Canada"
+                    },
+                    {
+                        "value": "America/Denver",
+                        "text": "Denver — US Mountain"
+                    },
+                    {
+                        "value": "America/Phoenix",
+                        "text": "Phoenix — Arizona"
+                    },
+                    {
+                        "value": "America/Chicago",
+                        "text": "Chicago — US Central"
+                    },
+                    {
+                        "value": "America/Mexico_City",
+                        "text": "Mexico City — Mexico"
+                    },
+                    {
+                        "value": "America/New_York",
+                        "text": "New York — US Eastern"
+                    },
+                    {
+                        "value": "America/Toronto",
+                        "text": "Toronto — Canada"
+                    },
+                    {
+                        "value": "America/Bogota",
+                        "text": "Bogotá — Colombia"
+                    },
+                    {
+                        "value": "America/Sao_Paulo",
+                        "text": "São Paulo — Brazil"
+                    },
+                    {
+                        "value": "America/Argentina/Buenos_Aires",
+                        "text": "Buenos Aires — Argentina"
+                    },
+                    {
+                        "value": "Atlantic/Reykjavik",
+                        "text": "Reykjavik — Iceland"
+                    },
+                    {
+                        "value": "UTC",
+                        "text": "UTC"
+                    },
+                    {
+                        "value": "Europe/London",
+                        "text": "London — UK"
+                    },
+                    {
+                        "value": "Europe/Dublin",
+                        "text": "Dublin — Ireland"
+                    },
+                    {
+                        "value": "Europe/Lisbon",
+                        "text": "Lisbon — Portugal"
+                    },
+                    {
+                        "value": "Europe/Paris",
+                        "text": "Paris — France"
+                    },
+                    {
+                        "value": "Europe/Berlin",
+                        "text": "Berlin — Germany"
+                    },
+                    {
+                        "value": "Europe/Amsterdam",
+                        "text": "Amsterdam — Netherlands"
+                    },
+                    {
+                        "value": "Europe/Madrid",
+                        "text": "Madrid — Spain"
+                    },
+                    {
+                        "value": "Europe/Rome",
+                        "text": "Rome — Italy"
+                    },
+                    {
+                        "value": "Europe/Stockholm",
+                        "text": "Stockholm — Sweden"
+                    },
+                    {
+                        "value": "Europe/Zurich",
+                        "text": "Zurich — Switzerland"
+                    },
+                    {
+                        "value": "Africa/Lagos",
+                        "text": "Lagos — Nigeria"
+                    },
+                    {
+                        "value": "Africa/Cairo",
+                        "text": "Cairo — Egypt"
+                    },
+                    {
+                        "value": "Africa/Johannesburg",
+                        "text": "Johannesburg — South Africa"
+                    },
+                    {
+                        "value": "Europe/Athens",
+                        "text": "Athens — Greece"
+                    },
+                    {
+                        "value": "Europe/Istanbul",
+                        "text": "Istanbul — Turkey"
+                    },
+                    {
+                        "value": "Asia/Jerusalem",
+                        "text": "Jerusalem — Israel"
+                    },
+                    {
+                        "value": "Africa/Nairobi",
+                        "text": "Nairobi — Kenya"
+                    },
+                    {
+                        "value": "Europe/Moscow",
+                        "text": "Moscow — Russia"
+                    },
+                    {
+                        "value": "Asia/Riyadh",
+                        "text": "Riyadh — Saudi Arabia"
+                    },
+                    {
+                        "value": "Asia/Tehran",
+                        "text": "Tehran — Iran"
+                    },
+                    {
+                        "value": "Asia/Dubai",
+                        "text": "Dubai — UAE"
+                    },
+                    {
+                        "value": "Asia/Karachi",
+                        "text": "Karachi — Pakistan"
+                    },
+                    {
+                        "value": "Asia/Kolkata",
+                        "text": "Kolkata — India"
+                    },
+                    {
+                        "value": "Asia/Kathmandu",
+                        "text": "Kathmandu — Nepal"
+                    },
+                    {
+                        "value": "Asia/Dhaka",
+                        "text": "Dhaka — Bangladesh"
+                    },
+                    {
+                        "value": "Asia/Bangkok",
+                        "text": "Bangkok — Thailand"
+                    },
+                    {
+                        "value": "Asia/Jakarta",
+                        "text": "Jakarta — Indonesia"
+                    },
+                    {
+                        "value": "Asia/Singapore",
+                        "text": "Singapore"
+                    },
+                    {
+                        "value": "Asia/Hong_Kong",
+                        "text": "Hong Kong"
+                    },
+                    {
+                        "value": "Asia/Shanghai",
+                        "text": "Shanghai — China"
+                    },
+                    {
+                        "value": "Asia/Taipei",
+                        "text": "Taipei — Taiwan"
+                    },
+                    {
+                        "value": "Asia/Manila",
+                        "text": "Manila — Philippines"
+                    },
+                    {
+                        "value": "Asia/Seoul",
+                        "text": "Seoul — South Korea"
+                    },
+                    {
+                        "value": "Asia/Tokyo",
+                        "text": "Tokyo — Japan"
+                    },
+                    {
+                        "value": "Australia/Perth",
+                        "text": "Perth — Australia"
+                    },
+                    {
+                        "value": "Australia/Adelaide",
+                        "text": "Adelaide — Australia"
+                    },
+                    {
+                        "value": "Australia/Brisbane",
+                        "text": "Brisbane — Australia"
+                    },
+                    {
+                        "value": "Australia/Sydney",
+                        "text": "Sydney — Australia"
+                    },
+                    {
+                        "value": "Pacific/Auckland",
+                        "text": "Auckland — New Zealand"
+                    }
+                ]
+            },
+            {
+                "key": "zone4",
+                "text": "Zone 4",
+                "type": "choice",
+                "def": "",
+                "choices": [
+                    {
+                        "value": "",
+                        "text": "None"
+                    },
+                    {
+                        "value": "Pacific/Honolulu",
+                        "text": "Honolulu — Hawaii"
+                    },
+                    {
+                        "value": "America/Anchorage",
+                        "text": "Anchorage — Alaska"
+                    },
+                    {
+                        "value": "America/Los_Angeles",
+                        "text": "Los Angeles — US Pacific"
+                    },
+                    {
+                        "value": "America/Vancouver",
+                        "text": "Vancouver — Canada"
+                    },
+                    {
+                        "value": "America/Denver",
+                        "text": "Denver — US Mountain"
+                    },
+                    {
+                        "value": "America/Phoenix",
+                        "text": "Phoenix — Arizona"
+                    },
+                    {
+                        "value": "America/Chicago",
+                        "text": "Chicago — US Central"
+                    },
+                    {
+                        "value": "America/Mexico_City",
+                        "text": "Mexico City — Mexico"
+                    },
+                    {
+                        "value": "America/New_York",
+                        "text": "New York — US Eastern"
+                    },
+                    {
+                        "value": "America/Toronto",
+                        "text": "Toronto — Canada"
+                    },
+                    {
+                        "value": "America/Bogota",
+                        "text": "Bogotá — Colombia"
+                    },
+                    {
+                        "value": "America/Sao_Paulo",
+                        "text": "São Paulo — Brazil"
+                    },
+                    {
+                        "value": "America/Argentina/Buenos_Aires",
+                        "text": "Buenos Aires — Argentina"
+                    },
+                    {
+                        "value": "Atlantic/Reykjavik",
+                        "text": "Reykjavik — Iceland"
+                    },
+                    {
+                        "value": "UTC",
+                        "text": "UTC"
+                    },
+                    {
+                        "value": "Europe/London",
+                        "text": "London — UK"
+                    },
+                    {
+                        "value": "Europe/Dublin",
+                        "text": "Dublin — Ireland"
+                    },
+                    {
+                        "value": "Europe/Lisbon",
+                        "text": "Lisbon — Portugal"
+                    },
+                    {
+                        "value": "Europe/Paris",
+                        "text": "Paris — France"
+                    },
+                    {
+                        "value": "Europe/Berlin",
+                        "text": "Berlin — Germany"
+                    },
+                    {
+                        "value": "Europe/Amsterdam",
+                        "text": "Amsterdam — Netherlands"
+                    },
+                    {
+                        "value": "Europe/Madrid",
+                        "text": "Madrid — Spain"
+                    },
+                    {
+                        "value": "Europe/Rome",
+                        "text": "Rome — Italy"
+                    },
+                    {
+                        "value": "Europe/Stockholm",
+                        "text": "Stockholm — Sweden"
+                    },
+                    {
+                        "value": "Europe/Zurich",
+                        "text": "Zurich — Switzerland"
+                    },
+                    {
+                        "value": "Africa/Lagos",
+                        "text": "Lagos — Nigeria"
+                    },
+                    {
+                        "value": "Africa/Cairo",
+                        "text": "Cairo — Egypt"
+                    },
+                    {
+                        "value": "Africa/Johannesburg",
+                        "text": "Johannesburg — South Africa"
+                    },
+                    {
+                        "value": "Europe/Athens",
+                        "text": "Athens — Greece"
+                    },
+                    {
+                        "value": "Europe/Istanbul",
+                        "text": "Istanbul — Turkey"
+                    },
+                    {
+                        "value": "Asia/Jerusalem",
+                        "text": "Jerusalem — Israel"
+                    },
+                    {
+                        "value": "Africa/Nairobi",
+                        "text": "Nairobi — Kenya"
+                    },
+                    {
+                        "value": "Europe/Moscow",
+                        "text": "Moscow — Russia"
+                    },
+                    {
+                        "value": "Asia/Riyadh",
+                        "text": "Riyadh — Saudi Arabia"
+                    },
+                    {
+                        "value": "Asia/Tehran",
+                        "text": "Tehran — Iran"
+                    },
+                    {
+                        "value": "Asia/Dubai",
+                        "text": "Dubai — UAE"
+                    },
+                    {
+                        "value": "Asia/Karachi",
+                        "text": "Karachi — Pakistan"
+                    },
+                    {
+                        "value": "Asia/Kolkata",
+                        "text": "Kolkata — India"
+                    },
+                    {
+                        "value": "Asia/Kathmandu",
+                        "text": "Kathmandu — Nepal"
+                    },
+                    {
+                        "value": "Asia/Dhaka",
+                        "text": "Dhaka — Bangladesh"
+                    },
+                    {
+                        "value": "Asia/Bangkok",
+                        "text": "Bangkok — Thailand"
+                    },
+                    {
+                        "value": "Asia/Jakarta",
+                        "text": "Jakarta — Indonesia"
+                    },
+                    {
+                        "value": "Asia/Singapore",
+                        "text": "Singapore"
+                    },
+                    {
+                        "value": "Asia/Hong_Kong",
+                        "text": "Hong Kong"
+                    },
+                    {
+                        "value": "Asia/Shanghai",
+                        "text": "Shanghai — China"
+                    },
+                    {
+                        "value": "Asia/Taipei",
+                        "text": "Taipei — Taiwan"
+                    },
+                    {
+                        "value": "Asia/Manila",
+                        "text": "Manila — Philippines"
+                    },
+                    {
+                        "value": "Asia/Seoul",
+                        "text": "Seoul — South Korea"
+                    },
+                    {
+                        "value": "Asia/Tokyo",
+                        "text": "Tokyo — Japan"
+                    },
+                    {
+                        "value": "Australia/Perth",
+                        "text": "Perth — Australia"
+                    },
+                    {
+                        "value": "Australia/Adelaide",
+                        "text": "Adelaide — Australia"
+                    },
+                    {
+                        "value": "Australia/Brisbane",
+                        "text": "Brisbane — Australia"
+                    },
+                    {
+                        "value": "Australia/Sydney",
+                        "text": "Sydney — Australia"
+                    },
+                    {
+                        "value": "Pacific/Auckland",
+                        "text": "Auckland — New Zealand"
+                    }
+                ]
+            },
+            {
+                "key": "zone5",
+                "text": "Zone 5",
+                "type": "choice",
+                "def": "",
+                "choices": [
+                    {
+                        "value": "",
+                        "text": "None"
+                    },
+                    {
+                        "value": "Pacific/Honolulu",
+                        "text": "Honolulu — Hawaii"
+                    },
+                    {
+                        "value": "America/Anchorage",
+                        "text": "Anchorage — Alaska"
+                    },
+                    {
+                        "value": "America/Los_Angeles",
+                        "text": "Los Angeles — US Pacific"
+                    },
+                    {
+                        "value": "America/Vancouver",
+                        "text": "Vancouver — Canada"
+                    },
+                    {
+                        "value": "America/Denver",
+                        "text": "Denver — US Mountain"
+                    },
+                    {
+                        "value": "America/Phoenix",
+                        "text": "Phoenix — Arizona"
+                    },
+                    {
+                        "value": "America/Chicago",
+                        "text": "Chicago — US Central"
+                    },
+                    {
+                        "value": "America/Mexico_City",
+                        "text": "Mexico City — Mexico"
+                    },
+                    {
+                        "value": "America/New_York",
+                        "text": "New York — US Eastern"
+                    },
+                    {
+                        "value": "America/Toronto",
+                        "text": "Toronto — Canada"
+                    },
+                    {
+                        "value": "America/Bogota",
+                        "text": "Bogotá — Colombia"
+                    },
+                    {
+                        "value": "America/Sao_Paulo",
+                        "text": "São Paulo — Brazil"
+                    },
+                    {
+                        "value": "America/Argentina/Buenos_Aires",
+                        "text": "Buenos Aires — Argentina"
+                    },
+                    {
+                        "value": "Atlantic/Reykjavik",
+                        "text": "Reykjavik — Iceland"
+                    },
+                    {
+                        "value": "UTC",
+                        "text": "UTC"
+                    },
+                    {
+                        "value": "Europe/London",
+                        "text": "London — UK"
+                    },
+                    {
+                        "value": "Europe/Dublin",
+                        "text": "Dublin — Ireland"
+                    },
+                    {
+                        "value": "Europe/Lisbon",
+                        "text": "Lisbon — Portugal"
+                    },
+                    {
+                        "value": "Europe/Paris",
+                        "text": "Paris — France"
+                    },
+                    {
+                        "value": "Europe/Berlin",
+                        "text": "Berlin — Germany"
+                    },
+                    {
+                        "value": "Europe/Amsterdam",
+                        "text": "Amsterdam — Netherlands"
+                    },
+                    {
+                        "value": "Europe/Madrid",
+                        "text": "Madrid — Spain"
+                    },
+                    {
+                        "value": "Europe/Rome",
+                        "text": "Rome — Italy"
+                    },
+                    {
+                        "value": "Europe/Stockholm",
+                        "text": "Stockholm — Sweden"
+                    },
+                    {
+                        "value": "Europe/Zurich",
+                        "text": "Zurich — Switzerland"
+                    },
+                    {
+                        "value": "Africa/Lagos",
+                        "text": "Lagos — Nigeria"
+                    },
+                    {
+                        "value": "Africa/Cairo",
+                        "text": "Cairo — Egypt"
+                    },
+                    {
+                        "value": "Africa/Johannesburg",
+                        "text": "Johannesburg — South Africa"
+                    },
+                    {
+                        "value": "Europe/Athens",
+                        "text": "Athens — Greece"
+                    },
+                    {
+                        "value": "Europe/Istanbul",
+                        "text": "Istanbul — Turkey"
+                    },
+                    {
+                        "value": "Asia/Jerusalem",
+                        "text": "Jerusalem — Israel"
+                    },
+                    {
+                        "value": "Africa/Nairobi",
+                        "text": "Nairobi — Kenya"
+                    },
+                    {
+                        "value": "Europe/Moscow",
+                        "text": "Moscow — Russia"
+                    },
+                    {
+                        "value": "Asia/Riyadh",
+                        "text": "Riyadh — Saudi Arabia"
+                    },
+                    {
+                        "value": "Asia/Tehran",
+                        "text": "Tehran — Iran"
+                    },
+                    {
+                        "value": "Asia/Dubai",
+                        "text": "Dubai — UAE"
+                    },
+                    {
+                        "value": "Asia/Karachi",
+                        "text": "Karachi — Pakistan"
+                    },
+                    {
+                        "value": "Asia/Kolkata",
+                        "text": "Kolkata — India"
+                    },
+                    {
+                        "value": "Asia/Kathmandu",
+                        "text": "Kathmandu — Nepal"
+                    },
+                    {
+                        "value": "Asia/Dhaka",
+                        "text": "Dhaka — Bangladesh"
+                    },
+                    {
+                        "value": "Asia/Bangkok",
+                        "text": "Bangkok — Thailand"
+                    },
+                    {
+                        "value": "Asia/Jakarta",
+                        "text": "Jakarta — Indonesia"
+                    },
+                    {
+                        "value": "Asia/Singapore",
+                        "text": "Singapore"
+                    },
+                    {
+                        "value": "Asia/Hong_Kong",
+                        "text": "Hong Kong"
+                    },
+                    {
+                        "value": "Asia/Shanghai",
+                        "text": "Shanghai — China"
+                    },
+                    {
+                        "value": "Asia/Taipei",
+                        "text": "Taipei — Taiwan"
+                    },
+                    {
+                        "value": "Asia/Manila",
+                        "text": "Manila — Philippines"
+                    },
+                    {
+                        "value": "Asia/Seoul",
+                        "text": "Seoul — South Korea"
+                    },
+                    {
+                        "value": "Asia/Tokyo",
+                        "text": "Tokyo — Japan"
+                    },
+                    {
+                        "value": "Australia/Perth",
+                        "text": "Perth — Australia"
+                    },
+                    {
+                        "value": "Australia/Adelaide",
+                        "text": "Adelaide — Australia"
+                    },
+                    {
+                        "value": "Australia/Brisbane",
+                        "text": "Brisbane — Australia"
+                    },
+                    {
+                        "value": "Australia/Sydney",
+                        "text": "Sydney — Australia"
+                    },
+                    {
+                        "value": "Pacific/Auckland",
+                        "text": "Auckland — New Zealand"
+                    }
+                ]
+            },
+            {
+                "key": "zone6",
+                "text": "Zone 6",
+                "type": "choice",
+                "def": "",
+                "choices": [
+                    {
+                        "value": "",
+                        "text": "None"
+                    },
+                    {
+                        "value": "Pacific/Honolulu",
+                        "text": "Honolulu — Hawaii"
+                    },
+                    {
+                        "value": "America/Anchorage",
+                        "text": "Anchorage — Alaska"
+                    },
+                    {
+                        "value": "America/Los_Angeles",
+                        "text": "Los Angeles — US Pacific"
+                    },
+                    {
+                        "value": "America/Vancouver",
+                        "text": "Vancouver — Canada"
+                    },
+                    {
+                        "value": "America/Denver",
+                        "text": "Denver — US Mountain"
+                    },
+                    {
+                        "value": "America/Phoenix",
+                        "text": "Phoenix — Arizona"
+                    },
+                    {
+                        "value": "America/Chicago",
+                        "text": "Chicago — US Central"
+                    },
+                    {
+                        "value": "America/Mexico_City",
+                        "text": "Mexico City — Mexico"
+                    },
+                    {
+                        "value": "America/New_York",
+                        "text": "New York — US Eastern"
+                    },
+                    {
+                        "value": "America/Toronto",
+                        "text": "Toronto — Canada"
+                    },
+                    {
+                        "value": "America/Bogota",
+                        "text": "Bogotá — Colombia"
+                    },
+                    {
+                        "value": "America/Sao_Paulo",
+                        "text": "São Paulo — Brazil"
+                    },
+                    {
+                        "value": "America/Argentina/Buenos_Aires",
+                        "text": "Buenos Aires — Argentina"
+                    },
+                    {
+                        "value": "Atlantic/Reykjavik",
+                        "text": "Reykjavik — Iceland"
+                    },
+                    {
+                        "value": "UTC",
+                        "text": "UTC"
+                    },
+                    {
+                        "value": "Europe/London",
+                        "text": "London — UK"
+                    },
+                    {
+                        "value": "Europe/Dublin",
+                        "text": "Dublin — Ireland"
+                    },
+                    {
+                        "value": "Europe/Lisbon",
+                        "text": "Lisbon — Portugal"
+                    },
+                    {
+                        "value": "Europe/Paris",
+                        "text": "Paris — France"
+                    },
+                    {
+                        "value": "Europe/Berlin",
+                        "text": "Berlin — Germany"
+                    },
+                    {
+                        "value": "Europe/Amsterdam",
+                        "text": "Amsterdam — Netherlands"
+                    },
+                    {
+                        "value": "Europe/Madrid",
+                        "text": "Madrid — Spain"
+                    },
+                    {
+                        "value": "Europe/Rome",
+                        "text": "Rome — Italy"
+                    },
+                    {
+                        "value": "Europe/Stockholm",
+                        "text": "Stockholm — Sweden"
+                    },
+                    {
+                        "value": "Europe/Zurich",
+                        "text": "Zurich — Switzerland"
+                    },
+                    {
+                        "value": "Africa/Lagos",
+                        "text": "Lagos — Nigeria"
+                    },
+                    {
+                        "value": "Africa/Cairo",
+                        "text": "Cairo — Egypt"
+                    },
+                    {
+                        "value": "Africa/Johannesburg",
+                        "text": "Johannesburg — South Africa"
+                    },
+                    {
+                        "value": "Europe/Athens",
+                        "text": "Athens — Greece"
+                    },
+                    {
+                        "value": "Europe/Istanbul",
+                        "text": "Istanbul — Turkey"
+                    },
+                    {
+                        "value": "Asia/Jerusalem",
+                        "text": "Jerusalem — Israel"
+                    },
+                    {
+                        "value": "Africa/Nairobi",
+                        "text": "Nairobi — Kenya"
+                    },
+                    {
+                        "value": "Europe/Moscow",
+                        "text": "Moscow — Russia"
+                    },
+                    {
+                        "value": "Asia/Riyadh",
+                        "text": "Riyadh — Saudi Arabia"
+                    },
+                    {
+                        "value": "Asia/Tehran",
+                        "text": "Tehran — Iran"
+                    },
+                    {
+                        "value": "Asia/Dubai",
+                        "text": "Dubai — UAE"
+                    },
+                    {
+                        "value": "Asia/Karachi",
+                        "text": "Karachi — Pakistan"
+                    },
+                    {
+                        "value": "Asia/Kolkata",
+                        "text": "Kolkata — India"
+                    },
+                    {
+                        "value": "Asia/Kathmandu",
+                        "text": "Kathmandu — Nepal"
+                    },
+                    {
+                        "value": "Asia/Dhaka",
+                        "text": "Dhaka — Bangladesh"
+                    },
+                    {
+                        "value": "Asia/Bangkok",
+                        "text": "Bangkok — Thailand"
+                    },
+                    {
+                        "value": "Asia/Jakarta",
+                        "text": "Jakarta — Indonesia"
+                    },
+                    {
+                        "value": "Asia/Singapore",
+                        "text": "Singapore"
+                    },
+                    {
+                        "value": "Asia/Hong_Kong",
+                        "text": "Hong Kong"
+                    },
+                    {
+                        "value": "Asia/Shanghai",
+                        "text": "Shanghai — China"
+                    },
+                    {
+                        "value": "Asia/Taipei",
+                        "text": "Taipei — Taiwan"
+                    },
+                    {
+                        "value": "Asia/Manila",
+                        "text": "Manila — Philippines"
+                    },
+                    {
+                        "value": "Asia/Seoul",
+                        "text": "Seoul — South Korea"
+                    },
+                    {
+                        "value": "Asia/Tokyo",
+                        "text": "Tokyo — Japan"
+                    },
+                    {
+                        "value": "Australia/Perth",
+                        "text": "Perth — Australia"
+                    },
+                    {
+                        "value": "Australia/Adelaide",
+                        "text": "Adelaide — Australia"
+                    },
+                    {
+                        "value": "Australia/Brisbane",
+                        "text": "Brisbane — Australia"
+                    },
+                    {
+                        "value": "Australia/Sydney",
+                        "text": "Sydney — Australia"
+                    },
+                    {
+                        "value": "Pacific/Auckland",
+                        "text": "Auckland — New Zealand"
+                    }
+                ]
+            },
+            {
+                "key": "showOffset",
+                "text": "Show offset from local time",
+                "type": "toggle",
+                "def": true
+            },
+            {
+                "key": "tone",
+                "text": "Tone",
+                "type": "choice",
+                "def": "",
+                "choices": [
+                    {
+                        "value": "",
+                        "text": "Surface"
+                    },
+                    {
+                        "value": "primary",
+                        "text": "Primary"
+                    },
+                    {
+                        "value": "secondary",
+                        "text": "Secondary"
+                    },
+                    {
+                        "value": "tertiary",
+                        "text": "Tertiary"
+                    }
+                ]
+            }
+        ]
+    },
+    "requires_dms": ">=1.7.0",
+    "permissions": [
+        "shell_execute"
+    ]
+}
