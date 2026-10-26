@@ -11,9 +11,9 @@ spawn-at-startup "wvkbd-mobintl" "--hidden" "-L" "300" "-R" "25" "--bg" "1c1b1f"
 spawn-at-startup "~/.local/scripts/osk-tray.py"
 spawn-at-startup "copyq" "--start-server" // Clipboard manager
 spawn-at-startup "gnome-keyring-daemon" "--start" "--components=secrets,pkcs11,ssh"
+spawn-at-startup "~/.local/share/mise/shims/dcal" "run" "-d" "--hidden" // Dux Calendar daemon (feeds DMS calendar)
 
 // STARTUP APPS
-spawn-at-startup "ghostty"
 spawn-at-startup "~/.local/scripts/tmux-general" // tmux session for the drop-down terminal
 spawn-at-startup "sh" "-c" "sleep 5 && brave-browser --profile-directory=Default"
 
